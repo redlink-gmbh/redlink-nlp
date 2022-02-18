@@ -16,88 +16,86 @@
 
 package io.redlink.nlp.langdetect;
 
+import com.cybozu.labs.langdetect.Detector;
+import com.cybozu.labs.langdetect.DetectorFactory;
+import com.cybozu.labs.langdetect.LangDetectException;
+import com.cybozu.labs.langdetect.Language;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
-import com.cybozu.labs.langdetect.Detector;
-import com.cybozu.labs.langdetect.DetectorFactory;
-import com.cybozu.labs.langdetect.LangDetectException;
-import com.cybozu.labs.langdetect.Language;
-
 @Component
 public class LanguageIdentifier {
 
     private static final Logger LOG = LoggerFactory.getLogger(LanguageIdentifier.class);
-    
+
     private static final String PROFILE_PATH = "profiles";
 
-    private final static String[] LANGUAGES = new String [] {"af", "ar", "bg",
-            "bn", "cs", "da", "de", "el", "en", "es", "et", "fa", "fi", "fr", 
-            "gu", "he", "hi", "hr", "hu", "id", "it", "ja", "kn", "ko", "lt", 
-            "lv", "mk", "ml", "mr", "ne", "nl", "no", "pa", "pl", "pt", "ro", 
-            "ru", "sk", "sl", "so", "sq", "sv", "sw", "ta", "te", "th", "tl", 
+    private final static String[] LANGUAGES = new String[]{"af", "ar", "bg",
+            "bn", "cs", "da", "de", "el", "en", "es", "et", "fa", "fi", "fr",
+            "gu", "he", "hi", "hr", "hu", "id", "it", "ja", "kn", "ko", "lt",
+            "lv", "mk", "ml", "mr", "ne", "nl", "no", "pa", "pl", "pt", "ro",
+            "ru", "sk", "sl", "so", "sq", "sv", "sw", "ta", "te", "th", "tl",
             "tr", "uk", "ur", "vi", "zh-cn", "zh-tw"};
-    
+
     private final List<String> languageProfiles;
-    
+
     public LanguageIdentifier() {
         languageProfiles = Collections.unmodifiableList(loadProfiles(PROFILE_PATH));
-        if(languageProfiles == null || languageProfiles.isEmpty()){
+        if (languageProfiles == null || languageProfiles.isEmpty()) {
             throw new IllegalStateException("Unable to find any language profiles under '"
-                    + PROFILE_PATH +"'");
+                    + PROFILE_PATH + "'");
         }
     }
-    
+
     public void loadProfiles() throws LangDetectException {
         DetectorFactory.clear();
         try {
             DetectorFactory.loadProfile(languageProfiles);
         } catch (Exception e) {
-            throw new LangDetectException(null, "Error in Initialization: "+e.getMessage());
-        } 
+            throw new LangDetectException(null, "Error in Initialization: " + e.getMessage());
+        }
     }
+
     /**
      * Load the profiles from the classpath
+     *
      * @param path where the profiles are
      * @return a list of profiles
-     * @throws Exception
      */
     private List<String> loadProfiles(String path) {
-        String pathFormat = path+"/%s";
+        String pathFormat = path + "/%s";
         List<String> profiles = new ArrayList<>(LANGUAGES.length);
-        for (String lang: LANGUAGES) {
+        for (String lang : LANGUAGES) {
             String profileFile = String.format(pathFormat, lang);
             InputStream is = getClass().getClassLoader().getResourceAsStream(profileFile);
-            if(is != null){
+            if (is != null) {
                 try {
                     String profile = IOUtils.toString(is, StandardCharsets.UTF_8);
-                    if(StringUtils.isNotBlank(profile)){
+                    if (StringUtils.isNotBlank(profile)) {
                         profiles.add(profile);
                     }
                 } catch (IOException e) {
-                    LOG.warn("Unable to load Langauge Detection Profile for language '"+lang+"'", e);
+                    LOG.warn("Unable to load Langauge Detection Profile for language '" + lang + "'", e);
                 } finally {
                     IOUtils.closeQuietly(is);
                 }
             } else {
                 LOG.warn("Missing Language Detection Profile for language profile "
-                        + "for language '{}' (resource: {})",lang, profileFile);
+                        + "for language '{}' (resource: {})", lang, profileFile);
             }
         }
         return profiles;
     }
-    
+
     public List<Language> getLanguages(String text) throws LangDetectException {
         Detector detector = DetectorFactory.create();
         detector.append(text);

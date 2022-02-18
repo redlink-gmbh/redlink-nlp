@@ -16,6 +16,16 @@
 
 package io.redlink.nlp.opennlp.pos;
 
+import io.redlink.nlp.api.ProcessingData;
+import io.redlink.nlp.api.Processor;
+import io.redlink.nlp.api.model.Value;
+import io.redlink.nlp.model.AnalyzedText;
+import io.redlink.nlp.model.NlpAnnotations;
+import io.redlink.nlp.model.Sentence;
+import io.redlink.nlp.model.SpanCollection;
+import io.redlink.nlp.model.Token;
+import io.redlink.nlp.model.pos.PosTag;
+import io.redlink.nlp.model.util.NlpUtils;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collection;
@@ -29,23 +39,11 @@ import java.util.Set;
 import java.util.TreeSet;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
-
+import opennlp.tools.util.Span;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
-import io.redlink.nlp.api.ProcessingData;
-import io.redlink.nlp.api.Processor;
-import io.redlink.nlp.api.model.Value;
-import io.redlink.nlp.model.AnalyzedText;
-import io.redlink.nlp.model.NlpAnnotations;
-import io.redlink.nlp.model.Sentence;
-import io.redlink.nlp.model.SpanCollection;
-import io.redlink.nlp.model.Token;
-import io.redlink.nlp.model.pos.PosTag;
-import io.redlink.nlp.model.util.NlpUtils;
-import opennlp.tools.util.Span;
 
 @Component
 public class OpenNlpPosProcessor extends Processor {
@@ -59,10 +57,10 @@ public class OpenNlpPosProcessor extends Processor {
     private final Map<String, OpenNlpLanguageModel> _languageModels;
     private final ReadWriteLock languageModelLock;
     private final Collection<OpenNlpLanguageModel> models;
-    
-    
+
+
     @Autowired
-    public OpenNlpPosProcessor(Collection<OpenNlpLanguageModel> models){
+    public OpenNlpPosProcessor(Collection<OpenNlpLanguageModel> models) {
         super("opennlp.pos", "OpenNLP POS", Phase.pos);
         OpenNlpLanguageModel[] modelArray = models.toArray(new OpenNlpLanguageModel[models.size()]);
         //we need to sort based on their priority
@@ -71,22 +69,22 @@ public class OpenNlpPosProcessor extends Processor {
         _languageModels = new HashMap<>();
         languageModelLock = new ReentrantReadWriteLock();
     }
-    
+
     @Override
     public Map<String, Object> getDefaultConfiguration() {
         return Collections.emptyMap();
     }
-    
+
     @Override
     protected void init() throws Exception {
         int modelCount = models.size();
         Set<String> initLangs = new TreeSet<>();
-        for(Iterator<OpenNlpLanguageModel> it = models.iterator(); it.hasNext();){
+        for (Iterator<OpenNlpLanguageModel> it = models.iterator(); it.hasNext(); ) {
             OpenNlpLanguageModel model = it.next();
             try {
                 model.activate();
                 initLangs.add(String.valueOf(model.getLocale()));
-            } catch(IOException e){
+            } catch (IOException e) {
                 LOG.warn("Unable to activate OpenNLP model for language {} ({}: {})",
                         model.getLocale(), e.getClass().getSimpleName(), e.getMessage());
                 LOG.debug("STACKTRACE", e);
@@ -95,42 +93,44 @@ public class OpenNlpPosProcessor extends Processor {
         }
         LOG.info("initialized {}/{} models (lang: {})", models.size(), modelCount, initLangs);
     }
-    
+
     @Override
     protected void doProcessing(ProcessingData processingData) {
         String language = processingData.getLanguage();
         AnalyzedText at = NlpUtils.getOrInitAnalyzedText(processingData);
         OpenNlpLanguageModel model = lookupModel(language);
-        
-        if(model == null || !model.supports(language)){
+
+        if (model == null || !model.supports(language)) {
             LOG.debug("No Model for Language '{}' available. Unable to POS tag {}", language, processingData);
             return;
         }
-        
+
         Iterator<? extends SpanCollection> contentSections = at.getSections();
-        if(!contentSections.hasNext()){ //no content sections available
+        if (!contentSections.hasNext()) { //no content sections available
             contentSections = Collections.singleton(at).iterator(); //fall back to the text as a whole
         }
         SpanCollection prevSection = null;
-        while(contentSections.hasNext()){
+        while (contentSections.hasNext()) {
             SpanCollection section = contentSections.next();
-            if(prevSection != null && section.getStart() < prevSection.getStart()){ //overlapping sections
+            if (prevSection != null && section.getStart() < prevSection.getStart()) { //overlapping sections
                 LOG.warn("will ignore overlapping Section in Document {} (prev: {} | overlapping: {})", prevSection, section);
                 continue;
             }
             process(model, section);
         }
     }
+
     /**
      * searches for a suiting model for the parsed language
+     *
      * @param language the language
-     * return
+     *                 return
      */
     private OpenNlpLanguageModel lookupModel(String language) {
         languageModelLock.readLock().lock();
         OpenNlpLanguageModel model = null;
         try {
-            if(_languageModels.containsKey(language)){ //language in the cache
+            if (_languageModels.containsKey(language)) { //language in the cache
                 return _languageModels.get(language); //return the cached value
             }
         } finally {
@@ -138,23 +138,23 @@ public class OpenNlpPosProcessor extends Processor {
         }
         languageModelLock.writeLock().lock();
         try {
-            if(_languageModels.containsKey(language)){ //language in the cache
+            if (_languageModels.containsKey(language)) { //language in the cache
                 return _languageModels.get(language); //return the cached value
             }
             String normLanguage = language == null ? null : Locale.forLanguageTag(language).getLanguage();
-            for(OpenNlpLanguageModel m : models){
-                if(m.supports(normLanguage)){
+            for (OpenNlpLanguageModel m : models) {
+                if (m.supports(normLanguage)) {
                     LOG.debug(" - will use Model {} for language {}", m.getName(), language);
                     model = m;
                     break;
                 }
             }
-            if(model == null && normLanguage != null){ //still not found a language.
+            if (model == null && normLanguage != null) { //still not found a language.
                 //maybe we can find a model for the root language
                 String[] normLangParts = normLanguage.split("-_");
-                if(normLangParts.length > 1){
-                    for(OpenNlpLanguageModel m : models){
-                        if(m.supports(normLangParts[0])){
+                if (normLangParts.length > 1) {
+                    for (OpenNlpLanguageModel m : models) {
+                        if (m.supports(normLangParts[0])) {
                             LOG.debug(" - will use Model {} for language {}", m.getName(), language);
                             model = m;
                             break;
@@ -162,7 +162,7 @@ public class OpenNlpPosProcessor extends Processor {
                     }
                 }
             }
-            if(LOG.isDebugEnabled() && model == null){
+            if (LOG.isDebugEnabled() && model == null) {
                 LOG.debug(" - no suiting Model registered for language {}", language);
             }
             _languageModels.put(language, model); // NOTE: this will also add NULL models for unsupported languages
@@ -171,15 +171,15 @@ public class OpenNlpPosProcessor extends Processor {
             languageModelLock.writeLock().unlock();
         }
     }
-    
+
     private void process(OpenNlpLanguageModel model, SpanCollection section) {
         AnalyzedText at = section.getContext();
         int offset = section.getStart();
-        String sectionText = model.isCaseSensitive() ? NlpUtils.toTrueCase(section) : 
-            section.getSpan().toLowerCase(model.getLocale());
+        String sectionText = model.isCaseSensitive() ? NlpUtils.toTrueCase(section) :
+                section.getSpan().toLowerCase(model.getLocale());
         Span[] sentSpans = model.split(sectionText);
         String[] sentStrings = Span.spansToStrings(sentSpans, sectionText);
-        for(int sidx=0;sidx<sentSpans.length;sidx++){
+        for (int sidx = 0; sidx < sentSpans.length; sidx++) {
             Span sentSpan = sentSpans[sidx];
             String sentString = sentStrings[sidx];
             Sentence sentence = at.addSentence(offset + sentSpan.getStart(), offset + sentSpan.getEnd());
@@ -188,12 +188,12 @@ public class OpenNlpPosProcessor extends Processor {
             Span[] tokenSpans = model.tokenize(sentString);
             String[] sentTokens = Span.spansToStrings(tokenSpans, sentString);
             List<Value<PosTag>>[] posTags = model.tag(sentTokens);
-            for(int tidx=0; tidx < tokenSpans.length; tidx++){
+            for (int tidx = 0; tidx < tokenSpans.length; tidx++) {
                 Span tokenSpan = tokenSpans[tidx];
                 Token token = sentence.addToken(tokenSpan.getStart(), tokenSpan.getEnd());
                 //save guard that asserts that we use the same offsets as OpenNLP
                 assert tokenSpan.getCoveredText(sentString).toString().equals(token.getSpan());
-                if(posTags != null){ //POS tagging is supported by the model
+                if (posTags != null) { //POS tagging is supported by the model
                     token.addValues(NlpAnnotations.POS_ANNOTATION, posTags[tidx]);
                 }
             }

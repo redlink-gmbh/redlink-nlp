@@ -23,9 +23,10 @@ import io.redlink.nlp.model.util.NlpUtils;
 public class DefaultNegationRule implements NegationRule {
 
     public static final DefaultNegationRule INSTANCE = new DefaultNegationRule();
-    
-    protected DefaultNegationRule(){}
-    
+
+    protected DefaultNegationRule() {
+    }
+
     @Override
     public boolean isNegation(Token token) {
         return NlpUtils.isOfPos(token, PosSet.NEGATION);
@@ -35,5 +36,5 @@ public class DefaultNegationRule implements NegationRule {
     public String getLanguage() {
         return null;
     }
-    
+
 }

@@ -1,25 +1,28 @@
 {
-  "spans" : [ {
-    "type" : "Text",
-    "start" : 0,
-    "end" : 1409
-  }, {
-    "type" : "TextSection",
-    "start" : 0,
-    "end" : 1408,
-    "stanbol.enhancer.nlp.section.stats" : {
-      "value" : {
-        "numChars" : 1408,
-        "numAlpha" : 1139,
-        "numDigit" : 6,
-        "numWhitespace" : 237
-      },
-      "class" : "io.redlink.nlp.model.section.SectionStats"
+  "spans": [
+    {
+      "type": "Text",
+      "start": 0,
+      "end": 1409
     },
-    "stanbol.enhancer.nlp.section" : {
-      "tag" : "p",
-      "section" : 2,
-      "class" : "io.redlink.nlp.model.section.SectionTag"
+    {
+      "type": "TextSection",
+      "start": 0,
+      "end": 1408,
+      "stanbol.enhancer.nlp.section.stats": {
+        "value": {
+          "numChars": 1408,
+          "numAlpha": 1139,
+          "numDigit": 6,
+          "numWhitespace": 237
+        },
+        "class": "io.redlink.nlp.model.section.SectionStats"
+      },
+      "stanbol.enhancer.nlp.section": {
+        "tag": "p",
+        "section": 2,
+        "class": "io.redlink.nlp.model.section.SectionTag"
+      }
     }
-  } ]
+  ]
 }

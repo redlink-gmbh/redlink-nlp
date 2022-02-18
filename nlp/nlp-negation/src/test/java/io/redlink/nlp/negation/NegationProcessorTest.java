@@ -16,6 +16,20 @@
 
 package io.redlink.nlp.negation;
 
+import io.redlink.nlp.api.ProcessingData;
+import io.redlink.nlp.api.ProcessingException;
+import io.redlink.nlp.api.Processor;
+import io.redlink.nlp.api.annotation.Annotations;
+import io.redlink.nlp.api.content.StringContent;
+import io.redlink.nlp.api.model.Value;
+import io.redlink.nlp.model.AnalyzedText;
+import io.redlink.nlp.model.AnalyzedText.AnalyzedTextBuilder;
+import io.redlink.nlp.model.Chunk;
+import io.redlink.nlp.model.NlpAnnotations;
+import io.redlink.nlp.model.util.NlpUtils;
+import io.redlink.nlp.negation.de.GermanNegationRule;
+import io.redlink.nlp.opennlp.de.LanguageGerman;
+import io.redlink.nlp.opennlp.pos.OpenNlpPosProcessor;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
@@ -33,9 +47,6 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
-
-import io.redlink.nlp.api.ProcessingException;
-import io.redlink.nlp.api.content.StringContent;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.commons.math3.util.Precision;
@@ -46,97 +57,83 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import io.redlink.nlp.api.ProcessingData;
-import io.redlink.nlp.api.Processor;
-import io.redlink.nlp.api.annotation.Annotations;
-import io.redlink.nlp.api.model.Value;
-import io.redlink.nlp.model.AnalyzedText;
-import io.redlink.nlp.model.AnalyzedText.AnalyzedTextBuilder;
-import io.redlink.nlp.model.NlpAnnotations;
-import io.redlink.nlp.model.util.NlpUtils;
-import io.redlink.nlp.model.Chunk;
-import io.redlink.nlp.negation.de.GermanNegationRule;
-import io.redlink.nlp.opennlp.de.LanguageGerman;
-import io.redlink.nlp.opennlp.pos.OpenNlpPosProcessor;
-
 public class NegationProcessorTest {
-    
+
     private static final Logger log = LoggerFactory.getLogger(NegationProcessorTest.class);
 
-    private static List<Pair<String[],String[]>> CONTENTS = new ArrayList<>();
+    private static List<Pair<String[], String[]>> CONTENTS = new ArrayList<>();
 
     private static List<Processor> REQUIRED_PRE_PROCESSORS;
 
     private NegationProcessor negation;
-    
-    
+
+
     @BeforeClass
     public static void initClass() throws IOException, IllegalAccessException, IllegalArgumentException, InvocationTargetException, NoSuchMethodException, SecurityException {
         CONTENTS.add(new ImmutablePair<String[], String[]>(
                 new String[]{
-                "Ich brauche einen Zug von München über Nürnberg nach Hamburg. Am besten über Nürnberg."},
+                        "Ich brauche einen Zug von München über Nürnberg nach Hamburg. Am besten über Nürnberg."},
                 new String[]{}));
         CONTENTS.add(new ImmutablePair<String[], String[]>(
                 new String[]{
-                "Hi Riesebuddy, könnt Ihr mir für heute Abend ein Restaurant in Berlin"
-                        + "entpfhelen. Bitte keine Döner Bude oder Pizzaria."},
+                        "Hi Riesebuddy, könnt Ihr mir für heute Abend ein Restaurant in Berlin"
+                                + "entpfhelen. Bitte keine Döner Bude oder Pizzaria."},
                 new String[]{"keine Döner Bude oder Pizzaria"}));
         CONTENTS.add(new ImmutablePair<String[], String[]>(
                 new String[]{
-                "Hi Riesebuddy, könnt Ihr mir für heute Abend ein Restaurant in Berlin"
-                        + "entpfhelen. Eine Pizzaria bitte nicht."},
+                        "Hi Riesebuddy, könnt Ihr mir für heute Abend ein Restaurant in Berlin"
+                                + "entpfhelen. Eine Pizzaria bitte nicht."},
                 new String[]{"Pizzaria bitte nicht"}));
         CONTENTS.add(new ImmutablePair<String[], String[]>(
                 new String[]{
-                "Bruache ein Zimmer in München. Preis nicht über 150 Euro.",
-                "Muss es zentrumsnahe sein?",
-                "Nein, kann auch ein wenig Außerhalb sein. Sollte aber mit öffentlichen erreichbar sein."},
+                        "Bruache ein Zimmer in München. Preis nicht über 150 Euro.",
+                        "Muss es zentrumsnahe sein?",
+                        "Nein, kann auch ein wenig Außerhalb sein. Sollte aber mit öffentlichen erreichbar sein."},
                 new String[]{"nicht über 150 Euro"}));
         CONTENTS.add(new ImmutablePair<String[], String[]>(
                 new String[]{
-                "Hat der ICE 1234 echt keine Verspätung? "},
+                        "Hat der ICE 1234 echt keine Verspätung? "},
                 new String[]{"keine Verspätung"}));
 
         REQUIRED_PRE_PROCESSORS = Arrays.asList(
                 new OpenNlpPosProcessor(Collections.singleton(new LanguageGerman())));
-        
+
     }
-    
+
 
     private static final ProcessingData initTestData(int index) {
         return initTestData(index, new HashMap<>());
-    }    
-    
-    private static final ProcessingData initTestData(int index, Map<String,Object> config) {
+    }
+
+    private static final ProcessingData initTestData(int index, Map<String, Object> config) {
         AnalyzedTextBuilder atb = AnalyzedText.build();
-        for(String section : CONTENTS.get(index).getLeft()){
+        for (String section : CONTENTS.get(index).getLeft()) {
             atb.appendSection(null, section, "\n");
         }
         AnalyzedText at = atb.create();
         //this text is German
-        ProcessingData pd = new ProcessingData(new StringContent(at.getText()),config);
+        ProcessingData pd = new ProcessingData(new StringContent(at.getText()), config);
         pd.addAnnotation(Annotations.LANGUAGE, "de");
         pd.addAnnotation(AnalyzedText.ANNOTATION, at);
         return pd;
     }
 
-    
 
     @Before
-    public void init(){
+    public void init() {
         negation = new NegationProcessor(Arrays.asList(new GermanNegationRule()));
     }
-    
+
     private static final void prepairTestCase(ProcessingData pd) throws ProcessingException {
-        for(Processor p : REQUIRED_PRE_PROCESSORS){
+        for (Processor p : REQUIRED_PRE_PROCESSORS) {
             p.process(pd);
         }
     }
 
-    
+
     @Test
     public void testSingle() throws ProcessingException {
-        int idx = Math.round((float)Math.random()*(CONTENTS.size()-1));
+        int idx = Math.round((float) Math.random() * (CONTENTS.size() - 1));
         //idx = 0;
         ProcessingData processingData = initTestData(idx);
         processTestCase(processingData);
@@ -149,10 +146,10 @@ public class NegationProcessorTest {
         log.trace(" - start OpenNLP NER extraction");
         long start = System.currentTimeMillis();
         negation.process(processingData);
-        log.trace(" - processing time: {}",System.currentTimeMillis()-start);
+        log.trace(" - processing time: {}", System.currentTimeMillis() - start);
     }
 
-    
+
     //@Test
     public void testMultiple() throws InterruptedException, ExecutionException {
         ExecutorService executor = Executors.newFixedThreadPool(4);
@@ -160,83 +157,84 @@ public class NegationProcessorTest {
         int numWarmup = Math.max(CONTENTS.size(), 20);
         log.info("> warnup ({} calls + assertion of results)", numWarmup);
         List<Future<ConversationProcessor>> tasks = new LinkedList<>();
-        for(int i = 0; i < numWarmup; i++){
-            int idx = i%CONTENTS.size();
+        for (int i = 0; i < numWarmup; i++) {
+            int idx = i % CONTENTS.size();
             tasks.add(executor.submit(new ConversationProcessor(idx)));
         }
-        while(!tasks.isEmpty()){ //wait for all the tasks to complete
+        while (!tasks.isEmpty()) { //wait for all the tasks to complete
             //during warmup we assert the NLP results
             ConversationProcessor cp = tasks.remove(0).get();
-            assertNegations(cp.getProcessingData(),CONTENTS.get(cp.idx).getRight()); 
+            assertNegations(cp.getProcessingData(), CONTENTS.get(cp.idx).getRight());
         }
         log.info("   ... done");
         log.info("> processing {} documents ...", numDoc);
         long min = Integer.MAX_VALUE;
         long max = Integer.MIN_VALUE;
         long sum = 0;
-        for(int i = 0; i < numDoc; i++){
-            int idx = i%CONTENTS.size();
+        for (int i = 0; i < numDoc; i++) {
+            int idx = i % CONTENTS.size();
             tasks.add(executor.submit(new ConversationProcessor(idx)));
         }
         int i = 0;
-        while(!tasks.isEmpty()){ //wait for all the tasks to complete
+        while (!tasks.isEmpty()) { //wait for all the tasks to complete
             ConversationProcessor completed = tasks.remove(0).get();
             i++;
-            if(i%10 == 0){
-                log.info(" ... {} documents processed",i);
+            if (i % 10 == 0) {
+                log.info(" ... {} documents processed", i);
             }
             int dur = completed.getDuration();
-            if(dur > max){
+            if (dur > max) {
                 max = dur;
             }
-            if(dur < min){
+            if (dur < min) {
                 min = dur;
             }
             sum = sum + dur;
         }
-        log.info("Processing Times after {} documents",numDoc);
-        log.info(" - average: {}ms",Precision.round(sum/(double)numDoc, 2));
-        log.info(" - max: {}ms",max);
-        log.info(" - min: {}ms",min);
+        log.info("Processing Times after {} documents", numDoc);
+        log.info(" - average: {}ms", Precision.round(sum / (double) numDoc, 2));
+        log.info(" - max: {}ms", max);
+        log.info(" - min: {}ms", min);
         executor.shutdown();
     }
-    
+
     private void assertNegations(ProcessingData processingData, String[] expected) {
         log.debug(" - expected Negations: {}", Arrays.toString(expected));
         Set<String> negSet = new HashSet<>(Arrays.asList(expected));
         AnalyzedText at = NlpUtils.getAnalyzedText(processingData).get();
         Iterator<Chunk> chunks = at.getChunks();
-        while(chunks.hasNext()){
+        while (chunks.hasNext()) {
             Chunk chunk = chunks.next();
             Value<Boolean> negation = chunk.getValue(NlpAnnotations.NEGATION_ANNOTATION);
-            if(negation != null){
+            if (negation != null) {
                 log.debug(" - negation {}: {}", chunk, chunk.getSpan());
                 Assert.assertTrue("unexpected Negation:", negSet.remove(chunk.getSpan()));
             }
         }
         Assert.assertTrue("not detected negations: " + negSet, negSet.isEmpty());
     }
-    
-    
+
+
     private class ConversationProcessor implements Callable<ConversationProcessor> {
 
         private final int idx;
         private final ProcessingData processingData;
         private int duration;
 
-        ConversationProcessor(int idx){
+        ConversationProcessor(int idx) {
             this.idx = idx;
             this.processingData = initTestData(idx);
         }
-        
+
 
         @Override
         public ConversationProcessor call() throws Exception {
             long start = System.currentTimeMillis();
             processTestCase(processingData);
-            duration = (int)(System.currentTimeMillis() - start);
+            duration = (int) (System.currentTimeMillis() - start);
             return this;
         }
+
         public int getIdx() {
             return idx;
         }
@@ -244,10 +242,10 @@ public class NegationProcessorTest {
         public ProcessingData getProcessingData() {
             return processingData;
         }
-        
+
         public int getDuration() {
             return duration;
         }
-        
+
     }
 }

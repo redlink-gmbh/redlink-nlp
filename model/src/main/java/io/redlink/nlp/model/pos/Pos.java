@@ -1,21 +1,22 @@
 /*
-* Licensed to the Apache Software Foundation (ASF) under one or more
-* contributor license agreements.  See the NOTICE file distributed with
-* this work for additional information regarding copyright ownership.
-* The ASF licenses this file to You under the Apache License, Version 2.0
-* (the "License"); you may not use this file except in compliance with
-* the License.  You may obtain a copy of the License at
-*
-*     http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*/
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package io.redlink.nlp.model.pos;
 
+import io.redlink.nlp.model.morpho.Tense;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -26,12 +27,10 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
-import io.redlink.nlp.model.morpho.Tense;
-
 
 /**
- * Enumeration over all POS (Part of Speach) categories as defined by the 
- * MorphosyntacticCategory class hierarchy og the 
+ * Enumeration over all POS (Part of Speach) categories as defined by the
+ * MorphosyntacticCategory class hierarchy og the
  * <a href="http://olia.nlp2rdf.org/">Olia</a> Ontology.<p>
  * The top-level morphosyntactic categories are not defined by this enum, but link
  * to the {@link LexicalCategory} enumeration. The multi-sub-class hierarchy of the
@@ -47,8 +46,7 @@ import io.redlink.nlp.model.morpho.Tense;
 @SuppressWarnings("java:S115")
 public enum Pos {
     /**
-     * 
-     An attributive adjective is an adjective that qualifies or modifies a noun and that precedes the noun,
+     * An attributive adjective is an adjective that qualifies or modifies a noun and that precedes the noun,
      * e.g."a delicious apple", "a short letter".<br>
      * (http://en.wikipedia.org/wiki/Adjective 18.09.06)
      */
@@ -56,26 +54,26 @@ public enum Pos {
     /**
      * It is an adjective, which expresses the character and feature of subject or an object, while modifying
      * a noun.
-     * 
+     *
      * <pre>
      *     ང་འ ་ ང ་ འ ག།
      *     Shing-di rim du
      *     'The tree is tall'
      * </pre>
-     * 
+     *
      * <br>
      * (http://panl10n.net/english/Outputs%20Phase%202/CCs/Bhutan/Papers/2007/0701/PartOfSpeech.pdf)
      */
     CharacteristicAdjective(LexicalCategory.Adjective),
     /**
      * It is an adjective, which expresses the time or period of the circumstances, while modifying a noun.
-     * 
+     *
      * <pre>
      *     ན་ ང་ ང་ ་ ལ་ ་ འ ་ །
      *     Nahing Nga chigyel-lu joyi
      *     'I went abroad last year'
      * </pre>
-     * 
+     *
      * <br>
      * (http://panl10n.net/english/Outputs%20Phase%202/CCs/Bhutan/Papers/2007/0701/PartOfSpeech.pdf)
      */
@@ -104,8 +102,7 @@ public enum Pos {
      */
     PossessiveAdjective(LexicalCategory.Adjective),
     /**
-     * 
-     A predicative adjective is one which functions as part of the predicate of a sentence. This means that
+     * A predicative adjective is one which functions as part of the predicate of a sentence. This means that
      * it is linked to the noun by a verb, often a copula (such as to be). <br>
      * (http://en.wikipedia.org/wiki/Adjective 18.09.06)
      */
@@ -116,8 +113,7 @@ public enum Pos {
      */
     RelativeAdjective(LexicalCategory.Adjective),
     /**
-     * 
-     An adjective that modifies an implied, but not expressed, noun. When translating such an adjective into
+     * An adjective that modifies an implied, but not expressed, noun. When translating such an adjective into
      * English, you must supply the missing noun. (www.southwestern.edu/~carlg/Latin_Web/glossary.html;
      * http://www.isocat.org/datcat/DC-1394)
      * <p>
@@ -125,18 +121,17 @@ public enum Pos {
      */
     SubstantiveAdjective(LexicalCategory.Adjective),
     /**
-     * 
-     Adjective expressing a numeric ranking.<br>
+     * Adjective expressing a numeric ranking.<br>
      * (http://www.isocat.org/datcat/DC-1338)
      * <p>
      * Cf. "second", "next", "last"
-     * 
+     *
      * @deprecated The DCR definition and this term are incorrect. "Ordinal adjective" entered ISOcat from
-     *             MULTEXT-East, where it was originally applied to relational adjectives (Slovene, Resian,
-     *             Ukrainian, Czech). "Ordinal adjective" is a mistranslation from Slovene _vrstni pridevniki_
-     *             that should be properly rendered in English as "relational adjective" (Derzhanski and
-     *             Kotsyba 2009). However, the Macedonian MULTEXT v.4 guidelines use this category for ordinal
-     *             numerals. Due to its inherent ambiguity, this category is to be avoided.
+     * MULTEXT-East, where it was originally applied to relational adjectives (Slovene, Resian,
+     * Ukrainian, Czech). "Ordinal adjective" is a mistranslation from Slovene _vrstni pridevniki_
+     * that should be properly rendered in English as "relational adjective" (Derzhanski and
+     * Kotsyba 2009). However, the Macedonian MULTEXT v.4 guidelines use this category for ordinal
+     * numerals. Due to its inherent ambiguity, this category is to be avoided.
      */
     OrdinalAdjective(LexicalCategory.Adjective),
     /**
@@ -194,7 +189,7 @@ public enum Pos {
     /**
      * Adverb/Type="causal" is used in the Hungarian MTE v4, but no examples are provided. <br>
      * (http://purl.org/olia/mte/multext-east.owl#CausalAdverb)
-     * 
+     *
      * @deprecated equivalent to Adverb and hasSemanticRole some CauseRole
      */
     CausalAdverb(LexicalCategory.Adverb),
@@ -340,8 +335,7 @@ public enum Pos {
      */
     SubordinatingConjunction(LexicalCategory.Conjuction),
     /**
-     * 
-     For example, in German the subordinating conjunction "als" is followed by various kinds of comparative
+     * For example, in German the subordinating conjunction "als" is followed by various kinds of comparative
      * clause (including clauses without finite verbs). <br>
      * (http://www.ilc.cnr.it/EAGLES96/annotate/node19.html#oav2u 17.11.06)
      */
@@ -382,13 +376,12 @@ public enum Pos {
      * 0 stands in for overt subordinating conjunctions like that in tensed subordinate clauses, including
      * relative clauses. So the relative clause the man I saw should be bracketed as follows: (NP (NP the man)
      * (SBAR 0 (S (NP I) (VP saw) (NP T)))))
-     * 
+     * <p>
      * (Santorini 1991)
      */
     ZeroComplementizer(SubordinatingConjunction),
     /**
-     * 
-     An interjection is a form, typically brief, such as one syllable or word, which is used most often as
+     * An interjection is a form, typically brief, such as one syllable or word, which is used most often as
      * an exclamation or part of an exclamation. It typically expresses an emotional reaction, often with
      * respect to an accompanying sentence and may include a combination of sounds not otherwise found in the
      * language, e.g. in English: psst; ugh; well, well <br>
@@ -490,8 +483,7 @@ public enum Pos {
      */
     RelationNoun(CommonNoun),
     /**
-     * 
-     A countable noun (also count noun) is a noun which can be modified by a numeral and occur in both
+     * A countable noun (also count noun) is a noun which can be modified by a numeral and occur in both
      * singular and plural form, as well as co-occurring with quantificational determiners like every, each,
      * several, most, etc..<br>
      * (http://en.wikipedia.org/wiki/Countable_noun 19.09.06)
@@ -514,14 +506,14 @@ public enum Pos {
     DiminutiveNoun(LexicalCategory.Noun),
     /**
      * A noun which quantifies one or more things, regardless of subject and an object.
-     * 
+     *
      * <pre>
      *             ང་གིས་ བམོ་ ལ་ དང་ ཕད་ཅི།
      *             NGAGI BUM 'NGA 'DA CHECI
      *             I girl five with met
      *             “I met with five girls.”
      * </pre>
-     * 
+     * <p>
      * (Jurmey Rabgay, email Sep 20, 2010)
      */
     NominalQuantifier(LexicalCategory.Noun, LexicalCategory.Quantifier),
@@ -741,13 +733,13 @@ public enum Pos {
     /**
      * A pronoun, which classifies or differentiates(pronoun) by a single basis, like everybody; each;
      * individual etc.
-     * 
+     *
      * <pre>
      *             འ ག་པ ་ ་ ར་ ག་ར་ ན་ ང་ ང་ཁ་ ས་ད །
      *             Drupai Miser Gara Enrung Dzongkha ShegÔ
      *             'Every Bhutanese must know Dzongkha'
      * </pre>
-     * 
+     *
      * <br>
      * (http://panl10n.net/english/Outputs%20Phase%202/CCs/Bhutan/Papers/2007/0701/PartOfSpeech.pdf)
      */
@@ -808,13 +800,13 @@ public enum Pos {
     NegativePronoun(IndefinitePronoun),
     /**
      * A Locative pronoun is a pronoun, which locates the object of a noun or place of anything.
-     * 
+     *
      * <pre>
      *             ་ ན་ གས་ ང་ ་ ག།
      *             Nâ[LP] PhÜntsho'ling-lu ShÔ
      *             'Come here at Phuntsholing'
      * </pre>
-     * 
+     *
      * <br>
      * (http://panl10n.net/english/Outputs%20Phase%202/CCs/Bhutan/Papers/2007/0701/PartOfSpeech.pdf)
      */
@@ -1058,7 +1050,7 @@ public enum Pos {
     /**
      * End of a paired punctuation.<br>
      * (http://www.isocat.org/datcat/DC-2079)
-     * 
+     * <p>
      * RightParentheticalPunctuation is a punctuation mark which concludes a constituent whose the opening is
      * marked by a LeftParentheticalPunctuation, e.g. ), ] and Spanish ?. <br>
      * (http://www.ilc.cnr.it/EAGLES96/annotate/node17.html#recv 19.09.06)
@@ -1190,14 +1182,14 @@ public enum Pos {
      * Nominal numbers are used to identify or refer the things. It does not show the quantity or rank.
      * <p>
      * Example:
-     * 
+     *
      * <pre>
      *             ངེ་གི་ འགལ་འཕིན་ ཨང་གངས་ འདི་ ༡༧༦༤༩༠༣༧ ཨིན།
      *             NGIGI DRUELTHRIN ANGDRANG 'DI 17649037 INN
      *             my mobile number is 17649037 be
      *             “ My mobile number is 17649037.”
      * </pre>
-     * 
+     * <p>
      * (Jurmey Rabgay, email Sep 20, 2010, http://purl.org/olia/dzongkha.owl#NominalNumber)
      */
     NominalNumber(Numeral),
@@ -1329,14 +1321,12 @@ public enum Pos {
      */
     ListMarker(LayoutElement),
     /**
-     * 
-     Sign used to mark an item in a list.<br>
+     * Sign used to mark an item in a list.<br>
      * (http://www.isocat.org/datcat/DC-1438)
      */
     Bullet(LayoutElement),
     /**
-     * 
-     graphical representation<br>
+     * graphical representation<br>
      * (http://www.isocat.org/datcat/DC-2249)
      */
     Image(LayoutElement),
@@ -1419,30 +1409,30 @@ public enum Pos {
     AdjectivalParticle(Particle),
     /**
      * Contrastive particle, e.g., (one of the uses of) Urdu tô:
-     * 
+     *
      * <pre>
      *     vo urdû parhê gâ
      *     "He will study Urdu." (simple statement)
-     * 
+     *
      *     vo tô urdû parhê gâ
      *     "HE will study Urdu." (Contrast: the other students may not.)
      * </pre>
-     * 
+     * <p>
      * (Schmidt 1999, p. 232, see http://purl.org/olia/emille.owl#ContrastiveEmphaticParticle)
      */
     ContrastiveParticle(Particle),
     /**
      * Emphatic particle, e.g., (one of the uses of) Urdu tô:
-     * 
+     *
      * <pre>
      *     vo urdû parhê gâ
      *     "He will study Urdu." (simple statement)
-     *         
+     *
      *     vo urdû parhê gâ tô lêkin imtihân nahîm dê gâ
      * "He will STUDY Urdu, OF COURSE, but he won't take the examination."
-     * 
+     *
      * </pre>
-     (Schmidt 1999, p. 232, see http://purl.org/olia/emille.owl#ContrastiveEmphaticParticle)
+     * (Schmidt 1999, p. 232, see http://purl.org/olia/emille.owl#ContrastiveEmphaticParticle)
      */
     EmphaticParticle(Particle, Intensifier),
     /**
@@ -1455,30 +1445,30 @@ public enum Pos {
      * (which may not be expressed). (Schmidt 1999, p.233,
      * http://purl.org/olia/emille.owl#ExclusiveEmphaticParticle) <br>
      * Compare with the inclusive emphatic particle bhî:
-     * 
+     *
      * <pre>
      *     maim *bhî* faisalâ karûm gâ
      *     "I'll *also* make a decision"
-     *      
+     *
      *     maim *hî* faisalâ karûm gâ
      *     "*I'm the one who* will make the decision."
      * </pre>
-     * 
+     * <p>
      * (Schmidt 1999, p.237, http://purl.org/olia/emille.owl#InclusiveEmphaticParticle)
      */
     ExclusiveEmphaticParticle(EmphaticParticle),
     /**
      * In Urdu, bhî is an emphatic particle meaning 'even'. In opposition to contrastive tô and exclusive hî,
      * bhî is inclusive:
-     * 
+     *
      * <pre>
      *     maim *bhî* faisalâ karûm gâ
      *     "I'll *also* make a decision"
-     *             
+     *
      *      maim *hî* faisalâ karûm gâ
      *      "*I'm the one who* will make the decision."
      * </pre>
-     * 
+     * <p>
      * (Schmidt 1999, p.237, http://purl.org/olia/emille.owl#InclusiveEmphaticParticle)
      */
     InclusiveEmphaticParticle(EmphaticParticle),
@@ -1494,7 +1484,7 @@ public enum Pos {
     /**
      * A verbal particle modifies the verb and carries information on the verb form (e.g., finiteness, tense
      * and aspect). (Dimitrova et al. 2009, Dan Tufis, email 2010/06/09).
-     * 
+     * <p>
      * In the Bulgarian MTE specs, Particle/Type=verbal(v) is used to form different type of verbal
      * syntactical relationships, e.g. to create future tense (ще говориш), or particles like се, да.
      * (Dimitrova et al. 2009) The Romanian MTE v4 specs provide a more fine-grained subclassification of
@@ -1512,7 +1502,7 @@ public enum Pos {
      * Schmidt 1999). Note that this is not to be confused with the conventional meaning of "modal adverb" in
      * the sense of "manner adverb" (cf. http://en.wiktionary.org/wiki/Category:English_modal_adverbs), hence
      * the uncommon name.
-     * 
+     * <p>
      * Ruth Laila Schmidt (1999) Urdu, an essential grammar, Routledge, London.
      */
     ModalityMarkingAdverb(LexicalCategory.Adverb, VerbalParticle),
@@ -1526,14 +1516,14 @@ public enum Pos {
      * Dzongkha has also a tense marker, which is not complicated like in other languages. It has got only six
      * tense markers and can be used in a very simple and effective way. They are: ('Ni'+'Wong') for future,
      * ('D'o'+'D'ä') for present and ('Ci'+'Yi') for past tense.
-     * 
+     *
      * <pre>
      *     ང་ ནངས་པ་ འ ་ །
      *     Nga naba jo-ni[past tense]
      *     I tomorrow go-will-[past]
      *     'I am going tomorrow'
      * </pre>
-     * 
+     *
      * <br>
      * (http://panl10n.net/english/Outputs%20Phase%202/CCs/Bhutan/Papers/2007/0701/PartOfSpeech.pdf)
      */
@@ -1549,47 +1539,39 @@ public enum Pos {
      */
     VoiceParticle(VerbalParticle),
     /**
-     * 
-     Particle used to express infinitive.<br>
+     * Particle used to express infinitive.<br>
      * (http://www.isocat.org/datcat/DC-1896)
      */
     InfinitiveParticle(VerbalParticle),
     /**
-     * 
-     Particle used to compare.<br>
+     * Particle used to compare.<br>
      * (http://www.isocat.org/datcat/DC-1922)
      */
     ComparativeParticle(Particle),
     /**
-     * 
-     conditional particule (MIRACL &amp; LSCA; http://www.isocat.org/datcat/DC-2230)
+     * conditional particule (MIRACL &amp; LSCA; http://www.isocat.org/datcat/DC-2230)
      */
     ConditionalParticule(CoordinatingConjunction, Particle),
     /**
-     * 
-     particle for coordination (MIRACL &amp; LSCA; http://www.isocat.org/datcat/DC-2227)
+     * particle for coordination (MIRACL &amp; LSCA; http://www.isocat.org/datcat/DC-2227)
      */
     CoordinationParticle(Particle),
     /**
-     * 
-     distinctive particle (MIRACL &amp; LSCA; http://www.isocat.org/datcat/DC-2228)
+     * distinctive particle (MIRACL &amp; LSCA; http://www.isocat.org/datcat/DC-2228)
      */
     DistinctiveParticle(Particle),
     /**
-     * 
-     Particle used to express a question.<br>
+     * Particle used to express a question.<br>
      * (http://www.isocat.org/datcat/DC-1921)
      */
     InterrogativeParticle(Particle),
     /**
-     * 
-     Particle which functions as a modal.<br>
+     * Particle which functions as a modal.<br>
      * (http://www.isocat.org/datcat/DC-1920)
      */
     ModalParticle(Particle),
     /**
-     * 
-     Particle used to express negation. (Gil Francopoulo; http://www.isocat.org/datcat/DC-1894)
+     * Particle used to express negation. (Gil Francopoulo; http://www.isocat.org/datcat/DC-1894)
      */
     NegativeParticle(Particle),
     /**
@@ -1598,8 +1580,7 @@ public enum Pos {
      */
     AffirmativeParticle(Particle),
     /**
-     * 
-     Particle expressing ownship.<br>
+     * Particle expressing ownship.<br>
      * (http://www.isocat.org/datcat/DC-1895)
      */
     PossessiveParticle(Particle),
@@ -1608,8 +1589,7 @@ public enum Pos {
      */
     RelativeParticle(Particle),
     /**
-     * 
-     Particle expressing superlative degree. Superlative is the comparison between more than two entities
+     * Particle expressing superlative degree. Superlative is the comparison between more than two entities
      * and contrasts with comparative where only two entities are involved and positive where no comparison is
      * implied. (Crystal 2003; http://www.isocat.org/datcat/DC-1923)
      */
@@ -1621,14 +1601,12 @@ public enum Pos {
      */
     PossessionMarker(LexicalCategory.Unique),
     /**
-     * 
-     Word which serves no grammatical function, but which fills up a sentence or gives emphasis.
+     * Word which serves no grammatical function, but which fills up a sentence or gives emphasis.
      * (www.southwestern.edu/~carlg/Latin_Web/glossary.html; http://www.isocat.org/datcat/DC-1283)
      */
     Expletive(LexicalCategory.Unique),
     /**
-     * 
-     An expletive (also known as a dummy word) is a part of speech whose members have no meaning, but
+     * An expletive (also known as a dummy word) is a part of speech whose members have no meaning, but
      * complete a sentence to make it grammatical [Crystal 1997, 127] <br>
      * (http://purl.org/linguistics/gold/Expletive)
      * <p>
@@ -1637,8 +1615,7 @@ public enum Pos {
      */
     ExpletivePronoun(ThirdPersonPronoun, Expletive),
     /**
-     * 
-     Three different expletive usages [of the German expletive pronoun es] are traditionally distinguished:
+     * Three different expletive usages [of the German expletive pronoun es] are traditionally distinguished:
      * formal subject or object (expletive argument), correlate of an extraposed clausal argument (expletive
      * correlate), and Vorfeld-es (structural expletive) (cf. (Eisenberg 1999 2001), (Pütz 1986)). ...
      * <p>
@@ -1652,8 +1629,7 @@ public enum Pos {
      */
     ExpletiveArgument(ExpletivePronoun),
     /**
-     * 
-     Three different expletive usages [of the German expletive pronoun es] are traditionally distinguished:
+     * Three different expletive usages [of the German expletive pronoun es] are traditionally distinguished:
      * formal subject or object (expletive argument), correlate of an extraposed clausal argument (expletive
      * correlate), and Vorfeld-es (structural expletive) (cf. (Eisenberg 1999 2001), (Pütz 1986)). (Telljohann
      * et al. 2009, p.60)
@@ -1664,8 +1640,7 @@ public enum Pos {
      */
     ExpletiveCorrelate(ExpletivePronoun),
     /**
-     * 
-     Three different expletive usages [of the German expletive pronoun es] are traditionally distinguished:
+     * Three different expletive usages [of the German expletive pronoun es] are traditionally distinguished:
      * formal subject or object (expletive argument), correlate of an extraposed clausal argument (expletive
      * correlate), and Vorfeld-es (structural expletive) (cf. (Eisenberg 1999 2001), (Pütz 1986)). (Telljohann
      * et al. 2009, p.60)
@@ -1680,8 +1655,7 @@ public enum Pos {
      */
     StructuralExpletive(ExpletivePronoun),
     /**
-     * 
-     An auxiliary verb is a verb which accompanies the lexical verb of a verb phrase, and expresses
+     * An auxiliary verb is a verb which accompanies the lexical verb of a verb phrase, and expresses
      * grammatical distinctions not carried by the lexical verb, such as person, number, tense aspect, and
      * voice.<br>
      * (http://www.sil.org/linguistics/GlossaryOfLinguisticTerms/WhatIsAnAuxiliaryVerb.htm 19.09.06)
@@ -1695,15 +1669,13 @@ public enum Pos {
      */
     AuxiliaryVerb(LexicalCategory.Verb),
     /**
-     * 
-     A copula is an intransitivity verb which links a subject to a noun phrase, an adjective or an other
+     * A copula is an intransitivity verb which links a subject to a noun phrase, an adjective or an other
      * constituent which expresses the predicate. <br>
      * (http://www.sil.org/linguistics/GlossaryOfLinguisticTerms/WhatIsACopula.htm 19.09.06)
      */
     Copula(AuxiliaryVerb),
     /**
-     * 
-     Verb form that is usually used with another verb to express ideas such as possibilities, permission, or
+     * Verb form that is usually used with another verb to express ideas such as possibilities, permission, or
      * intention. (Gil Francopoulo; http://www.isocat.org/datcat/DC-1329)
      * <p>
      * A modal verb (also modal, modal auxiliary verb, modal auxiliary) is a type of auxiliary verb that is
@@ -1722,8 +1694,7 @@ public enum Pos {
      */
     ModalVerb(AuxiliaryVerb),
     /**
-     * 
-     Non-modal, non-copular auxiliary verb.
+     * Non-modal, non-copular auxiliary verb.
      */
     StrictAuxiliaryVerb(AuxiliaryVerb),
     /**
@@ -1749,22 +1720,19 @@ public enum Pos {
      */
     TenseMarkingAuxiliary(StrictAuxiliaryVerb),
     /**
-     * 
-     Verb used to link the subject of a sentence and its noun or adjective complement or complementing
+     * Verb used to link the subject of a sentence and its noun or adjective complement or complementing
      * phrase in certain languages. This verb could be used also to form the passive voice.
      * (www.wordreference.com/English/definition.asp?en=be - 4); http://www.isocat.org/datcat/DC-1246)
      */
     BeAuxiliary(StrictAuxiliaryVerb),
     /**
-     * 
-     The verb have as an auxiliary.
+     * The verb have as an auxiliary.
      * (www.sil.org/linguistics/GlossaryOfLinguisticTerms/WhatIsAnAuxiliaryVerb.htm;
      * http://www.isocat.org/datcat/DC-1299)
      */
     HaveAuxiliary(StrictAuxiliaryVerb),
     /**
-     * 
-     A finite verb is a verb form that occurs in an independent clause, and is fully inflected according to
+     * A finite verb is a verb form that occurs in an independent clause, and is fully inflected according to
      * the inflectional categories marked on verbs in the language. <br>
      * (http://www.sil.org/linguistics/GlossaryOfLinguisticTerms/WhatIsAFiniteVerb.htm 19.09.06)
      * <p>
@@ -1773,32 +1741,28 @@ public enum Pos {
      */
     FiniteVerb(LexicalCategory.Verb),
     /**
-     * 
-     A conditional verb is a verb form in many languages. It is used to express degrees of certainty or
+     * A conditional verb is a verb form in many languages. It is used to express degrees of certainty or
      * uncertainty and hypothesis about past, present, or future. Such forms often occur in conditional
      * sentences.<br>
      * (http://en.wikipedia.org/wiki/Conditional_mood 19.09.06)
      */
     ConditionalVerb(FiniteVerb),
     /**
-     * 
-     An imperative verb is used to express commands, direct requests, and prohibitions. Often, direct use of
+     * An imperative verb is used to express commands, direct requests, and prohibitions. Often, direct use of
      * the imperative mood may appear blunt or even rude, so it is often used with care. Example: "Paul, read
      * that book".<br>
      * (http://en.wikipedia.org/wiki/Grammatical_mood#Imperative_mood 19.09.06)
      */
     ImperativeVerb(FiniteVerb),
     /**
-     * 
-     Indicative mood is used in factual statements. All intentions in speaking that a particular language
+     * Indicative mood is used in factual statements. All intentions in speaking that a particular language
      * does not put into another mood use the indicative. It is the most commonly used mood and is found in
      * all languages.<br>
      * (http://en.wikipedia.org/wiki/Grammatical_mood#Indicative_mood 19.09.06)
      */
     IndicativeVerb(FiniteVerb),
     /**
-     * 
-     A subjunctive verb is typically used to expresses wishes, commands (in subordinate clauses), emotion,
+     * A subjunctive verb is typically used to expresses wishes, commands (in subordinate clauses), emotion,
      * possibility, judgment, necessity, and statements that are contrary to fact at present. <br>
      * (http://en.wikipedia.org/wiki/Subjunctive_mood 19.09.06)
      */
@@ -1863,8 +1827,7 @@ public enum Pos {
      */
     Infinitive(NonFiniteVerb),
     /**
-     * 
-     A participle is a lexical item, derived from a verb that has some of the characteristics and functions
+     * A participle is a lexical item, derived from a verb that has some of the characteristics and functions
      * of both verbs and adjectives. In English, participles may be used as adjectives, and in non-finite
      * forms of verbs.<br>
      * (http://www.sil.org/linguistics/GlossaryOfLinguisticTerms/WhatIsAParticiple.htm 19.09.06)
@@ -1908,20 +1871,17 @@ public enum Pos {
      */
     ParticipleAdjective(LexicalCategory.Adjective, Participle),
     /**
-     * 
-     Adjective based on a past participle.<br>
+     * Adjective based on a past participle.<br>
      * (http://www.isocat.org/datcat/DC-1596)
      */
     PastParticipleAdjective(ParticipleAdjective, PastParticiple),
     /**
-     * 
-     Adjective based on a present participle.<br>
+     * Adjective based on a present participle.<br>
      * (http://www.isocat.org/datcat/DC-1597)
      */
     PresentParticipleAdjective(ParticipleAdjective, PresentParticiple),
     /**
-     * 
-     Supine is a nonfinite form of motion verbs with functions similar to that of an infinitive (Angelika
+     * Supine is a nonfinite form of motion verbs with functions similar to that of an infinitive (Angelika
      * Adams)
      */
     Supine(NonFiniteVerb),
@@ -1941,26 +1901,26 @@ public enum Pos {
      * An agentive verb marks the semantic role of agent or the doer of an action.
      * <p>
      * Example:
-     * 
+     *
      * <pre>
-     *     ་ ་ ས་ ་ ་ བསད་ ག། 
-     *     Dorji-gi jele sänu 
+     *     ་ ་ ས་ ་ ་ བསད་ ག།
+     *     Dorji-gi jele sänu
      *     'Dorji killed the cat'
      * </pre>
-     * 
+     *
      * <br>
      * (http://panl10n.net/english/Outputs%20Phase%202/CCs/Bhutan/Papers/2007/0701/PartOfSpeech.pdf)
      */
     AgentiveVerb(MainVerb),
     /**
      * It is a verb, which indicates a strong desire to achieve something, without the doer.
-     * 
+     *
      * <pre>
-     *     དག་པ ་ ང་ ་ ་བར་ ག། 
-     *     dag-pai zhing-lu kewa shÔ 
+     *     དག་པ ་ ང་ ་ ་བར་ ག།
+     *     dag-pai zhing-lu kewa shÔ
      *     'May i be born in pure land'
      * </pre>
-     * 
+     *
      * <br>
      * (http://panl10n.net/english/Outputs%20Phase%202/CCs/Bhutan/Papers/2007/0701/PartOfSpeech.pdf)
      */
@@ -1987,7 +1947,8 @@ public enum Pos {
      * Example: ང་མ་ འ ར་ ས། 'lungma phur-dä 'A wind is blowing' <br>
      * (http://panl10n.net/english/Outputs%20Phase%202/CCs/Bhutan/Papers/2007/0701/PartOfSpeech.pdf)
      */
-    NonAgentiveVerb(MainVerb), ;
+    NonAgentiveVerb(MainVerb),
+    ;
     static final String OLIA_NAMESPACE = "http://purl.org/olia/olia.owl#";
 
     private final Set<LexicalCategory> categories;
@@ -2059,10 +2020,10 @@ public enum Pos {
 
     @Override
     public String toString() {
-        return String.format("olia:%s", 
-            uri.substring(OLIA_NAMESPACE.length()));
+        return String.format("olia:%s",
+                uri.substring(OLIA_NAMESPACE.length()));
     }
-    
+
     /**
      * This is needed because one can not create EnumSet instances before the
      * initialization of an Enum has finished.<p>
@@ -2070,22 +2031,22 @@ public enum Pos {
      * in an static {} block is used as a workaround. The {@link Tense#getTenses()}
      * method does use this static member instead of a member variable
      */
-    private static final Map<Pos,Set<Pos>> transitiveClosureMap;
-    
+    private static final Map<Pos, Set<Pos>> transitiveClosureMap;
+
     static {
-        transitiveClosureMap = new EnumMap<Pos,Set<Pos>>(Pos.class);
-        for(Pos pos : Pos.values()){
+        transitiveClosureMap = new EnumMap<Pos, Set<Pos>>(Pos.class);
+        for (Pos pos : Pos.values()) {
             Set<Pos> parents = EnumSet.of(pos);
-            for(Pos posParent : pos.parents()){
+            for (Pos posParent : pos.parents()) {
                 Set<Pos> transParents = transitiveClosureMap.get(posParent);
-                if(transParents != null){
+                if (transParents != null) {
                     parents.addAll(transParents);
-                } else if(posParent != null){
+                } else if (posParent != null) {
                     parents.add(posParent);
                 } // else no parent
             }
             transitiveClosureMap.put(pos, parents);
         }
     }
-    
+
 }

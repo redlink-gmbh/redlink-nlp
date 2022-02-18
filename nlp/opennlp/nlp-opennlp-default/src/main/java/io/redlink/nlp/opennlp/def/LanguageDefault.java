@@ -17,17 +17,15 @@
 package io.redlink.nlp.opennlp.def;
 
 
+import io.redlink.nlp.opennlp.pos.OpenNlpLanguageModel;
+import io.redlink.nlp.opennlp.pos.impl.RegexSentenceSplitter;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Locale;
 import java.util.Set;
-
-import org.springframework.stereotype.Component;
-
-import io.redlink.nlp.opennlp.pos.OpenNlpLanguageModel;
-import io.redlink.nlp.opennlp.pos.impl.RegexSentenceSplitter;
 import opennlp.tools.tokenize.SimpleTokenizer;
+import org.springframework.stereotype.Component;
 
 /**
  * A simple Language Model that will use the {@link SimpleTokenizer} for
@@ -35,10 +33,8 @@ import opennlp.tools.tokenize.SimpleTokenizer;
  * It registers itself for the <code>null</code> {@link Locale} and will
  * Therefore be used for languages where no dedicated language model is
  * available.
- * 
- * 
- * @author Rupert Westenthaler
  *
+ * @author Rupert Westenthaler
  */
 @Component
 public class LanguageDefault extends OpenNlpLanguageModel {
@@ -47,20 +43,21 @@ public class LanguageDefault extends OpenNlpLanguageModel {
      * We can not support languages without whitespaces
      */
     private static final Set<String> UNSUPPORTED = Collections.unmodifiableSet(
-            new HashSet<>(Arrays.asList(Locale.CHINESE.getLanguage(), 
+            new HashSet<>(Arrays.asList(Locale.CHINESE.getLanguage(),
                     Locale.KOREAN.getLanguage(), Locale.JAPANESE.getLanguage())));
-    
-    
+
+
     public LanguageDefault() {
         super(null, null, null, null, null);
     }
+
     /*
      * This overrides the supports method to only return false for languages without
      * whitespaces
      */
     @Override
     public boolean supports(String lang) {
-        if(lang == null){
+        if (lang == null) {
             return true; //try to process documents with unknown language
         } else {
             String normLang = Locale.forLanguageTag(lang).getLanguage();
@@ -68,6 +65,7 @@ public class LanguageDefault extends OpenNlpLanguageModel {
             return !UNSUPPORTED.contains(normLangParts[0]);
         }
     }
+
     /**
      * This is a fallback Model so it returns {@link Integer#MIN_VALUE} as ranking
      */
@@ -75,5 +73,5 @@ public class LanguageDefault extends OpenNlpLanguageModel {
     public int getModelRanking() {
         return Integer.MIN_VALUE;
     }
-    
+
 }

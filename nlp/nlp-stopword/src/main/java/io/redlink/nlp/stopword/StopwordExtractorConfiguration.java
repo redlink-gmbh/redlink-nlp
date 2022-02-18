@@ -18,13 +18,13 @@ package io.redlink.nlp.stopword;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
-@ConfigurationProperties(prefix=StopwordExtractorConfiguration.NLP_STOPWORD)
+@ConfigurationProperties(prefix = StopwordExtractorConfiguration.NLP_STOPWORD)
 public class StopwordExtractorConfiguration {
 
     public static final String NLP_STOPWORD = "nlp.stopword";
     private static final String CONF_PREFIX = NLP_STOPWORD + '.';
 
-    
+
     public static final String PROP_CASE_SENSITIVE = CONF_PREFIX + "caseSensitive";
     public static final boolean DEFAULT_CASE_SENSITIVE = false;
 
@@ -35,24 +35,24 @@ public class StopwordExtractorConfiguration {
     public static final boolean DEFAULT_USE_POS = true;
 
     private boolean caseSensitive = DEFAULT_CASE_SENSITIVE;
-    
+
     private boolean usePos = DEFAULT_USE_POS;
 
 
     public boolean isCaseSensitive() {
         return caseSensitive;
     }
-    
+
     public void setCaseSensitive(boolean caseSensitive) {
         this.caseSensitive = caseSensitive;
     }
-    
+
     public boolean isUsePos() {
         return usePos;
     }
-    
+
     public void setUsePos(boolean usePos) {
         this.usePos = usePos;
     }
-    
+
 }

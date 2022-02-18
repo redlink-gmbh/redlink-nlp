@@ -16,25 +16,26 @@
 
 package io.redlink.nlp.regex.ner.csv;
 
-import org.apache.commons.csv.CSVFormat;
-import org.apache.commons.csv.CSVParser;
-import org.apache.commons.csv.CSVRecord;
-
 import io.redlink.nlp.model.ner.NerTag;
 import io.redlink.nlp.regex.ner.vocab.VocabularyDetector;
 import io.redlink.nlp.regex.ner.vocab.VocabularyEntry;
-
 import java.io.IOException;
 import java.io.Reader;
-import java.util.*;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Locale;
+import java.util.Map;
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVParser;
+import org.apache.commons.csv.CSVRecord;
 
 /**
  * Variant of the {@link VocabularyDetector} that reads a Vocabulary from a
  * CSV file where the first column is the name and all further columns are
  * synonyms
- * 
- * @author Rupert Westenthaler
  *
+ * @author Rupert Westenthaler
  */
 public abstract class CsvVocabularyNerDetector extends VocabularyDetector {
 
@@ -48,22 +49,24 @@ public abstract class CsvVocabularyNerDetector extends VocabularyDetector {
         super(name, type, lang, cs);
         this.csvFormat = csvFormat;
     }
+
     @Override
     protected final Collection<VocabularyEntry> loadEntries() throws IOException {
-        Map<String,VocabularyEntry> entries = new HashMap<>();
-        try (CSVParser csv = new CSVParser(readFrom(), csvFormat)){
-            nextEntry: for(Iterator<CSVRecord> records = csv.iterator(); records.hasNext();){
+        Map<String, VocabularyEntry> entries = new HashMap<>();
+        try (CSVParser csv = new CSVParser(readFrom(), csvFormat)) {
+            nextEntry:
+            for (Iterator<CSVRecord> records = csv.iterator(); records.hasNext(); ) {
                 CSVRecord record = records.next();
                 VocabularyEntry entry = null;
-                for(String name : record){
+                for (String name : record) {
                     String normName = normalize(name);
-                    if(entry == null){ //lookup/create a record for this name
-                        if(normName == null){
-                            log.warn("Line {}: Invalid name '{}' (record data: {})",record.getRecordNumber(), name, record);
+                    if (entry == null) { //lookup/create a record for this name
+                        if (normName == null) {
+                            log.warn("Line {}: Invalid name '{}' (record data: {})", record.getRecordNumber(), name, record);
                             continue nextEntry;
                         }
                         entry = entries.get(normName);
-                        if(entry == null){
+                        if (entry == null) {
                             entry = new VocabularyEntry(name);
                             entries.put(normName, entry);
                         } else {
@@ -71,7 +74,7 @@ public abstract class CsvVocabularyNerDetector extends VocabularyDetector {
                                     record.getRecordNumber(), normName);
                         }
                     } else { //record already present add as synonym
-                        if(normName != null){
+                        if (normName != null) {
                             entry.addSynonym(name);
                         } //empty synonym
                     }
@@ -80,7 +83,7 @@ public abstract class CsvVocabularyNerDetector extends VocabularyDetector {
         }
         return entries.values();
     }
-    
+
     protected abstract Reader readFrom();
 
 }

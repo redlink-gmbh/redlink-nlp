@@ -16,27 +16,6 @@
 
 package io.redlink.nlp.truecase.de;
 
-import static edu.stanford.nlp.pipeline.Annotator.STANFORD_POS;
-import static edu.stanford.nlp.pipeline.Annotator.STANFORD_SSPLIT;
-import static edu.stanford.nlp.pipeline.Annotator.STANFORD_TOKENIZE;
-import static io.redlink.nlp.stanfordnlp.annotators.RedlinkAnnotator.REDLINK_AT_SECTION;
-
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Properties;
-
-import javax.annotation.PreDestroy;
-
-import org.apache.commons.lang3.text.WordUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
-import org.springframework.stereotype.Component;
-
 import edu.stanford.nlp.ling.CoreAnnotations.PartOfSpeechAnnotation;
 import edu.stanford.nlp.ling.CoreAnnotations.SentencesAnnotation;
 import edu.stanford.nlp.ling.CoreAnnotations.TokensAnnotation;
@@ -54,11 +33,29 @@ import io.redlink.nlp.model.NlpAnnotations;
 import io.redlink.nlp.model.Token;
 import io.redlink.nlp.model.util.NlpUtils;
 import io.redlink.nlp.stanfordnlp.annotators.AnalyzedTextSectionAnnotator;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Properties;
+import javax.annotation.PreDestroy;
+import org.apache.commons.lang3.text.WordUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
+import org.springframework.stereotype.Component;
+
+import static edu.stanford.nlp.pipeline.Annotator.STANFORD_POS;
+import static edu.stanford.nlp.pipeline.Annotator.STANFORD_SSPLIT;
+import static edu.stanford.nlp.pipeline.Annotator.STANFORD_TOKENIZE;
+import static io.redlink.nlp.stanfordnlp.annotators.RedlinkAnnotator.REDLINK_AT_SECTION;
 
 /**
  * The Named Entity {@link Preprocessor} used for extracting named entities
  * from processed documents.
- * 
+ *
  * @author rupert.westenthaler@redlink.co
  */
 @Component
@@ -66,13 +63,13 @@ import io.redlink.nlp.stanfordnlp.annotators.AnalyzedTextSectionAnnotator;
 public class GermanTrueCaseExtractor extends Processor {
 
     private static final Logger LOG = LoggerFactory.getLogger(GermanTrueCaseExtractor.class);
-    
+
     private AnnotatorPool pool;
     private AnnotationPipeline pipeline;
     private final Properties props;
 
     public GermanTrueCaseExtractor() {
-        super("truecase.de","German True Case",Phase.pos,-10); //this should run before POS tagging
+        super("truecase.de", "German True Case", Phase.pos, -10); //this should run before POS tagging
         props = new Properties();
         props.put("pos.model", "edu/stanford/nlp/models/pos-tagger/german/german-fast-caseless.tagger");
         props.put("tokenize.language", "de");
@@ -82,9 +79,9 @@ public class GermanTrueCaseExtractor extends Processor {
     public Map<String, Object> getDefaultConfiguration() {
         return Collections.emptyMap();
     }
-    
+
     @Override
-    protected void init(){
+    protected void init() {
         initAnnotatorPool(props);
         pipeline = new AnnotationPipeline(Arrays.asList(
                 pool.get("tokenize"),
@@ -92,10 +89,10 @@ public class GermanTrueCaseExtractor extends Processor {
                 pool.get("ssplit"),
                 pool.get("pos")));
     }
- 
+
 
     @PreDestroy
-    protected void destroyNerModels(){
+    protected void destroyNerModels() {
         pool = null;
         pipeline = null;
     }
@@ -103,16 +100,16 @@ public class GermanTrueCaseExtractor extends Processor {
     @Override
     protected void doProcessing(ProcessingData processingData) {
         LOG.debug("> process {} with {}", processingData, getClass().getSimpleName());
-        
+
         Optional<AnalyzedText> at = NlpUtils.getAnalyzedText(processingData);
-        if(at.isEmpty()){ //create a new AnalyzedText
+        if (at.isEmpty()) { //create a new AnalyzedText
             LOG.warn("Unable to preprocess {} because no AnalyzedText is present "
-                    + "and this QueryPreperator requires Tokens and Sentences!",
+                            + "and this QueryPreperator requires Tokens and Sentences!",
                     processingData);
             return;
         }
         String language = processingData.getLanguage();
-        if(language == null || !"de".equals(language.toLowerCase(Locale.ROOT))){
+        if (language == null || !"de".equals(language.toLowerCase(Locale.ROOT))) {
             LOG.debug("language {} not supported (supported: de)", language);
             return; //language not supported
         }
@@ -120,8 +117,8 @@ public class GermanTrueCaseExtractor extends Processor {
         Annotation document = new Annotation(at.get().getSpan().toLowerCase(Locale.GERMAN));
         //add the AnalyzedText to the document so that the TextSectionAnnotator can do its work
         document.set(AnalyzedTextSectionAnnotator.AnalyzedTextAnnotation.class, at.get());
-        
-        pipeline.annotate(document); 
+
+        pipeline.annotate(document);
 
         // these are all the sentences in this document
         // a CoreMap is essentially a Map that uses class objects as keys and has values with custom types
@@ -131,7 +128,7 @@ public class GermanTrueCaseExtractor extends Processor {
             List<CoreLabel> tokens = sentence.get(TokensAnnotation.class);
             int tokenIdx = -1;
             for (CoreLabel token : tokens) {
-                if(token.beginPosition() >= token.endPosition()){
+                if (token.beginPosition() >= token.endPosition()) {
                     LOG.warn("Illegal Token start:{}/end:{} values -> ignored", token.beginPosition(), token.endPosition());
                     continue;
                 }
@@ -141,23 +138,23 @@ public class GermanTrueCaseExtractor extends Processor {
                 String pos = token.get(PartOfSpeechAnnotation.class);
                 boolean isNoun = pos != null && pos.length() > 0 && (pos.charAt(0) == 'N' || pos.equals("FM"));
                 String span = t.getSpan();
-                if(span.length() > 0){
+                if (span.length() > 0) {
                     char c = span.charAt(0);
-                    if(isNoun || tokenIdx == 0){ //upper case
-                        if(Character.isAlphabetic(c) && !Character.isUpperCase(c)){
-                            t.addAnnotation(NlpAnnotations.TRUE_CASE_ANNOTATION, 
-                                    WordUtils.capitalize(span," -–—".toCharArray()));
+                    if (isNoun || tokenIdx == 0) { //upper case
+                        if (Character.isAlphabetic(c) && !Character.isUpperCase(c)) {
+                            t.addAnnotation(NlpAnnotations.TRUE_CASE_ANNOTATION,
+                                    WordUtils.capitalize(span, " -–—".toCharArray()));
                         } //else already upper case
                     } else { //lower case
-                        if(Character.isAlphabetic(c) && Character.isUpperCase(c)){
+                        if (Character.isAlphabetic(c) && Character.isUpperCase(c)) {
                             boolean otherUcChar = false;
-                            for(int i = 1; !otherUcChar && i < span.length(); i++){
+                            for (int i = 1; !otherUcChar && i < span.length(); i++) {
                                 char ch = span.charAt(i);
-                                if(Character.isAlphabetic(ch) && Character.isUpperCase(c)){
+                                if (Character.isAlphabetic(ch) && Character.isUpperCase(c)) {
                                     otherUcChar = true;
                                 }
                             }
-                            if(!otherUcChar){
+                            if (!otherUcChar) {
                                 t.addAnnotation(NlpAnnotations.TRUE_CASE_ANNOTATION, span.toLowerCase(Locale.GERMAN));
                             }
                         }
@@ -166,13 +163,14 @@ public class GermanTrueCaseExtractor extends Processor {
             } //end iterate over tokens in sentence
         }
     }
-    
+
     /**
      * Initializes the Annotators as referenced by the '<code>annotators</code>' field of the parsed properties.
      * <p>
      * NOTE: This will only initialize {@link AnnotatorFactories} that are actually used in the configured
      * pipeline (the {@link #getAnnotators()} list)
-     * @param properties the properties 
+     *
+     * @param properties              the properties
      * @param annotatorImplementation annotator impl instance
      */
     protected void initAnnotatorPool(final Properties properties) {
@@ -185,5 +183,5 @@ public class GermanTrueCaseExtractor extends Processor {
         pool.register(STANFORD_POS, properties, Lazy.cache(() -> aImpl.posTagger(properties)));
         pool.register(REDLINK_AT_SECTION, properties, Lazy.cache(() -> new AnalyzedTextSectionAnnotator()));
     }
-    
+
 }

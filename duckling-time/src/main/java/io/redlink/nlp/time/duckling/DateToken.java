@@ -15,11 +15,11 @@
  */
 package io.redlink.nlp.time.duckling;
 
+import io.redlink.nlp.model.temporal.Temporal;
 import java.util.Comparator;
 
-import io.redlink.nlp.model.temporal.Temporal;
-
 /**
+ *
  */
 public class DateToken {
 
@@ -34,12 +34,12 @@ public class DateToken {
     public static final Comparator<DateToken> IDX_START_END_COMPARATOR = (t1, t2) -> {
         //lower start first
         int c = Integer.compare(t1.getOffsetStart(), t2.getOffsetStart());
-        if(c == 0){ //higher end first
+        if (c == 0) { //higher end first
             c = Integer.compare(t2.getOffsetEnd(), t1.getOffsetEnd());
         }
         return c;
     };
-    
+
     /**
      * Comparator that sorts the {@link DateToken} with the highest {@link DateToken#getConfidence()}
      * first.
@@ -67,6 +67,7 @@ public class DateToken {
 
     /**
      * Getter for the start char offset of the Token
+     *
      * @return the start char offset
      */
     public int getOffsetStart() {
@@ -75,6 +76,7 @@ public class DateToken {
 
     /**
      * Setter for the start char offset of the Token
+     *
      * @param offsetStart the start char offset
      */
     void setOffsetStart(int offsetStart) {
@@ -83,6 +85,7 @@ public class DateToken {
 
     /**
      * Getter for the end char offset of the Token
+     *
      * @return the end char offset (exclusive) (similar to {@link String#substring(int, int)})
      */
     public int getOffsetEnd() {
@@ -91,6 +94,7 @@ public class DateToken {
 
     /**
      * Setter for the end char offset of the Token
+     *
      * @param offsetEnd the end char offset (exclusive) (similar to {@link String#substring(int, int)})
      */
     void setOffsetEnd(int offsetEnd) {
@@ -99,6 +103,7 @@ public class DateToken {
 
     /**
      * The start of the date-range. If instants, this is the same as {@link #getEnd()}
+     *
      * @return the start of the date-range
      */
     public Temporal getStart() {
@@ -114,6 +119,7 @@ public class DateToken {
 
     /**
      * The end of the date-range. If instants, this is the same as {@link #getStart()}
+     *
      * @return the end of the date-range
      */
     public Temporal getEnd() {
@@ -142,6 +148,7 @@ public class DateToken {
 
     /**
      * Getter for the <code>[0..1]</code> confidence of this token.
+     *
      * @return the confidence
      */
     public float getConfidence() {
@@ -150,6 +157,7 @@ public class DateToken {
 
     /**
      * Setter for the <code>[0..1]</code> confidence of this token.
+     *
      * @param confidence the confidence
      */
     void setConfidence(float confidence) {
@@ -167,13 +175,13 @@ public class DateToken {
                     ", conf=" + confidence + "]";
         } else {
             return "DateToken [" +
-                    "interval" + (isOpenInterval()?" (open)":"") +
+                    "interval" + (isOpenInterval() ? " (open)" : "") +
                     ", start=" + start +
                     ", end=" + end +
                     ", offset=" + offsetStart + ".." + offsetEnd +
                     ", conf=" + confidence + "]";
         }
     }
-    
-    
+
+
 }

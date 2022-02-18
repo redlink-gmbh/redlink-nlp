@@ -16,13 +16,13 @@
 
 package io.redlink.nlp.stemmer.snowball;
 
+import io.redlink.nlp.stemmer.StemmerRegistry;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
-
 import org.springframework.stereotype.Component;
 import org.tartarus.snowball.SnowballProgram;
 import org.tartarus.snowball.ext.danishStemmer;
@@ -41,12 +41,11 @@ import org.tartarus.snowball.ext.spanishStemmer;
 import org.tartarus.snowball.ext.swedishStemmer;
 import org.tartarus.snowball.ext.turkishStemmer;
 
-import io.redlink.nlp.stemmer.StemmerRegistry;
-
 @Component
 public class SnowballStemmerRegistry implements StemmerRegistry {
-    
+
     private static final Map<String, Class<? extends SnowballProgram>> SNOWBALL_CONFIG;
+
     static {
         Map<String, Class<? extends SnowballProgram>> conf = new HashMap<>();
         conf.put("en", englishStemmer.class);
@@ -66,18 +65,18 @@ public class SnowballStemmerRegistry implements StemmerRegistry {
         conf.put("tr", turkishStemmer.class);
         SNOWBALL_CONFIG = Collections.unmodifiableMap(conf);
     }
-    
-    
+
+
     private final Map<String, SnowballStemmerModel> stemmerModels;
     private final ReadWriteLock stemmerModelsLock;
-    
-    
+
+
     public SnowballStemmerRegistry() {
         stemmerModels = new HashMap<>();
         stemmerModelsLock = new ReentrantReadWriteLock();
     }
-    
-    
+
+
     /* (non-Javadoc)
      * @see io.redlink.nlp.stemmer.StemmerRegistry#getStemmerModel(java.lang.String)
      */
@@ -92,14 +91,14 @@ public class SnowballStemmerRegistry implements StemmerRegistry {
         } finally {
             stemmerModelsLock.readLock().unlock();
         }
-        if(model == null){
+        if (model == null) {
             @SuppressWarnings("rawtypes")
             Class stemmerClass = SNOWBALL_CONFIG.get(lang);
-            if(stemmerClass != null){ //language supported
+            if (stemmerClass != null) { //language supported
                 stemmerModelsLock.writeLock().lock();
                 try {
                     model = stemmerModels.get(lang); //other thread initialized it in the meantime
-                    if(model == null){
+                    if (model == null) {
                         model = new SnowballStemmerModel(Locale.forLanguageTag(lang), stemmerClass);
                         stemmerModels.put(lang, model);
                     }
@@ -110,5 +109,5 @@ public class SnowballStemmerRegistry implements StemmerRegistry {
         }
         return model;
     }
-    
+
 }

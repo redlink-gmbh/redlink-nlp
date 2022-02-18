@@ -19,16 +19,8 @@ package io.redlink.nlp.api;
 import java.io.Closeable;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
-import java.nio.charset.Charset;
-import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.StandardOpenOption;
-import java.security.cert.PKIXRevocationChecker.Option;
 import java.util.Optional;
-
-import org.apache.commons.io.input.CharSequenceInputStream;
-import org.apache.commons.lang3.StringUtils;
 
 public interface Content extends Closeable {
 
@@ -43,7 +35,6 @@ public interface Content extends Closeable {
      * The content as stream
      *
      * @return the content
-     * @throws IOException
      */
     InputStream getContent() throws IOException;
 

@@ -16,14 +16,12 @@
 
 package io.redlink.nlp.api.annotation;
 
-import java.net.URI;
-import java.net.URISyntaxException;
-
-import org.springframework.data.annotation.Transient;
-
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import java.net.URI;
+import java.net.URISyntaxException;
+import org.springframework.data.annotation.Transient;
 
 /**
  * An image referenced by the content of a document.
@@ -231,8 +229,6 @@ public class ContentImage {
 
     /**
      * If the {@link #getUri()} is a valid and absolute URI
-     *
-     * @return
      */
     @JsonIgnore
     public boolean isValid() {

@@ -15,28 +15,27 @@
  */
 package io.redlink.nlp.time.duckling;
 
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.Iterator;
-
 import clojure.java.api.Clojure;
 import clojure.lang.IFn;
 import clojure.lang.IPersistentMap;
 import clojure.lang.LazySeq;
 import clojure.lang.PersistentArrayMap;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Iterator;
 
 /**
  *
  */
 public class DucklingTest {
 
-    public static void main(String [] args) throws IOException {
+    public static void main(String[] args) throws IOException {
         final IFn require = Clojure.var("clojure.core", "require");
         require.invoke(Clojure.read("duckling.core"));
 
         final IFn load = Clojure.var("duckling.core", "load!");
         load.invoke();
-        
+
         final IFn parse = Clojure.var("duckling.core", "parse");
 
         // Reference-Time
@@ -49,9 +48,9 @@ public class DucklingTest {
 
         final Object o = parse.invoke("de$core", "now", Clojure.read("[:time]"), assoc);
 
-        final Iterator<PersistentArrayMap> map = ((LazySeq)o).iterator();
+        final Iterator<PersistentArrayMap> map = ((LazySeq) o).iterator();
 
-        while(map.hasNext()) {
+        while (map.hasNext()) {
             PersistentArrayMap m = map.next();
             if (":time".equals(String.valueOf(m.valAt(Clojure.read(":dim"))))) {
                 System.out.println(m);

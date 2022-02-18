@@ -1,169 +1,180 @@
 {
-  "spans" : [ {
-    "type" : "Text",
-    "start" : 0,
-    "end" : 1239
-  }, {
-    "type" : "TextSection",
-    "start" : 20,
-    "end" : 79,
-    "stanbol.enhancer.nlp.section.stats" : {
-      "value" : {
-        "numChars" : 59,
-        "numAlpha" : 20,
-        "numDigit" : 10,
-        "numWhitespace" : 22
-      },
-      "class" : "io.redlink.nlp.model.section.SectionStats"
+  "spans": [
+    {
+      "type": "Text",
+      "start": 0,
+      "end": 1239
     },
-    "stanbol.enhancer.nlp.section" : {
-      "tag" : "p",
-      "section" : 2,
-      "class" : "io.redlink.nlp.model.section.SectionTag"
-    }
-  }, {
-    "type" : "TextSection",
-    "start" : 110,
-    "end" : 151,
-    "stanbol.enhancer.nlp.section.stats" : {
-      "value" : {
-        "numChars" : 41,
-        "numAlpha" : 8,
-        "numDigit" : 9,
-        "numWhitespace" : 20
+    {
+      "type": "TextSection",
+      "start": 20,
+      "end": 79,
+      "stanbol.enhancer.nlp.section.stats": {
+        "value": {
+          "numChars": 59,
+          "numAlpha": 20,
+          "numDigit": 10,
+          "numWhitespace": 22
+        },
+        "class": "io.redlink.nlp.model.section.SectionStats"
       },
-      "class" : "io.redlink.nlp.model.section.SectionStats"
+      "stanbol.enhancer.nlp.section": {
+        "tag": "p",
+        "section": 2,
+        "class": "io.redlink.nlp.model.section.SectionTag"
+      }
     },
-    "stanbol.enhancer.nlp.section" : {
-      "tag" : "p",
-      "section" : 2,
-      "class" : "io.redlink.nlp.model.section.SectionTag"
-    }
-  }, {
-    "type" : "TextSection",
-    "start" : 331,
-    "end" : 435,
-    "stanbol.enhancer.nlp.section.stats" : {
-      "value" : {
-        "numChars" : 104,
-        "numAlpha" : 28,
-        "numDigit" : 4,
-        "numWhitespace" : 70
+    {
+      "type": "TextSection",
+      "start": 110,
+      "end": 151,
+      "stanbol.enhancer.nlp.section.stats": {
+        "value": {
+          "numChars": 41,
+          "numAlpha": 8,
+          "numDigit": 9,
+          "numWhitespace": 20
+        },
+        "class": "io.redlink.nlp.model.section.SectionStats"
       },
-      "class" : "io.redlink.nlp.model.section.SectionStats"
+      "stanbol.enhancer.nlp.section": {
+        "tag": "p",
+        "section": 2,
+        "class": "io.redlink.nlp.model.section.SectionTag"
+      }
     },
-    "stanbol.enhancer.nlp.section" : {
-      "tag" : "li",
-      "section" : 3,
-      "class" : "io.redlink.nlp.model.section.SectionTag"
-    }
-  }, {
-    "type" : "TextSection",
-    "start" : 331,
-    "end" : 350,
-    "stanbol.enhancer.nlp.section.stats" : {
-      "value" : {
-        "numChars" : 19,
-        "numAlpha" : 15,
-        "numDigit" : 0,
-        "numWhitespace" : 2
+    {
+      "type": "TextSection",
+      "start": 331,
+      "end": 435,
+      "stanbol.enhancer.nlp.section.stats": {
+        "value": {
+          "numChars": 104,
+          "numAlpha": 28,
+          "numDigit": 4,
+          "numWhitespace": 70
+        },
+        "class": "io.redlink.nlp.model.section.SectionStats"
       },
-      "class" : "io.redlink.nlp.model.section.SectionStats"
+      "stanbol.enhancer.nlp.section": {
+        "tag": "li",
+        "section": 3,
+        "class": "io.redlink.nlp.model.section.SectionTag"
+      }
     },
-    "stanbol.enhancer.nlp.section" : {
-      "tag" : "p",
-      "section" : 2,
-      "class" : "io.redlink.nlp.model.section.SectionTag"
-    }
-  }, {
-    "type" : "TextSection",
-    "start" : 398,
-    "end" : 435,
-    "stanbol.enhancer.nlp.section.stats" : {
-      "value" : {
-        "numChars" : 37,
-        "numAlpha" : 13,
-        "numDigit" : 4,
-        "numWhitespace" : 20
+    {
+      "type": "TextSection",
+      "start": 331,
+      "end": 350,
+      "stanbol.enhancer.nlp.section.stats": {
+        "value": {
+          "numChars": 19,
+          "numAlpha": 15,
+          "numDigit": 0,
+          "numWhitespace": 2
+        },
+        "class": "io.redlink.nlp.model.section.SectionStats"
       },
-      "class" : "io.redlink.nlp.model.section.SectionStats"
+      "stanbol.enhancer.nlp.section": {
+        "tag": "p",
+        "section": 2,
+        "class": "io.redlink.nlp.model.section.SectionTag"
+      }
     },
-    "stanbol.enhancer.nlp.section" : {
-      "tag" : "p",
-      "section" : 2,
-      "class" : "io.redlink.nlp.model.section.SectionTag"
-    }
-  }, {
-    "type" : "TextSection",
-    "start" : 501,
-    "end" : 603,
-    "stanbol.enhancer.nlp.section.stats" : {
-      "value" : {
-        "numChars" : 102,
-        "numAlpha" : 26,
-        "numDigit" : 4,
-        "numWhitespace" : 70
+    {
+      "type": "TextSection",
+      "start": 398,
+      "end": 435,
+      "stanbol.enhancer.nlp.section.stats": {
+        "value": {
+          "numChars": 37,
+          "numAlpha": 13,
+          "numDigit": 4,
+          "numWhitespace": 20
+        },
+        "class": "io.redlink.nlp.model.section.SectionStats"
       },
-      "class" : "io.redlink.nlp.model.section.SectionStats"
+      "stanbol.enhancer.nlp.section": {
+        "tag": "p",
+        "section": 2,
+        "class": "io.redlink.nlp.model.section.SectionTag"
+      }
     },
-    "stanbol.enhancer.nlp.section" : {
-      "tag" : "li",
-      "section" : 3,
-      "class" : "io.redlink.nlp.model.section.SectionTag"
-    }
-  }, {
-    "type" : "TextSection",
-    "start" : 501,
-    "end" : 520,
-    "stanbol.enhancer.nlp.section.stats" : {
-      "value" : {
-        "numChars" : 19,
-        "numAlpha" : 15,
-        "numDigit" : 0,
-        "numWhitespace" : 2
+    {
+      "type": "TextSection",
+      "start": 501,
+      "end": 603,
+      "stanbol.enhancer.nlp.section.stats": {
+        "value": {
+          "numChars": 102,
+          "numAlpha": 26,
+          "numDigit": 4,
+          "numWhitespace": 70
+        },
+        "class": "io.redlink.nlp.model.section.SectionStats"
       },
-      "class" : "io.redlink.nlp.model.section.SectionStats"
+      "stanbol.enhancer.nlp.section": {
+        "tag": "li",
+        "section": 3,
+        "class": "io.redlink.nlp.model.section.SectionTag"
+      }
     },
-    "stanbol.enhancer.nlp.section" : {
-      "tag" : "p",
-      "section" : 2,
-      "class" : "io.redlink.nlp.model.section.SectionTag"
-    }
-  }, {
-    "type" : "TextSection",
-    "start" : 568,
-    "end" : 603,
-    "stanbol.enhancer.nlp.section.stats" : {
-      "value" : {
-        "numChars" : 35,
-        "numAlpha" : 11,
-        "numDigit" : 4,
-        "numWhitespace" : 20
+    {
+      "type": "TextSection",
+      "start": 501,
+      "end": 520,
+      "stanbol.enhancer.nlp.section.stats": {
+        "value": {
+          "numChars": 19,
+          "numAlpha": 15,
+          "numDigit": 0,
+          "numWhitespace": 2
+        },
+        "class": "io.redlink.nlp.model.section.SectionStats"
       },
-      "class" : "io.redlink.nlp.model.section.SectionStats"
+      "stanbol.enhancer.nlp.section": {
+        "tag": "p",
+        "section": 2,
+        "class": "io.redlink.nlp.model.section.SectionTag"
+      }
     },
-    "stanbol.enhancer.nlp.section" : {
-      "tag" : "p",
-      "section" : 2,
-      "class" : "io.redlink.nlp.model.section.SectionTag"
-    }
-  }, {
-    "type" : "TextSection",
-    "start" : 830,
-    "end" : 872,
-    "stanbol.enhancer.nlp.section.stats" : {
-      "value" : {
-        "numChars" : 42,
-        "numAlpha" : 30,
-        "numDigit" : 4,
-        "numWhitespace" : 5
+    {
+      "type": "TextSection",
+      "start": 568,
+      "end": 603,
+      "stanbol.enhancer.nlp.section.stats": {
+        "value": {
+          "numChars": 35,
+          "numAlpha": 11,
+          "numDigit": 4,
+          "numWhitespace": 20
+        },
+        "class": "io.redlink.nlp.model.section.SectionStats"
       },
-      "class" : "io.redlink.nlp.model.section.SectionStats"
+      "stanbol.enhancer.nlp.section": {
+        "tag": "p",
+        "section": 2,
+        "class": "io.redlink.nlp.model.section.SectionTag"
+      }
     },
-    "stanbol.enhancer.nlp.section" : {
-      "tag" : "p",
-      "section" : 2,
-      "class" : "io.redlink.nlp.model.section.SectionTag"
+    {
+      "type": "TextSection",
+      "start": 830,
+      "end": 872,
+      "stanbol.enhancer.nlp.section.stats": {
+        "value": {
+          "numChars": 42,
+          "numAlpha": 30,
+          "numDigit": 4,
+          "numWhitespace": 5
+        },
+        "class": "io.redlink.nlp.model.section.SectionStats"
+      },
+      "stanbol.enhancer.nlp.section": {
+        "tag": "p",
+        "section": 2,
+        "class": "io.redlink.nlp.model.section.SectionTag"
+      }
     }
-  } ]
+  ]
 }

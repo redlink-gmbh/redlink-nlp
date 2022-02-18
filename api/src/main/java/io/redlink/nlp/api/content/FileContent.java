@@ -16,7 +16,6 @@
 package io.redlink.nlp.api.content;
 
 import io.redlink.nlp.api.Content;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;

@@ -27,7 +27,6 @@ import java.util.Set;
 import java.util.TreeSet;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
-
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.LineIterator;
 import org.slf4j.Logger;
@@ -36,8 +35,8 @@ import org.springframework.stereotype.Component;
 
 /**
  * Spring Component that cares about the loading and management of stopword lists.
- * @author Rupert Westenthaler
  *
+ * @author Rupert Westenthaler
  */
 @Component
 public class StopwordListRegistry {
@@ -47,12 +46,12 @@ public class StopwordListRegistry {
     /**
      * The pattern used to load stopword lists for {@link Locale}s from the classpath
      */
-    public static final String STOPWORD_LIST_NAME = "lang/stopwords-%s.txt"; 
+    public static final String STOPWORD_LIST_NAME = "lang/stopwords-%s.txt";
 
     /**
      * Stopwords for different languages
      */
-    private final Map<Key,Set<String>> stopwords;
+    private final Map<Key, Set<String>> stopwords;
     private final ReadWriteLock stopwordsLock;
 
     public StopwordListRegistry() {
@@ -62,11 +61,12 @@ public class StopwordListRegistry {
 
     /**
      * Initializes the OpenNLP language model based on the parsed parameters
-     * @param sentModelResource Required sentence model resource (loaded via classpath)
-     * @param tokenModelResource optional tokenizer model resource (loaded via classpath).
-     * If <code>null</code> the {@link SimpleTokenizer} will be used.
-     * @param posModelResource Required POS tagging model resource (loaded via classpath)
-     * @param stemmerClass Required {@link SnowballStemmer} class
+     *
+     * @param sentModelResource    Required sentence model resource (loaded via classpath)
+     * @param tokenModelResource   optional tokenizer model resource (loaded via classpath).
+     *                             If <code>null</code> the {@link SimpleTokenizer} will be used.
+     * @param posModelResource     Required POS tagging model resource (loaded via classpath)
+     * @param stemmerClass         Required {@link SnowballStemmer} class
      * @param stopwordListResource Required stopword list resource (loaded via classpath)
      * @throws LanguageModelException if the initialization fails
      */
@@ -75,20 +75,20 @@ public class StopwordListRegistry {
         LOG.debug("> loading stopwords for {}", locale == null ? "default language" : locale.getDisplayLanguage());
 
         LOG.info("  ... loading Stopwords");
-        String stopwordListResource = String.format(STOPWORD_LIST_NAME, 
+        String stopwordListResource = String.format(STOPWORD_LIST_NAME,
                 locale == null ? "default" : locale.getLanguage());
-        try (InputStream in = getClass().getClassLoader().getResourceAsStream(stopwordListResource)){
-            if(in == null){
+        try (InputStream in = getClass().getClassLoader().getResourceAsStream(stopwordListResource)) {
+            if (in == null) {
                 LOG.warn("Unable to load stopword list for language {} (resource: '{}') via classpath", locale, stopwordListResource);
                 return null;
             } else {
-                LineIterator stopwordIt = IOUtils.lineIterator(in,"UTF-8");
+                LineIterator stopwordIt = IOUtils.lineIterator(in, "UTF-8");
                 Set<String> stopwords = new HashSet<>();
-                while(stopwordIt.hasNext()){
+                while (stopwordIt.hasNext()) {
                     String stopword = stopwordIt.nextLine();
-                    if(stopword != null){
+                    if (stopword != null) {
                         stopword = stopword.toLowerCase(Locale.GERMAN).trim();
-                        if(!stopword.isEmpty()) {
+                        if (!stopword.isEmpty()) {
                             stopwords.add(stopword);
                         }
                     }
@@ -97,8 +97,8 @@ public class StopwordListRegistry {
             }
         } catch (IOException e) {
             LOG.warn("Unable to load Stopwords for Locale {} (message: {})", locale, e.getMessage());
-            if(LOG.isDebugEnabled()){
-                LOG.debug("Exception ",e);
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("Exception ", e);
             }
             return null;
         }
@@ -106,15 +106,15 @@ public class StopwordListRegistry {
 
     /**
      * Getter for the stopwords for a given language.
+     *
      * @param locale the locale or <code>null</code> for stopwords to be used
-     * in case the language is unknown.
-     * @return
+     *               in case the language is unknown.
      */
-    public Set<String> getStopwords(Locale locale, boolean caseSensitive){
+    public Set<String> getStopwords(Locale locale, boolean caseSensitive) {
         Key key = Key.build(locale, caseSensitive);
         stopwordsLock.readLock().lock();
         try {
-            if(stopwords.containsKey(key)){ //check contains as map contais null values
+            if (stopwords.containsKey(key)) { //check contains as map contais null values
                 return stopwords.get(key);
             }
         } finally {
@@ -122,13 +122,13 @@ public class StopwordListRegistry {
         }
         stopwordsLock.writeLock().lock();
         try {
-            if(stopwords.containsKey(key)){ //check contains as map contais null values
+            if (stopwords.containsKey(key)) { //check contains as map contais null values
                 return stopwords.get(key);
             } else {
                 Set<String> localeStopwords = init(locale);
                 stopwords.put(Key.build(locale, false), localeStopwords);
                 Set<String> insensitiveLocaleStopwords = new TreeSet<>(String.CASE_INSENSITIVE_ORDER);
-                if(localeStopwords != null) {
+                if (localeStopwords != null) {
                     insensitiveLocaleStopwords.addAll(localeStopwords);
                 } //no stopwords for this combination
                 stopwords.put(Key.build(locale, true), insensitiveLocaleStopwords);
@@ -138,17 +138,18 @@ public class StopwordListRegistry {
             stopwordsLock.writeLock().unlock();
         }
     }
+
     /**
      * Internally used as key to manage stopwords for locale and case sensitivity
      */
     private static class Key {
         private final Locale locale;
         private final boolean caseSensitive;
-        
+
         public static Key build(Locale locale, boolean caseSensitive) {
             return new Key(locale, caseSensitive);
         }
-        
+
         private Key(Locale locale, boolean caseSensitive) {
             this.locale = locale;
             this.caseSensitive = caseSensitive;
@@ -181,7 +182,7 @@ public class StopwordListRegistry {
                 return false;
             return true;
         }
-        
+
     }
-    
+
 }

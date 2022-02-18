@@ -21,5 +21,6 @@ import io.redlink.nlp.model.Token;
 public interface NegationRule {
 
     boolean isNegation(Token token);
+
     String getLanguage();
 }

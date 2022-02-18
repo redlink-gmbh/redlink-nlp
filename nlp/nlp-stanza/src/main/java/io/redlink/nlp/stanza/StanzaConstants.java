@@ -16,35 +16,34 @@
 
 package io.redlink.nlp.stanza;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
-
 import io.redlink.nlp.model.ner.NerTag;
 import io.redlink.nlp.model.pos.LexicalCategory;
 import io.redlink.nlp.model.pos.Pos;
 import io.redlink.nlp.model.pos.PosTag;
 import io.redlink.nlp.model.tag.TagSet;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 
 public final class StanzaConstants {
 
     private StanzaConstants() {
         throw new IllegalStateException("Do not use reflection to create instances of Util classes :(");
     }
-    
-    /** 
+
+    /**
      * {@link TagSet} for the <a href="https://universaldependencies.org/u/pos/">
-     * Universal POS tags</a> 
+     * Universal POS tags</a>
      */
     public static final TagSet<PosTag> U_POS = new TagSet<PosTag>(
             "Universal POS tags");
 
     static {
-        U_POS.getProperties().put("olia.annotationModel", 
-            "https://www.w3.org/2012/pyRdfa/extract?uri=http://fginter.github.io/docs/u/pos/all.html&format=turtle&rdfagraph=output&vocab_expansion=false&rdfa_lite=false&embedded_rdf=true&space_preserve=false&vocab_cache=true&vocab_cache_report=false&vocab_cache_refresh=false");
-        U_POS.getProperties().put("olia.linkingModel", 
-            "http://www.acoli.informatik.uni-frankfurt.de/resources/olia/ud-pos-link.rdf");
-        
+        U_POS.getProperties().put("olia.annotationModel",
+                "https://www.w3.org/2012/pyRdfa/extract?uri=http://fginter.github.io/docs/u/pos/all.html&format=turtle&rdfagraph=output&vocab_expansion=false&rdfa_lite=false&embedded_rdf=true&space_preserve=false&vocab_cache=true&vocab_cache_report=false&vocab_cache_refresh=false");
+        U_POS.getProperties().put("olia.linkingModel",
+                "http://www.acoli.informatik.uni-frankfurt.de/resources/olia/ud-pos-link.rdf");
+
         U_POS.addTag(new PosTag("ADJ", LexicalCategory.Adjective));
         U_POS.addTag(new PosTag("ADP", LexicalCategory.Adposition));
         U_POS.addTag(new PosTag("ADV", LexicalCategory.Adverb));
@@ -63,76 +62,76 @@ public final class StanzaConstants {
         U_POS.addTag(new PosTag("VERB", LexicalCategory.Verb));
         U_POS.addTag(new PosTag("X")); //other stuff
     }
-    
+
     public static final TagSet<PosTag> ENGLISH = new TagSet<PosTag>(
             "English Penn Treebank tagset", "en");
-    
+
     static {
         //TODO: define constants for annotation model and linking model
-        ENGLISH.getProperties().put("olia.annotationModel", 
-            "http://purl.org/olia/penn.owl");
-        ENGLISH.getProperties().put("olia.linkingModel", 
-            "http://purl.org/olia/penn-link.rdf");
+        ENGLISH.getProperties().put("olia.annotationModel",
+                "http://purl.org/olia/penn.owl");
+        ENGLISH.getProperties().put("olia.linkingModel",
+                "http://purl.org/olia/penn-link.rdf");
 
         ENGLISH.addTag(new PosTag("CC", Pos.CoordinatingConjunction));
-        ENGLISH.addTag(new PosTag("CD",Pos.CardinalNumber));
-        ENGLISH.addTag(new PosTag("DT",Pos.Determiner));
-        ENGLISH.addTag(new PosTag("EX",Pos.ExistentialParticle)); //TODO: unsure mapping
-        ENGLISH.addTag(new PosTag("FW",Pos.Foreign));
-        ENGLISH.addTag(new PosTag("IN",Pos.Preposition, Pos.SubordinatingConjunction));
-        ENGLISH.addTag(new PosTag("JJ",LexicalCategory.Adjective));
-        ENGLISH.addTag(new PosTag("JJR",LexicalCategory.Adjective, Pos.ComparativeParticle));
-        ENGLISH.addTag(new PosTag("JJS",LexicalCategory.Adjective, Pos.SuperlativeParticle));
-        ENGLISH.addTag(new PosTag("LS",Pos.ListMarker));
-        ENGLISH.addTag(new PosTag("MD",Pos.ModalVerb));
-        ENGLISH.addTag(new PosTag("NN",Pos.CommonNoun, Pos.SingularQuantifier));
-        ENGLISH.addTag(new PosTag("NNP",Pos.ProperNoun, Pos.SingularQuantifier));
-        ENGLISH.addTag(new PosTag("NNPS",Pos.ProperNoun, Pos.PluralQuantifier));
-        ENGLISH.addTag(new PosTag("NNS",Pos.CommonNoun, Pos.PluralQuantifier));
-        ENGLISH.addTag(new PosTag("PDT",Pos.Determiner)); //TODO should be Pre-Determiner
+        ENGLISH.addTag(new PosTag("CD", Pos.CardinalNumber));
+        ENGLISH.addTag(new PosTag("DT", Pos.Determiner));
+        ENGLISH.addTag(new PosTag("EX", Pos.ExistentialParticle)); //TODO: unsure mapping
+        ENGLISH.addTag(new PosTag("FW", Pos.Foreign));
+        ENGLISH.addTag(new PosTag("IN", Pos.Preposition, Pos.SubordinatingConjunction));
+        ENGLISH.addTag(new PosTag("JJ", LexicalCategory.Adjective));
+        ENGLISH.addTag(new PosTag("JJR", LexicalCategory.Adjective, Pos.ComparativeParticle));
+        ENGLISH.addTag(new PosTag("JJS", LexicalCategory.Adjective, Pos.SuperlativeParticle));
+        ENGLISH.addTag(new PosTag("LS", Pos.ListMarker));
+        ENGLISH.addTag(new PosTag("MD", Pos.ModalVerb));
+        ENGLISH.addTag(new PosTag("NN", Pos.CommonNoun, Pos.SingularQuantifier));
+        ENGLISH.addTag(new PosTag("NNP", Pos.ProperNoun, Pos.SingularQuantifier));
+        ENGLISH.addTag(new PosTag("NNPS", Pos.ProperNoun, Pos.PluralQuantifier));
+        ENGLISH.addTag(new PosTag("NNS", Pos.CommonNoun, Pos.PluralQuantifier));
+        ENGLISH.addTag(new PosTag("PDT", Pos.Determiner)); //TODO should be Pre-Determiner
         ENGLISH.addTag(new PosTag("POS", Pos.PossessiveDeterminer)); //TODO: map Possessive Ending (e.g., Nouns ending in 's)
-        ENGLISH.addTag(new PosTag("PP",Pos.PersonalPronoun));
-        ENGLISH.addTag(new PosTag("PP$",Pos.PossessivePronoun));
-        ENGLISH.addTag(new PosTag("PRP",Pos.PersonalPronoun));
-        ENGLISH.addTag(new PosTag("PRP$",Pos.PossessivePronoun));
-        ENGLISH.addTag(new PosTag("RB",LexicalCategory.Adverb));
-        ENGLISH.addTag(new PosTag("RBR",LexicalCategory.Adverb,Pos.ComparativeParticle));
-        ENGLISH.addTag(new PosTag("RBS",LexicalCategory.Adverb,Pos.SuperlativeParticle));
-        ENGLISH.addTag(new PosTag("RP",Pos.Participle));
-        ENGLISH.addTag(new PosTag("SYM",Pos.Symbol));
-        ENGLISH.addTag(new PosTag("TO",LexicalCategory.Adposition));
-        ENGLISH.addTag(new PosTag("UH",LexicalCategory.Interjection));
-        ENGLISH.addTag(new PosTag("VB",Pos.Infinitive)); //TODO check a Verb in the base form should be Pos.Infinitive
-        ENGLISH.addTag(new PosTag("VBD",Pos.PastParticiple)); //TODO check
-        ENGLISH.addTag(new PosTag("VBG",Pos.PresentParticiple,Pos.Gerund));
-        ENGLISH.addTag(new PosTag("VBN",Pos.PastParticiple));
-        ENGLISH.addTag(new PosTag("VBP",Pos.PresentParticiple));
-        ENGLISH.addTag(new PosTag("VBZ",Pos.PresentParticiple));
-        ENGLISH.addTag(new PosTag("WDT",Pos.WHDeterminer));
-        ENGLISH.addTag(new PosTag("WP",Pos.WHPronoun));
-        ENGLISH.addTag(new PosTag("WP$",Pos.PossessivePronoun, Pos.WHPronoun));
-        ENGLISH.addTag(new PosTag("WRB",Pos.WHTypeAdverbs));
-        ENGLISH.addTag(new PosTag("´´",Pos.CloseQuote));
-        ENGLISH.addTag(new PosTag("''",Pos.Quote));
-        ENGLISH.addTag(new PosTag(":",Pos.Colon));
-        ENGLISH.addTag(new PosTag(",",Pos.Comma));
-        ENGLISH.addTag(new PosTag("$",LexicalCategory.Residual));
-        ENGLISH.addTag(new PosTag("\"",Pos.Quote));
-        ENGLISH.addTag(new PosTag("``",Pos.OpenQuote));
-        ENGLISH.addTag(new PosTag(".",Pos.Point));
-        ENGLISH.addTag(new PosTag("#",Pos.SecondaryPunctuation));
-        ENGLISH.addTag(new PosTag("{",Pos.OpenCurlyBracket));
-        ENGLISH.addTag(new PosTag("}",Pos.CloseCurlyBracket));
-        ENGLISH.addTag(new PosTag("[",Pos.OpenSquareBracket));
-        ENGLISH.addTag(new PosTag("]",Pos.CloseSquareBracket));
-        ENGLISH.addTag(new PosTag("(",Pos.OpenParenthesis));
-        ENGLISH.addTag(new PosTag(")",Pos.CloseParenthesis));
-        ENGLISH.addTag(new PosTag("-LRB-",Pos.OpenParenthesis)); //deprecated tag
-        ENGLISH.addTag(new PosTag("-RRB-",Pos.CloseParenthesis)); //deprecated tag
-    }    
-    
+        ENGLISH.addTag(new PosTag("PP", Pos.PersonalPronoun));
+        ENGLISH.addTag(new PosTag("PP$", Pos.PossessivePronoun));
+        ENGLISH.addTag(new PosTag("PRP", Pos.PersonalPronoun));
+        ENGLISH.addTag(new PosTag("PRP$", Pos.PossessivePronoun));
+        ENGLISH.addTag(new PosTag("RB", LexicalCategory.Adverb));
+        ENGLISH.addTag(new PosTag("RBR", LexicalCategory.Adverb, Pos.ComparativeParticle));
+        ENGLISH.addTag(new PosTag("RBS", LexicalCategory.Adverb, Pos.SuperlativeParticle));
+        ENGLISH.addTag(new PosTag("RP", Pos.Participle));
+        ENGLISH.addTag(new PosTag("SYM", Pos.Symbol));
+        ENGLISH.addTag(new PosTag("TO", LexicalCategory.Adposition));
+        ENGLISH.addTag(new PosTag("UH", LexicalCategory.Interjection));
+        ENGLISH.addTag(new PosTag("VB", Pos.Infinitive)); //TODO check a Verb in the base form should be Pos.Infinitive
+        ENGLISH.addTag(new PosTag("VBD", Pos.PastParticiple)); //TODO check
+        ENGLISH.addTag(new PosTag("VBG", Pos.PresentParticiple, Pos.Gerund));
+        ENGLISH.addTag(new PosTag("VBN", Pos.PastParticiple));
+        ENGLISH.addTag(new PosTag("VBP", Pos.PresentParticiple));
+        ENGLISH.addTag(new PosTag("VBZ", Pos.PresentParticiple));
+        ENGLISH.addTag(new PosTag("WDT", Pos.WHDeterminer));
+        ENGLISH.addTag(new PosTag("WP", Pos.WHPronoun));
+        ENGLISH.addTag(new PosTag("WP$", Pos.PossessivePronoun, Pos.WHPronoun));
+        ENGLISH.addTag(new PosTag("WRB", Pos.WHTypeAdverbs));
+        ENGLISH.addTag(new PosTag("´´", Pos.CloseQuote));
+        ENGLISH.addTag(new PosTag("''", Pos.Quote));
+        ENGLISH.addTag(new PosTag(":", Pos.Colon));
+        ENGLISH.addTag(new PosTag(",", Pos.Comma));
+        ENGLISH.addTag(new PosTag("$", LexicalCategory.Residual));
+        ENGLISH.addTag(new PosTag("\"", Pos.Quote));
+        ENGLISH.addTag(new PosTag("``", Pos.OpenQuote));
+        ENGLISH.addTag(new PosTag(".", Pos.Point));
+        ENGLISH.addTag(new PosTag("#", Pos.SecondaryPunctuation));
+        ENGLISH.addTag(new PosTag("{", Pos.OpenCurlyBracket));
+        ENGLISH.addTag(new PosTag("}", Pos.CloseCurlyBracket));
+        ENGLISH.addTag(new PosTag("[", Pos.OpenSquareBracket));
+        ENGLISH.addTag(new PosTag("]", Pos.CloseSquareBracket));
+        ENGLISH.addTag(new PosTag("(", Pos.OpenParenthesis));
+        ENGLISH.addTag(new PosTag(")", Pos.CloseParenthesis));
+        ENGLISH.addTag(new PosTag("-LRB-", Pos.OpenParenthesis)); //deprecated tag
+        ENGLISH.addTag(new PosTag("-RRB-", Pos.CloseParenthesis)); //deprecated tag
+    }
+
     /*
-     * Links to the STTS model as defined by the 
+     * Links to the STTS model as defined by the
      * <a herf="http://nlp2rdf.lod2.eu/olia/">OLIA</a> Ontology.
      * @see German#STTS
      */
@@ -142,11 +141,11 @@ public final class StanzaConstants {
     static {
         //This covers Tiger and Negra Tag sets (as documented by the mappings
         //to uPos (see 
-        GERMAN.getProperties().put("olia.annotationModel", 
-            "http://purl.org/olia/stts.owl");
-        GERMAN.getProperties().put("olia.linkingModel", 
-            "http://purl.org/olia/stts-link.rdf");
-        
+        GERMAN.getProperties().put("olia.annotationModel",
+                "http://purl.org/olia/stts.owl");
+        GERMAN.getProperties().put("olia.linkingModel",
+                "http://purl.org/olia/stts-link.rdf");
+
         GERMAN.addTag(new PosTag("ADJA", Pos.AttributiveAdjective));
         GERMAN.addTag(new PosTag("ADJD", Pos.PredicativeAdjective));
         GERMAN.addTag(new PosTag("ADV", LexicalCategory.Adverb));
@@ -164,10 +163,10 @@ public final class StanzaConstants {
         GERMAN.addTag(new PosTag("KOKOM", Pos.ComparativeParticle));
         GERMAN.addTag(new PosTag("NN", Pos.CommonNoun));
         GERMAN.addTag(new PosTag("NE", Pos.ProperNoun));
-        GERMAN.addTag(new PosTag("PDS", Pos.DemonstrativePronoun,Pos.SubstitutivePronoun));
+        GERMAN.addTag(new PosTag("PDS", Pos.DemonstrativePronoun, Pos.SubstitutivePronoun));
         GERMAN.addTag(new PosTag("PDAT", Pos.DemonstrativePronoun, Pos.AttributivePronoun));
         GERMAN.addTag(new PosTag("PIS", Pos.SubstitutivePronoun, Pos.IndefinitePronoun));
-        GERMAN.addTag(new PosTag("PIAT",  Pos.AttributivePronoun, Pos.IndefinitePronoun));
+        GERMAN.addTag(new PosTag("PIAT", Pos.AttributivePronoun, Pos.IndefinitePronoun));
         GERMAN.addTag(new PosTag("PIDAT", Pos.AttributivePronoun, Pos.IndefinitePronoun));
         GERMAN.addTag(new PosTag("PPER", Pos.PersonalPronoun));
         GERMAN.addTag(new PosTag("PPOSS", Pos.SubstitutivePronoun, Pos.PossessivePronoun));
@@ -206,9 +205,9 @@ public final class StanzaConstants {
         GERMAN.addTag(new PosTag("$[", Pos.ParentheticalPunctuation));
         GERMAN.addTag(new PosTag("NNE", Pos.ProperNoun)); //Normal nouns in named entities (not in stts 1999)
     }
-    
+
     public static final Map<String, TagSet<PosTag>> TAG_SETS;
-    
+
     static {
         Map<String, TagSet<PosTag>> tagSets = new HashMap<>();
         tagSets.put("de", GERMAN);
@@ -216,8 +215,9 @@ public final class StanzaConstants {
         TAG_SETS = Collections.unmodifiableMap(tagSets);
     }
 
-    
-    public static final TagSet<NerTag> NER_TAG_SET = new TagSet<NerTag>("German NER Tagset","de");
+
+    public static final TagSet<NerTag> NER_TAG_SET = new TagSet<NerTag>("German NER Tagset", "de");
+
     static {
         NER_TAG_SET.addTag(new NerTag("PERSON", NerTag.NAMED_ENTITY_PERSON));
         NER_TAG_SET.addTag(new NerTag("person", NerTag.NAMED_ENTITY_PERSON));
@@ -228,7 +228,7 @@ public final class StanzaConstants {
         NER_TAG_SET.addTag(new NerTag("I-PERS", NerTag.NAMED_ENTITY_PERSON));
         NER_TAG_SET.addTag(new NerTag("B-PER", NerTag.NAMED_ENTITY_PERSON));
         NER_TAG_SET.addTag(new NerTag("I-PER", NerTag.NAMED_ENTITY_PERSON));
-      
+
         NER_TAG_SET.addTag(new NerTag("ORGANIZATION", NerTag.NAMED_ENTITY_ORGANIZATION));
         NER_TAG_SET.addTag(new NerTag("organization", NerTag.NAMED_ENTITY_ORGANIZATION));
         NER_TAG_SET.addTag(new NerTag("Organization", NerTag.NAMED_ENTITY_ORGANIZATION));
@@ -239,7 +239,7 @@ public final class StanzaConstants {
         NER_TAG_SET.addTag(new NerTag("org", NerTag.NAMED_ENTITY_ORGANIZATION));
         NER_TAG_SET.addTag(new NerTag("B-ORG", NerTag.NAMED_ENTITY_ORGANIZATION));
         NER_TAG_SET.addTag(new NerTag("I-ORG", NerTag.NAMED_ENTITY_ORGANIZATION));
-      
+
         NER_TAG_SET.addTag(new NerTag("LOCATION", NerTag.NAMED_ENTITY_LOCATION));
         NER_TAG_SET.addTag(new NerTag("Location", NerTag.NAMED_ENTITY_LOCATION));
         NER_TAG_SET.addTag(new NerTag("location", NerTag.NAMED_ENTITY_LOCATION));

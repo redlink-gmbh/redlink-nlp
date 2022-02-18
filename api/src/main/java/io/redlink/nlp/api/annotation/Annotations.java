@@ -16,10 +16,9 @@
 
 package io.redlink.nlp.api.annotation;
 
+import io.redlink.nlp.api.model.Annotation;
 import java.net.URI;
 import java.util.Date;
-
-import io.redlink.nlp.api.model.Annotation;
 
 public interface Annotations {
 

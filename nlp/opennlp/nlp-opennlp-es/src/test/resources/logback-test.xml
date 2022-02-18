@@ -7,15 +7,15 @@
         </encoder>
     </appender>
 
-    <logger name="org.springframework" level="WARN" />
+    <logger name="org.springframework" level="WARN"/>
 
-    <logger name="io.redlink" level="INFO" />
-    <logger name="io.redlink.nlp" level="INFO" />
-    <logger name="io.redlink.nlp.opennlp" level="INFO" />
-    <logger name="io.redlink.nlp.opennlp.es" level="DEBUG" />
+    <logger name="io.redlink" level="INFO"/>
+    <logger name="io.redlink.nlp" level="INFO"/>
+    <logger name="io.redlink.nlp.opennlp" level="INFO"/>
+    <logger name="io.redlink.nlp.opennlp.es" level="DEBUG"/>
 
     <root level="WARN">
-        <appender-ref ref="STDOUT" />
+        <appender-ref ref="STDOUT"/>
     </root>
 
 

@@ -16,59 +16,61 @@
 
 package io.redlink.nlp.opennlp;
 
+import io.redlink.nlp.model.ner.NerTag;
 import java.util.HashMap;
 import java.util.Map;
-
-import io.redlink.nlp.model.ner.NerTag;
 import opennlp.tools.namefind.NameFinderME;
 import opennlp.tools.namefind.TokenNameFinderModel;
 
 /**
- * Represents a configured OpenNLP {@link TokenNameFinderModel}. 
+ * Represents a configured OpenNLP {@link TokenNameFinderModel}.
  * <p>
  * During construction the name and type mappings are set. During the
  * activation the model is loaded. {@link ThreadLocal} {@link NameFinderME}
  * instances are created at runtime.
- * 
- * @author Rupert Westenthaler
  *
+ * @author Rupert Westenthaler
  */
 public class NameFinderModel {
 
-    private final Map<String,String> typeMappings = new HashMap<>();
+    private final Map<String, String> typeMappings = new HashMap<>();
     /**
      * The name of the model.
      */
     protected final String modelName;
     private TokenNameFinderModel model;
     private ThreadLocal<NameFinderME> nameFinder;
-    
+
     public NameFinderModel(String modelName) {
         assert modelName != null;
         assert !modelName.isEmpty();
         this.modelName = modelName;
     }
+
     /**
      * Creates a NameFinderModel including some type mappings
-     * @param modelName the name of the {@link TokenNameFinderModel}
-     * @param typeMappings the type mappings formatted like 
-     * <code>[modelType1, type1, modelType2, type2, ... , modelTypeN, typeN]</code>
+     *
+     * @param modelName    the name of the {@link TokenNameFinderModel}
+     * @param typeMappings the type mappings formatted like
+     *                     <code>[modelType1, type1, modelType2, type2, ... , modelTypeN, typeN]</code>
      */
-    public NameFinderModel(String modelName,String...typeMappings) {
+    public NameFinderModel(String modelName, String... typeMappings) {
         this(modelName);
         assert typeMappings != null;
-        assert typeMappings.length%2 == 0;
-        for(int i=0; i < typeMappings.length-1; i++){
+        assert typeMappings.length % 2 == 0;
+        for (int i = 0; i < typeMappings.length - 1; i++) {
             addMapping(typeMappings[i++], typeMappings[i]);
         }
     }
+
     /**
-     * Adds a type mapping for the model. 
+     * Adds a type mapping for the model.
+     *
      * @param modelType the type string used by the model
-     * @param type the type string used by the {@link NamedEntity#type}
+     * @param type      the type string used by the {@link NamedEntity#type}
      * @return Returns this instance
      */
-    public NameFinderModel addMapping(String modelType,String type){
+    public NameFinderModel addMapping(String modelType, String type) {
         typeMappings.put(modelType, type);
         return this;
     }
@@ -76,17 +78,20 @@ public class NameFinderModel {
     /**
      * Used by the {@link OpenNlpNerModel#activate()} method to set the
      * loaded model.
+     *
      * @param model the model to set
      */
     void setModel(TokenNameFinderModel model) {
         assert model != null;
         this.model = model;
-        this.nameFinder = new ThreadLocal<NameFinderME>(){
-            @Override protected  NameFinderME initialValue() {
+        this.nameFinder = new ThreadLocal<NameFinderME>() {
+            @Override
+            protected NameFinderME initialValue() {
                 return new NameFinderME(NameFinderModel.this.model);
             }
         };
     }
+
     /**
      * Allows to reset the {@link #model} and {@link #nameFinder}
      */
@@ -94,30 +99,33 @@ public class NameFinderModel {
         this.model = null;
         this.nameFinder = null;
     }
-    
+
     /**
      * Getter for the model.
+     *
      * @return the model
      */
     public TokenNameFinderModel getModel() {
         return model;
     }
-    
+
     /**
      * Getter for the name finder
+     *
      * @return the name finder
      */
     public NameFinderME getNameFinder() {
         return nameFinder == null ? null : nameFinder.get();
     }
-    
+
     @Override
     public String toString() {
         return modelName;
     }
-    
+
     /**
      * Getter for the type based on the model type
+     *
      * @param type the model type
      * @return the mapped type or <code>null</code> if no mapping for this type
      * is present. If <code>null</code> is parsed this will return

@@ -17,13 +17,11 @@
 package io.redlink.nlp.opennlp.es;
 
 
-import java.util.Locale;
-
-import org.springframework.stereotype.Service;
-
 import io.redlink.nlp.model.ner.NerTag;
 import io.redlink.nlp.opennlp.NameFinderModel;
 import io.redlink.nlp.opennlp.OpenNlpNerModel;
+import java.util.Locale;
+import org.springframework.stereotype.Service;
 
 /**
  * Implementation of Spanish-specific tools for natural language processing.
@@ -34,14 +32,14 @@ import io.redlink.nlp.opennlp.OpenNlpNerModel;
  */
 @Service
 public class NerSpanish extends OpenNlpNerModel {
-    
+
     public NerSpanish() {
         super(Locale.forLanguageTag("es"),
                 new NameFinderModel("es-clusters-conll02.bin",
-                        "PER", NerTag.NAMED_ENTITY_PERSON, 
+                        "PER", NerTag.NAMED_ENTITY_PERSON,
                         "ORG", NerTag.NAMED_ENTITY_ORGANIZATION,
-                        "LOC", NerTag.NAMED_ENTITY_LOCATION, 
-                        "MISC",NerTag.NAMED_ENTITY_MISC));
+                        "LOC", NerTag.NAMED_ENTITY_LOCATION,
+                        "MISC", NerTag.NAMED_ENTITY_MISC));
         //can be used to set a custom tokenizer
         //setCustomTokenizer("none");
     }

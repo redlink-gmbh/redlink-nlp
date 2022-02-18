@@ -21,33 +21,30 @@ import java.io.InputStream;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
-
+import opennlp.tools.namefind.TokenNameFinderModel;
+import opennlp.tools.util.InvalidFormatException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
-
-import opennlp.tools.namefind.TokenNameFinderModel;
-import opennlp.tools.util.InvalidFormatException;
 
 /**
  * A language specific configuration for OpenNLP based NER recognitions.
  * Subclasses need to register them self as {@link Service}s so that they can
  * get injected to the {@link OpenNlpNerProcessor}
- * 
- * @author Rupert Westenthaler
  *
+ * @author Rupert Westenthaler
  */
 public abstract class OpenNlpNerModel {
 
     private final Logger log = LoggerFactory.getLogger(getClass());
-    
+
     private final Locale locale;
     private List<NameFinderModel> models;
     private boolean caseSensitive = true;
 
     private boolean activated;
 
-    protected OpenNlpNerModel(Locale locale, NameFinderModel...models){
+    protected OpenNlpNerModel(Locale locale, NameFinderModel... models) {
         assert locale != null;
         assert models != null;
         assert models.length > 0;
@@ -55,15 +52,19 @@ public abstract class OpenNlpNerModel {
         this.models = Arrays.asList(models);
         assert !this.models.contains(null);
     }
+
     /**
      * Needs to be set to false if the NER models are case less
+     *
      * @param caseSensitive the case sensitive state
      */
     protected void setCaseSensitive(boolean caseSensitive) {
         this.caseSensitive = caseSensitive;
     }
+
     /**
      * If the NER Models are case sensitive or not
+     *
      * @return the case sensitive state
      */
     public boolean isCaseSensitive() {
@@ -71,21 +72,21 @@ public abstract class OpenNlpNerModel {
     }
 
     public void activate() throws IOException {
-        if(!activated){
+        if (!activated) {
             synchronized (this) {
-                if(!activated){
-                    log.info("> activating {}",getClass().getSimpleName());
+                if (!activated) {
+                    log.info("> activating {}", getClass().getSimpleName());
                     ClassLoader cl = getClass().getClassLoader();
-                    for(NameFinderModel model : models){
-                        log.info("  ... loading {}",model.modelName);
+                    for (NameFinderModel model : models) {
+                        log.info("  ... loading {}", model.modelName);
                         InputStream in = cl.getResourceAsStream(model.modelName);
-                        if(in != null){
+                        if (in != null) {
                             try {
                                 model.setModel(new TokenNameFinderModel(in));
                             } catch (InvalidFormatException e) {
                                 throw new IOException("Unable to load OpenNLP Name Finder Model '"
                                         + model.modelName + "' for language '" + locale.getLanguage()
-                                        + "' Message: "+e.getMessage(), e);
+                                        + "' Message: " + e.getMessage(), e);
                             } catch (IOException e) {
                                 throw new IOException("Unable to load OpenNLP Name Finder Model '"
                                         + model.modelName + "' for language '" + locale.getLanguage()
@@ -110,42 +111,42 @@ public abstract class OpenNlpNerModel {
 
     /**
      * The NameFinder models
-     * @return
      */
-    public List<NameFinderModel> getNameFinders(){
+    public List<NameFinderModel> getNameFinders() {
         return models;
     }
-    
+
     public void deactivate() {
         synchronized (this) {
-            log.info("> deactivate {}",getClass().getSimpleName());
+            log.info("> deactivate {}", getClass().getSimpleName());
             activated = false;
-            for(NameFinderModel model : models){
+            for (NameFinderModel model : models) {
                 model.reset();
             }
         }
     }
 
-    public boolean isActive(){
+    public boolean isActive() {
         return activated;
     }
-    
+
     public Locale getLocale() {
         return locale;
     }
-    
+
     /**
      * The language supported by the NerModel. This method
      * can be called before {@link #activate() activation}
+     *
      * @return the ISO 639-1 language code (e.g. "en" for English)
      */
-    public final String getLanguage(){
+    public final String getLanguage() {
         Locale l = getLocale();
         return l == null ? null : l.getLanguage();
     }
 
     public String getName() {
-        return "OpenNLP Named Entity Extraction support for " +locale.getLanguage()
+        return "OpenNLP Named Entity Extraction support for " + locale.getLanguage()
                 + " based on " + models.toString();
     }
 

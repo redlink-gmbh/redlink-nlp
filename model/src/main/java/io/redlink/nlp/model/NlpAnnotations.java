@@ -16,8 +16,6 @@
 
 package io.redlink.nlp.model;
 
-import java.util.Date;
-
 import io.redlink.nlp.api.ProcessingData;
 import io.redlink.nlp.api.ProcessingData.Configuration;
 import io.redlink.nlp.api.annotation.Annotations;
@@ -34,6 +32,7 @@ import io.redlink.nlp.model.section.SectionStats;
 import io.redlink.nlp.model.section.SectionTag;
 import io.redlink.nlp.model.section.SectionType;
 import io.redlink.nlp.model.temporal.DateTimeValue;
+import java.util.Date;
 
 /**
  * Defines the {@link Annotation} constants typically used by NLP components
@@ -45,18 +44,18 @@ public final class NlpAnnotations {
      * {@link Section} in the text.
      */
     public static final Annotation<SectionTag> SECTION_ANNOTATION = new Annotation<SectionTag>(
-            "stanbol_enhancer_nlp_section",SectionTag.class);
+            "stanbol_enhancer_nlp_section", SectionTag.class);
     /**
      * Allows to attach statistics about a Section.
      */
     public static final Annotation<SectionStats> SECTION_STATS_ANNOTATION = new Annotation<SectionStats>(
-            "stanbol_enhancer_nlp_section_stats",SectionStats.class);
-    
+            "stanbol_enhancer_nlp_section_stats", SectionStats.class);
+
     /**
      * Allows to mark a section as containing Content.
      */
     public static final Annotation<Boolean> SECTION_CLASSIFICATION_CONTENT_SECTION = new Annotation<Boolean>(
-            "stanbol_enhancer_nlp_classification_content_section",Boolean.class);
+            "stanbol_enhancer_nlp_classification_content_section", Boolean.class);
 
     /**
      * The POS {@link Annotation} added by POS taggers to {@link Token}s of an
@@ -65,7 +64,7 @@ public final class NlpAnnotations {
     public static final Annotation<PosTag> POS_ANNOTATION = new Annotation<PosTag>(
             "stanbol_enhancer_nlp_pos", PosTag.class);
     /**
-     * 
+     *
      */
     public static final Annotation<NerTag> NER_ANNOTATION = new Annotation<NerTag>(
             "stanbol_enhancer_nlp_ner", NerTag.class);
@@ -123,7 +122,7 @@ public final class NlpAnnotations {
      */
     public static final Annotation<String> STEM_ANNOTATION = new Annotation<>(
             "stanbol_enhancer_nlp_stem", String.class);
-    
+
     /**
      * Simple Annotation to store the lemma. NOTE the lemma can also be
      * annotated by using the {@link #MORPHO_ANNOTATION}. In that case it
@@ -132,7 +131,7 @@ public final class NlpAnnotations {
      */
     public static final Annotation<String> LEMMA_ANNOTATION = new Annotation<>(
             "stanbol_enhancer_nlp_lemma", String.class);
-    
+
     /**
      * The case corrected version of the token
      */
@@ -157,11 +156,12 @@ public final class NlpAnnotations {
      * the whole {@link AnalyzedText}). NOTE: That the language detected for the Document as a
      * whole is expected to be annotated using {@link Annotations#LANGUAGE} on the
      * {@link ProcessingData}.
+     *
      * @see Annotations#LANGUAGE
      */
     public final static Annotation<String> LANGUAGE_ANNOTATION = new Annotation<>(
             "stanbol_enhancer_nlp_language", String.class);
-    
+
     /*
      * Temporal Annotations:
      *   1. the Configuration#TEMPORAL_CONTEXT set as ProcessingData#getConfiguration(). This
@@ -173,25 +173,26 @@ public final class NlpAnnotations {
      *      This annotation uses DateTimeValue allowing to represent both
      *      instants and intervals with a Date and a Grain.
      */
-    
+
     /**
      * Used to provide the temporal context of a {@link AnalyzedText} or single {@link Section}s.
      * This annotation if present for the {@link AnalyzedText} will override the {@link Configuration#TEMPORAL_CONTEXT}
      * property on the {@link ProcessingData} but its main intension is for allowing to define different
      * temporal context on {@link Section} level. <p>
      * <b>IMPORTANT:</b> Do <b>NOT</b> use this annotation for date/time values extracted from the Text.
+     *
      * @see Configuration#TEMPORAL_CONTEXT
      * @see NlpAnnotations#TEMPORAL_ANNOTATION
      */
     public final static Annotation<Date> TEMPORAL_CONTEXT = new Annotation<>(
             "stanbol_enhancer_nlp_context_temporal", Date.class);
-    
+
     /**
      * Used to annotation {@link Chunk}s with the instant or intervals they refer.
      */
     public final static Annotation<DateTimeValue> TEMPORAL_ANNOTATION = new Annotation<>(
             "stanbol_enhancer_nlp_temporal", DateTimeValue.class);
-    
+
     /**
      * Used to annotation {@link Chunk}s with the linked entity as value.
      */
@@ -218,6 +219,6 @@ public final class NlpAnnotations {
     // Annotation<VerbMoodTag> VERB_MOOD_ANNOTATION = new
     // Annotation<VerbMoodTag>(
     // "stanbol_enhancer_nlp_morpho_verb-mood",VerbMoodTag.class);
-    
-    private NlpAnnotations(){/*static only*/}
+
+    private NlpAnnotations() {/*static only*/}
 }

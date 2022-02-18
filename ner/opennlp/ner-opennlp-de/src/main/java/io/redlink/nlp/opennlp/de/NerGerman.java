@@ -17,13 +17,12 @@
 package io.redlink.nlp.opennlp.de;
 
 
-import static java.util.Locale.GERMAN;
-
-import org.springframework.stereotype.Component;
-
 import io.redlink.nlp.model.ner.NerTag;
 import io.redlink.nlp.opennlp.NameFinderModel;
 import io.redlink.nlp.opennlp.OpenNlpNerModel;
+import org.springframework.stereotype.Component;
+
+import static java.util.Locale.GERMAN;
 
 /**
  * Implementation of English-specific tools for natural language processing.
@@ -32,14 +31,14 @@ import io.redlink.nlp.opennlp.OpenNlpNerModel;
  */
 @Component
 public class NerGerman extends OpenNlpNerModel {
-    
+
     public NerGerman() {
         super(GERMAN,
                 new NameFinderModel("model/ner/opennlp/de-4-class-outer-clusters-germEval2014.bin",
-                        "PER", NerTag.NAMED_ENTITY_PERSON, 
+                        "PER", NerTag.NAMED_ENTITY_PERSON,
                         "ORG", NerTag.NAMED_ENTITY_ORGANIZATION,
-                        "LOC", NerTag.NAMED_ENTITY_LOCATION, 
-                        "MISC",NerTag.NAMED_ENTITY_MISC,
+                        "LOC", NerTag.NAMED_ENTITY_LOCATION,
+                        "MISC", NerTag.NAMED_ENTITY_MISC,
                         "OTH", NerTag.NAMED_ENTITY_MISC)); //Other
         setCaseSensitive(true); //this model is case sensitive
         //can be used to set a custom tokenizer

@@ -15,31 +15,29 @@
  */
 package io.redlink.nlp.regex.ner;
 
-import java.util.EnumSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.regex.MatchResult;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import io.redlink.nlp.api.model.Value;
 import io.redlink.nlp.model.AnalyzedText;
 import io.redlink.nlp.model.NlpAnnotations;
 import io.redlink.nlp.model.Span;
 import io.redlink.nlp.model.Span.SpanTypeEnum;
 import io.redlink.nlp.model.SpanCollection;
 import io.redlink.nlp.regex.ner.RegexNerProcessor.NamedEntity;
+import java.util.EnumSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.regex.MatchResult;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Extract patterns based on regexes.
- * 
+ * <p>
  * Subclasses need to provide a list of {@link NamedPattern}.
  * For matching {@link NamedPattern} the {@link #createNamedEntity(String, MatchResult)}
  * is called with the name of the matching pattern and the matching result.
+ *
  * @see RegexNerDetector
  * @see NamedRegexDetector
  */
@@ -50,9 +48,9 @@ public abstract class RegexNamedEntityFactory {
     public final void process(SpanCollection section, String lang, List<NamedEntity> namedEntities) {
         log.debug("extract Named Entities for {} (doc lang: {})", section, lang);
         //check for section specific language annotations
-        if(SpanTypeEnum.TextSection == section.getType()){
+        if (SpanTypeEnum.TextSection == section.getType()) {
             String sectionLang = section.getAnnotation(NlpAnnotations.LANGUAGE_ANNOTATION);
-            if(sectionLang != null){
+            if (sectionLang != null) {
                 log.debug("  - with section specific language: {}", sectionLang);
                 lang = sectionLang;
             }
@@ -60,12 +58,12 @@ public abstract class RegexNamedEntityFactory {
         final List<NamedPattern> patterns = getRegexes(section, lang);
         Iterator<Span> subSections = section.getEnclosed(EnumSet.of(SpanTypeEnum.TextSection, SpanTypeEnum.Sentence));
         SpanCollection active = section;
-        while(subSections.hasNext()){
-            SpanCollection subSection = (SpanCollection)subSections.next();
-            if(subSection.getStart() >= active.getEnd()){
+        while (subSections.hasNext()) {
+            SpanCollection subSection = (SpanCollection) subSections.next();
+            if (subSection.getStart() >= active.getEnd()) {
                 process(active.getType(), active.getStart(), active.getSpan(), patterns, namedEntities);
-            } else if(subSection.getEnd() < active.getEnd()){
-                if(subSection.getStart() > active.getStart()){
+            } else if (subSection.getEnd() < active.getEnd()) {
+                if (subSection.getStart() > active.getStart()) {
                     process(active.getType(), active.getStart(), active.getSpan().substring(0, subSection.getStart() - active.getStart()), patterns, namedEntities);
                 }
             }
@@ -76,13 +74,13 @@ public abstract class RegexNamedEntityFactory {
     }
 
     private void process(SpanTypeEnum spanType, int offset, String text, List<NamedPattern> patterns, List<NamedEntity> namedEntities) {
-        if(log.isTraceEnabled()){
-            log.trace(" - process {} [{}, {}] - {}",spanType, offset, offset + text.length(), StringUtils.abbreviate(text, 50));
+        if (log.isTraceEnabled()) {
+            log.trace(" - process {} [{}, {}] - {}", spanType, offset, offset + text.length(), StringUtils.abbreviate(text, 50));
         }
         for (NamedPattern namedPattern : patterns) {
             final Matcher matcher = namedPattern.getPattern().matcher(text);
             while (matcher.find()) {
-                final NamedEntity ne = createNamedEntity(namedPattern.getName(),matcher.toMatchResult());
+                final NamedEntity ne = createNamedEntity(namedPattern.getName(), matcher.toMatchResult());
                 if (ne == null) continue;
                 ne.setOffset(offset);
                 namedEntities.add(ne);
@@ -94,46 +92,47 @@ public abstract class RegexNamedEntityFactory {
     /**
      * Creates a token for the parsed {@link MatchResult} originating from the
      * {@link NamedPattern} with the parsed name
+     *
      * @param patternName the name of the {@link NamedPattern}
-     * @param match the {@link MatchResult}
+     * @param match       the {@link MatchResult}
      * @return the {@link NamedEntity} or <code>null</code> if no Token was created.
      */
     protected abstract NamedEntity createNamedEntity(String patternName, MatchResult match);
 
     /**
      * Getter for the {@link NamedPattern} to be used by the {@link RegexNerProcessor}
-     * @param section the section of an {@link AnalyzedText} to be analyzed with the
-     * returned patterns
+     *
+     * @param section  the section of an {@link AnalyzedText} to be analyzed with the
+     *                 returned patterns
      * @param language the language of the parsed text section
      * @return the list of {@link NamedPattern} or an empty list if none
      */
     protected abstract List<NamedPattern> getRegexes(SpanCollection section, String language);
-    
+
     /**
      * A regex {@link Pattern} with an assigned Name. The name is parsed
      * to the {@link RegexNamedEntityFactory#createNamedEntity(String, MatchResult)}
      * method so that implementers know what pattern caused the parsed
      * {@link MatchResult}.
-     * 
-     * @author Rupert Westenthaler
      *
+     * @author Rupert Westenthaler
      */
     public static final class NamedPattern {
-        
+
         private final String name;
         private final Pattern pattern;
-        
+
         public NamedPattern(String name, Pattern pattern) {
             assert StringUtils.isNotBlank(name);
             this.name = name;
             assert pattern != null;
             this.pattern = pattern;
         }
-        
+
         public String getName() {
             return name;
         }
-        
+
         public Pattern getPattern() {
             return pattern;
         }

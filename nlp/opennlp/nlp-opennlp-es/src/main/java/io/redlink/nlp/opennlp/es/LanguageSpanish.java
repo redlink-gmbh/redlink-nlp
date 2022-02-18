@@ -16,15 +16,13 @@
 
 package io.redlink.nlp.opennlp.es;
 
-import java.util.Locale;
-
-import org.springframework.stereotype.Service;
-
 import io.redlink.nlp.model.pos.LexicalCategory;
 import io.redlink.nlp.model.pos.Pos;
 import io.redlink.nlp.model.pos.PosTag;
 import io.redlink.nlp.model.tag.TagSet;
 import io.redlink.nlp.opennlp.pos.OpenNlpLanguageModel;
+import java.util.Locale;
+import org.springframework.stereotype.Service;
 
 /**
  * Implementation of Spanish-specific tools for natural language processing.
@@ -34,16 +32,17 @@ import io.redlink.nlp.opennlp.pos.OpenNlpLanguageModel;
 @Service
 public class LanguageSpanish extends OpenNlpLanguageModel {
     /**
-     * Links to the PAROLE model as defined by the 
+     * Links to the PAROLE model as defined by the
      * <a herf="http://nlp2rdf.lod2.eu/olia/">OLIA</a> Ontology.
+     *
      * @see Spanish#SPANISH_PAROLE
      */
     public static final TagSet<PosTag> SPANISH_PAROLE = new TagSet<PosTag>("PAROLE Spanish", "es");
 
     static {
         //TODO: define constants for annotation model and linking model
-        SPANISH_PAROLE.getProperties().put("olia.annotationModel", 
-            "http://purl.org/olia/parole_es_cat.owl");
+        SPANISH_PAROLE.getProperties().put("olia.annotationModel",
+                "http://purl.org/olia/parole_es_cat.owl");
 
         SPANISH_PAROLE.addTag(new PosTag("AO", LexicalCategory.Adjective));
         SPANISH_PAROLE.addTag(new PosTag("AQ", Pos.QualifierAdjective));
@@ -53,7 +52,7 @@ public class LanguageSpanish extends OpenNlpLanguageModel {
         SPANISH_PAROLE.addTag(new PosTag("DD", Pos.DemonstrativeDeterminer));
         SPANISH_PAROLE.addTag(new PosTag("DE", Pos.ExclamatoryDeterminer));
         SPANISH_PAROLE.addTag(new PosTag("DI", Pos.IndefiniteDeterminer));
-        SPANISH_PAROLE.addTag(new PosTag("DN", Pos.Numeral,Pos.Determiner));
+        SPANISH_PAROLE.addTag(new PosTag("DN", Pos.Numeral, Pos.Determiner));
         SPANISH_PAROLE.addTag(new PosTag("DP", Pos.PossessiveDeterminer));
         SPANISH_PAROLE.addTag(new PosTag("DT", Pos.InterrogativeDeterminer));
         SPANISH_PAROLE.addTag(new PosTag("Faa", LexicalCategory.Punctuation));
@@ -112,7 +111,7 @@ public class LanguageSpanish extends OpenNlpLanguageModel {
         SPANISH_PAROLE.addTag(new PosTag("Zm", Pos.Symbol)); //currency
         SPANISH_PAROLE.addTag(new PosTag("Zp", Pos.Symbol)); //percentage
     }
-        
+
     public LanguageSpanish() {
         super(Locale.forLanguageTag("es"), SPANISH_PAROLE, "es-sent.bin", null, "es-pos-maxent.bin");
     }

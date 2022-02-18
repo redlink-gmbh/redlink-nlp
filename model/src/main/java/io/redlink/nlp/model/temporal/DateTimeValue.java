@@ -20,34 +20,39 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 
 public class DateTimeValue {
 
-    
+
     private Temporal start, end;
 
     private boolean instant;
 
-    public DateTimeValue(){}
-    
+    public DateTimeValue() {
+    }
+
     /**
      * Creates an instant with the parsed temporal value
+     *
      * @param instant
      */
     public DateTimeValue(Temporal instant) {
         this.start = instant;
         this.instant = true;
     }
+
     /**
      * Creates an interval for the parsed temporal values
+     *
      * @param start the start of the interval or <code>null</code> if open
-     * @param end the end of the interval or <code>null</code> if open
+     * @param end   the end of the interval or <code>null</code> if open
      */
-    public DateTimeValue(Temporal start, Temporal end){
+    public DateTimeValue(Temporal start, Temporal end) {
         this.start = start;
         this.end = end;
         this.instant = false;
     }
-    
+
     /**
      * The start of the date-range. If instants, this is the same as {@link #getEnd()}
+     *
      * @return the start of the date-range
      */
     public Temporal getStart() {
@@ -63,6 +68,7 @@ public class DateTimeValue {
 
     /**
      * The end of the date-range. If instants, this is the same as {@link #getStart()}
+     *
      * @return the end of the date-range
      */
     public Temporal getEnd() {
@@ -90,7 +96,7 @@ public class DateTimeValue {
     public void setInstant(boolean instant) {
         this.instant = instant;
     }
-    
+
     @Override
     public String toString() {
         if (isInstant()) {
@@ -98,7 +104,7 @@ public class DateTimeValue {
                     "instant=" + getStart() + "]";
         } else {
             return "DateToken [" +
-                    "interval" + (isOpenInterval()?" (open)":"") +
+                    "interval" + (isOpenInterval() ? " (open)" : "") +
                     ", start=" + getStart() +
                     ", end=" + getEnd() + "]";
         }
@@ -138,6 +144,5 @@ public class DateTimeValue {
         return true;
     }
 
-    
 
 }

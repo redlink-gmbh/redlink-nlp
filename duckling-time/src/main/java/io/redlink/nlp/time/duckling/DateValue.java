@@ -22,14 +22,12 @@ import io.redlink.nlp.model.temporal.Temporal;
  * DateValue was initially used as values for the start/end
  * date/times for DateToken. Those do now use the
  * Temporal class. This is only here for backward compatibility reasons
- * 
- * @deprecated Use {@link Temporal} instead
- * @author Rupert Westenthaler
  *
+ * @author Rupert Westenthaler
+ * @deprecated Use {@link Temporal} instead
  */
 @Deprecated
 public class DateValue extends io.redlink.nlp.model.temporal.Temporal {
 
-    
-    
+
 }

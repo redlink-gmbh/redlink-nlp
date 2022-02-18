@@ -16,6 +16,9 @@
 
 package io.redlink.nlp.regex.ner;
 
+import io.redlink.nlp.model.SpanCollection;
+import io.redlink.nlp.model.ner.NerTag;
+import io.redlink.nlp.regex.ner.RegexNerProcessor.NamedEntity;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.HashMap;
@@ -26,19 +29,10 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.regex.MatchResult;
 import java.util.regex.Pattern;
-
 import javax.annotation.PostConstruct;
-
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.ListUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import io.redlink.nlp.model.SpanCollection;
-import io.redlink.nlp.model.ner.NerTag;
-import io.redlink.nlp.regex.ner.RegexNamedEntityFactory.NamedPattern;
-import io.redlink.nlp.regex.ner.RegexNerProcessor.NamedEntity;
 
 /**
  * Simplifies the Implementation of a {@link RegexNamedEntityFactory} in cases where
@@ -51,54 +45,53 @@ import io.redlink.nlp.regex.ner.RegexNerProcessor.NamedEntity;
  * The {@link #acceptMatch(String)} provides an callback so that unwanted matches can be
  * filtered out. The default implementation will filter all {@link StringUtils#isBlank(CharSequence) blank}
  * matches
- * 
- * @author Rupert Westenthaler
  *
+ * @author Rupert Westenthaler
  */
 public abstract class RegexNerDetector extends RegexNamedEntityFactory {
 
     private final String name;
     private final NerTag type;
-    private Map<String,List<NamedPattern>> langPatterns;
-    
-    
-    public RegexNerDetector(String name, NerTag type){
+    private Map<String, List<NamedPattern>> langPatterns;
+
+
+    public RegexNerDetector(String name, NerTag type) {
         this.name = name;
         this.type = type;
     }
-    
+
     public String getName() {
         return name;
     }
-    
+
     public NerTag getType() {
         return type;
     }
 
     @PostConstruct
-    protected final void init() throws IOException{
+    protected final void init() throws IOException {
         this.langPatterns = loadPatterns();
     }
 
     private Map<String, List<NamedPattern>> loadPatterns() throws IOException {
         Map<String, List<NamedPattern>> langPatterns = new HashMap<>();
-        Map<String,List<Pattern>> patternMap = initPatterns();
+        Map<String, List<Pattern>> patternMap = initPatterns();
         int numPattern = 0;
         log.debug("load Patterns for {}", getClass().getSimpleName());
-        if(patternMap != null){
-            for(Entry<String,List<Pattern>> e : initPatterns().entrySet()){
+        if (patternMap != null) {
+            for (Entry<String, List<Pattern>> e : initPatterns().entrySet()) {
                 List<NamedPattern> patterns = new LinkedList<>();
                 String lang = e.getKey();
-                if(lang != null){
+                if (lang != null) {
                     lang = lang.toLowerCase(Locale.ROOT);
                 }
-                for(Pattern pattern : e.getValue()){
-                    if(pattern != null){
+                for (Pattern pattern : e.getValue()) {
+                    if (pattern != null) {
                         patterns.add(new NamedPattern(name, pattern));
                         numPattern++;
                     }
                 }
-                if(!patterns.isEmpty()){
+                if (!patterns.isEmpty()) {
                     log.debug("loaded {} patterns for language {}", patterns.size(), lang);
                     langPatterns.put(lang, patterns);
                 }
@@ -106,36 +99,36 @@ public abstract class RegexNerDetector extends RegexNamedEntityFactory {
         } else {
             log.warn(" {}#initPatterns() has returned NULL. No Regex Pattern for extracting NamedEntities are active", getClass().getSimpleName());
         }
-        if(numPattern == 0){
+        if (numPattern == 0) {
             log.warn("{}#initPatterns() has not returned any Regex Pattern for extracting NamedEntities.", getClass().getSimpleName());
         } else {
             log.debug("loaded {} patterns for {} language(s)", numPattern, langPatterns.size());
         }
         return langPatterns;
     }
-    
+
     protected abstract Map<String, List<Pattern>> initPatterns() throws IOException;
-    
+
     @Override
     protected final List<NamedPattern> getRegexes(SpanCollection section, String lang) {
-        if(langPatterns == null){
+        if (langPatterns == null) {
             synchronized (this) {
-                if(langPatterns == null){
+                if (langPatterns == null) {
                     try {
                         langPatterns = loadPatterns();
-                    } catch (IOException e){
-                        log.error("Unable to load Regex Patterns!",e);
+                    } catch (IOException e) {
+                        log.error("Unable to load Regex Patterns!", e);
                     }
                 }
             }
         }
         String normLang = lang == null ? null : lang.toLowerCase(Locale.ROOT).split("-_")[0];
         List<NamedPattern> patterns = langPatterns.get(normLang);
-        if(lang != null){
+        if (lang != null) {
             //Patterns for the NULL language are used for all languages
             List<NamedPattern> defPatterns = langPatterns.get(null);
-            if(CollectionUtils.isNotEmpty(defPatterns)){
-                if(CollectionUtils.isNotEmpty(patterns)){
+            if (CollectionUtils.isNotEmpty(defPatterns)) {
+                if (CollectionUtils.isNotEmpty(patterns)) {
                     patterns = ListUtils.union(patterns, defPatterns);
                 } else {
                     patterns = defPatterns;
@@ -145,24 +138,25 @@ public abstract class RegexNerDetector extends RegexNamedEntityFactory {
         //ensure we return a read-only list so that no one messes around with the patterns we manage internally
         return patterns == null ? patterns : Collections.unmodifiableList(patterns);
     }
-    
+
     @Override
     protected final NamedEntity createNamedEntity(String patternName, MatchResult match) {
-        if (acceptMatch(match.group())){
-            log.debug("[{}] Create Token for [{},{}] - {}", name, match.start(), match.end(),match.group());
+        if (acceptMatch(match.group())) {
+            log.debug("[{}] Create Token for [{},{}] - {}", name, match.start(), match.end(), match.group());
             acceptMatch(match.group());
-            final NamedEntity ne = new NamedEntity(match.start(),match.end(), type);
+            final NamedEntity ne = new NamedEntity(match.start(), match.end(), type);
             ne.setConfidence(1f);
             return ne;
         } else {
-            log.debug("[{}] No Token for [{},{}] - {}", name, match.start(), match.end(),match.group());
+            log.debug("[{}] No Token for [{},{}] - {}", name, match.start(), match.end(), match.group());
             return null;
         }
     }
-    
+
     /**
      * Can be overwritten to validate matches based on the {@link Token#getValue()}.
      * The default implementation accepts all none black values
+     *
      * @param value the value
      */
     protected boolean acceptMatch(String value) {

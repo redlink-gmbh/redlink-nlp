@@ -16,21 +16,19 @@
 
 package io.redlink.nlp.negation.de;
 
-import java.util.Locale;
-
-import org.springframework.stereotype.Component;
-
 import io.redlink.nlp.model.Token;
 import io.redlink.nlp.model.pos.Pos;
 import io.redlink.nlp.model.pos.PosSet;
 import io.redlink.nlp.model.util.NlpUtils;
 import io.redlink.nlp.negation.DefaultNegationRule;
 import io.redlink.nlp.negation.NegationRule;
+import java.util.Locale;
+import org.springframework.stereotype.Component;
 
 /**
  * For German we also want to assume {@link Pos#IndefinitePronoun}s that
  * represent "kein(e|es|..)" as negation
- * 
+ *
  * @author Rupert Westenthaler
  */
 @Component
@@ -38,28 +36,28 @@ public class GermanNegationRule extends DefaultNegationRule implements NegationR
 
     private static final PosSet INDEV_PRONOUN = PosSet.of(Pos.IndefinitePronoun);
     private static final PosSet PREPOS = PosSet.of(Pos.Preposition);
-    
-    public GermanNegationRule(){
+
+    public GermanNegationRule() {
         super();
     }
-    
+
     @Override
     public boolean isNegation(Token token) {
-        if(!super.isNegation(token)){
+        if (!super.isNegation(token)) {
             String word = token.getSpan().toLowerCase(Locale.GERMAN);
             //keine <Token>
-            if(NlpUtils.isOfPos(token, INDEV_PRONOUN)){
-                if(word.startsWith("kein")){
+            if (NlpUtils.isOfPos(token, INDEV_PRONOUN)) {
+                if (word.startsWith("kein")) {
                     return true;
                 }
             }
             //exclusive <Token>
-            if(word.matches("ex(c|k)l(\\.?$|usiv)")){
+            if (word.matches("ex(c|k)l(\\.?$|usiv)")) {
                 return true;
             }
             //ohne <Token>
-            if(NlpUtils.isOfPos(token, PREPOS)){
-                if(word.startsWith("ohne")){
+            if (NlpUtils.isOfPos(token, PREPOS)) {
+                if (word.startsWith("ohne")) {
                     return true;
                 }
             }
@@ -68,10 +66,10 @@ public class GermanNegationRule extends DefaultNegationRule implements NegationR
             return true;
         }
     }
-    
+
     @Override
     public String getLanguage() {
         return "de";
     }
-    
+
 }

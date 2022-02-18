@@ -7,16 +7,16 @@
         </encoder>
     </appender>
 
-    <logger name="org.springframework" level="WARN" />
-    <logger name="org.apache" level="WARN" />
+    <logger name="org.springframework" level="WARN"/>
+    <logger name="org.apache" level="WARN"/>
 
-    <logger name="io.redlink" level="INFO" />
+    <logger name="io.redlink" level="INFO"/>
 
-    <logger name="io.redlink.nlp" level="DEBUG" />
+    <logger name="io.redlink.nlp" level="DEBUG"/>
     <!-- logger name="io.redlink.nlp.langdetect" level="TRACE" />  -->
 
     <root level="WARN">
-        <appender-ref ref="STDOUT" />
+        <appender-ref ref="STDOUT"/>
     </root>
 
 

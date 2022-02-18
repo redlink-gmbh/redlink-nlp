@@ -16,12 +16,8 @@
 
 package io.redlink.nlp.regex.ner.wordlist;
 
-import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang3.StringUtils;
-
 import io.redlink.nlp.model.ner.NerTag;
 import io.redlink.nlp.regex.ner.RegexNerDetector;
-
 import java.io.IOException;
 import java.io.Reader;
 import java.util.Collections;
@@ -30,52 +26,55 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
 
 /**
  * Variant of the {@link RegexDetector} that reads from a {@link Reader}
  * expecting one regex pattern per line.
  * It will ignore lines with illegal formatted patterns
- * @author Rupert Westenthaler
  *
+ * @author Rupert Westenthaler
  */
 public abstract class LinebasedRegexListNerDetector extends RegexNerDetector {
-    
+
     private int flags = 0;
     private final String lang;
-    
+
     /**
-     * @param name the name
-     * @param type the type of the Named Entities
-     * @param lang the language (<code>null</code> for any language)
+     * @param name          the name
+     * @param type          the type of the Named Entities
+     * @param lang          the language (<code>null</code> for any language)
      * @param caseSensitive case sensitive state
      */
-    protected LinebasedRegexListNerDetector(String name, NerTag type, String lang, boolean caseSensitive){
+    protected LinebasedRegexListNerDetector(String name, NerTag type, String lang, boolean caseSensitive) {
         super(name, type);
-        if(!caseSensitive){
+        if (!caseSensitive) {
             flags = flags | Pattern.CASE_INSENSITIVE;
         }
         this.lang = lang;
     }
+
     @Override
-    protected final Map<String,List<Pattern>> initPatterns() throws IOException {
+    protected final Map<String, List<Pattern>> initPatterns() throws IOException {
         List<Pattern> patterns = new LinkedList<>();
-        try (Reader r = readFrom()){
-            int lineNr=0;
+        try (Reader r = readFrom()) {
+            int lineNr = 0;
             Iterator<String> lines = IOUtils.lineIterator(r);
-            while(lines.hasNext()){
+            while (lines.hasNext()) {
                 lineNr++;
                 String patternString = StringUtils.trimToNull(lines.next());
-                if(patternString != null){
+                if (patternString != null) {
                     try {
                         patterns.add(Pattern.compile(patternString, flags));
-                    } catch(IllegalArgumentException e){
-                        log.warn("Unable to parsed pattern from line "+lineNr+":'"+patternString+"'",e);
+                    } catch (IllegalArgumentException e) {
+                        log.warn("Unable to parsed pattern from line " + lineNr + ":'" + patternString + "'", e);
                     }
                 }
             }
         }
-        return Collections.singletonMap(lang,patterns);
+        return Collections.singletonMap(lang, patterns);
     }
-    
+
     protected abstract Reader readFrom();
 }

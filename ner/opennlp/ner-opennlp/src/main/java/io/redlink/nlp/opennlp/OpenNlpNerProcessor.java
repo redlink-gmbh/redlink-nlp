@@ -16,6 +16,17 @@
 
 package io.redlink.nlp.opennlp;
 
+import io.redlink.nlp.api.ProcessingData;
+import io.redlink.nlp.api.Processor;
+import io.redlink.nlp.api.model.Value;
+import io.redlink.nlp.model.AnalyzedText;
+import io.redlink.nlp.model.Chunk;
+import io.redlink.nlp.model.NlpAnnotations;
+import io.redlink.nlp.model.Sentence;
+import io.redlink.nlp.model.Span.SpanTypeEnum;
+import io.redlink.nlp.model.SpanCollection;
+import io.redlink.nlp.model.ner.NerTag;
+import io.redlink.nlp.model.util.NlpUtils;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -28,33 +39,19 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-
 import javax.annotation.PreDestroy;
-
+import opennlp.tools.namefind.NameFinderME;
+import opennlp.tools.util.Span;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import io.redlink.nlp.api.ProcessingData;
-import io.redlink.nlp.api.Processor;
-import io.redlink.nlp.api.model.Value;
-import io.redlink.nlp.model.AnalyzedText;
-import io.redlink.nlp.model.NlpAnnotations;
-import io.redlink.nlp.model.Chunk;
-import io.redlink.nlp.model.Sentence;
-import io.redlink.nlp.model.Span.SpanTypeEnum;
-import io.redlink.nlp.model.SpanCollection;
-import io.redlink.nlp.model.ner.NerTag;
-import io.redlink.nlp.model.util.NlpUtils;
-import opennlp.tools.namefind.NameFinderME;
-import opennlp.tools.util.Span;
-
 /**
  * The Named Entity {@link Preprocessor} used for extracting named entities
  * from processed documents.
- * 
+ *
  * @author rupert.westenthaler@redlink.co
  */
 @Component
@@ -67,7 +64,7 @@ public class OpenNlpNerProcessor extends Processor {
     private final List<OpenNlpNerModel> nerModels;
 
     private final Map<String, OpenNlpNerModel> lang2NerModel;
-    
+
 
     @Autowired
     public OpenNlpNerProcessor(List<OpenNlpNerModel> nerModels) {
@@ -81,12 +78,12 @@ public class OpenNlpNerProcessor extends Processor {
     public Map<String, Object> getDefaultConfiguration() {
         return Collections.emptyMap();
     }
-    
+
     @Override
     protected void init() {
         LOG.debug("Initializing {} NER Models", nerModels.size());
-        for(OpenNlpNerModel nerModel : nerModels){
-            if(lang2NerModel.containsKey(nerModel.getLanguage())){
+        for (OpenNlpNerModel nerModel : nerModels) {
+            if (lang2NerModel.containsKey(nerModel.getLanguage())) {
                 LOG.warn("Multiple NER Models for Language {} (in-use: {} | ignored: {})",
                         nerModel.getLanguage(), lang2NerModel.get(nerModel.getLanguage()).getName(), nerModel.getName());
             } else {
@@ -105,67 +102,68 @@ public class OpenNlpNerProcessor extends Processor {
 
 
     @PreDestroy
-    protected void destroyNerModels(){
+    protected void destroyNerModels() {
         lang2NerModel.clear();
-        for(OpenNlpNerModel model : nerModels){
-            if(model.isActive()){
+        for (OpenNlpNerModel model : nerModels) {
+            if (model.isActive()) {
                 model.deactivate();
             }
         }
-        
+
     }
 
     /**
      * Getter for the NER Model for the requested language
+     *
      * @param language the language (lower case)
      * @return the activated {@link OpenNlpNerModel} or <code>null</code> if none
      * is available for the requested language
      */
-    private OpenNlpNerModel getModel(String language){
+    private OpenNlpNerModel getModel(String language) {
         OpenNlpNerModel model = lang2NerModel.get(language);
         return model != null && model.isActive() ? model : null;
     }
-    
+
 
     @Override
     protected void doProcessing(ProcessingData processingData) {
 
         LOG.debug("> process {} with {}", processingData, getClass().getSimpleName());
-        
+
         Optional<AnalyzedText> at = NlpUtils.getAnalyzedText(processingData);
-        if(!at.isPresent()) {
+        if (!at.isPresent()) {
             LOG.warn("Unable to preprocess conversation {} because no AnalyzedText is present "
-                    + "and this QueryPreperator requires Tokens and Sentences!",
+                            + "and this QueryPreperator requires Tokens and Sentences!",
                     processingData);
             return;
         }
         String language = processingData.getLanguage();
         LOG.debug(" - language: {}", language);
-        if(language == null || language.length() < 2){
+        if (language == null || language.length() < 2) {
             LOG.warn("Unable to process {} because missing/invalid language {}", processingData, language);
             return;
         }
 
         OpenNlpNerModel model = getModel(language);
 
-        if(model == null){
+        if (model == null) {
             LOG.debug("Unable to preprocess conversation {} because language {} "
                     + "is not supported", processingData, language);
             return;
         }
         //get the sections of the content
         Iterator<? extends SpanCollection> contentSections = at.get().getSections();
-        if(!contentSections.hasNext()){ //fallback use the AnalyzedText as a whole
+        if (!contentSections.hasNext()) { //fallback use the AnalyzedText as a whole
             contentSections = Collections.singleton(at.get()).iterator();
         }
         //try to get sentences from content sections
         Collection<SpanCollection> sentences = new LinkedList<>();
-        while(contentSections.hasNext()){
+        while (contentSections.hasNext()) {
             SpanCollection section = contentSections.next();
             Iterator<io.redlink.nlp.model.Span> sents = section.getEnclosed(EnumSet.of(SpanTypeEnum.Sentence));
-            if(sents.hasNext()){
-                while(sents.hasNext()){
-                    sentences.add((Sentence)sents.next());
+            if (sents.hasNext()) {
+                while (sents.hasNext()) {
+                    sentences.add((Sentence) sents.next());
                 }
             } else {
                 sentences.add(section); //process the whole section as a single sentence
@@ -179,62 +177,63 @@ public class OpenNlpNerProcessor extends Processor {
         int lastEnd = 0; //the end of the last processed sentence (used to track if we need to reset adaptive data in the NameFinder)
         LOG.trace("> extract Named Entities");
         try {
-            nextSentence : for(SpanCollection sentence : sentences){
-                if(at == null){ //init the Analyzed Text field
+            nextSentence:
+            for (SpanCollection sentence : sentences) {
+                if (at == null) { //init the Analyzed Text field
                     at = sentence.getContext(); //with the first processed sentence
                 }
                 int offset = sentence.getStart();
                 Iterator<io.redlink.nlp.model.Token> tokenIt = sentence.getTokens();
-                if(!tokenIt.hasNext()){
+                if (!tokenIt.hasNext()) {
                     LOG.warn("{} {} has not Tokens. Will not extract Named Entities",
                             sentence, StringUtils.abbreviate(sentence.getSpan(), 40));
                     continue nextSentence;
                 }
                 List<io.redlink.nlp.model.Token> tokens = new ArrayList<>();
-                while(tokenIt.hasNext()){
+                while (tokenIt.hasNext()) {
                     tokens.add(tokenIt.next());
                 }
                 String[] spans = new String[tokens.size()];
-                for(int i=0;i < spans.length;i++){
+                for (int i = 0; i < spans.length; i++) {
                     //use the case sensitive state to get the correct token
-                    spans[i] = langNerModel.isCaseSensitive() ? 
+                    spans[i] = langNerModel.isCaseSensitive() ?
                             NlpUtils.toTrueCase(tokens.get(i)) : //this uses true case annotations (if present)
-                                tokens.get(i).getSpan().toLowerCase(langNerModel.getLocale()); //to lower case
+                            tokens.get(i).getSpan().toLowerCase(langNerModel.getLocale()); //to lower case
                 }
-                if((offset - lastEnd) > CONTENT_INTERRUPTION){ //reset statistics
+                if ((offset - lastEnd) > CONTENT_INTERRUPTION) { //reset statistics
                     LOG.trace(" - content interuption (clear adaptive data of NER models)");
-                    for(NameFinderModel model : langNerModel.getNameFinders()){
+                    for (NameFinderModel model : langNerModel.getNameFinders()) {
                         NameFinderME nameFinder = model.getNameFinder();
-                        if(nameFinder != null){ //might be null if deactivating
+                        if (nameFinder != null) { //might be null if deactivating
                             nameFinder.clearAdaptiveData();
                         }
                     }
                 }
-                if(LOG.isTraceEnabled()){
+                if (LOG.isTraceEnabled()) {
                     LOG.trace("> sentence: {}: {}", sentence, Arrays.toString(spans));
                 }
-                for(NameFinderModel model : langNerModel.getNameFinders()){
+                for (NameFinderModel model : langNerModel.getNameFinders()) {
                     NameFinderME nameFinder = model.getNameFinder();
-                    if(nameFinder != null){ //might be null if deactivating
+                    if (nameFinder != null) { //might be null if deactivating
                         Span[] entitySpans = nameFinder.find(spans);
-                        if(entitySpans != null){
+                        if (entitySpans != null) {
                             double[] probs = nameFinder.probs();
-                            for(int i = 0; i< entitySpans.length; i++){
+                            for (int i = 0; i < entitySpans.length; i++) {
                                 Span entitySpan = entitySpans[i];
                                 String tag = entitySpan.getType();
                                 String type = model.getType(tag);
-                                if(type == null){
+                                if (type == null) {
                                     LOG.warn("Unmapped Type '{}' for OpenNLP Name Finder "
-                                            + "Model '{}' (lang: {}). Setting type to '{}'",
+                                                    + "Model '{}' (lang: {}). Setting type to '{}'",
                                             entitySpan.getType(), model,
                                             langNerModel.getLanguage(), NerTag.NAMED_ENTITY_MISC);
                                     type = NerTag.NAMED_ENTITY_MISC;
                                 }
                                 double prob = probs[i];
                                 int start = tokens.get(entitySpan.getStart()).getStart();
-                                int end = tokens.get(entitySpan.getEnd()-1).getEnd();
+                                int end = tokens.get(entitySpan.getEnd() - 1).getEnd();
                                 Chunk chunk = at.addChunk(start, end); // add a chunk for the Named Entity
-                                chunk.addValue(NlpAnnotations.NER_ANNOTATION, Value.value(new NerTag(tag, type),prob));
+                                chunk.addValue(NlpAnnotations.NER_ANNOTATION, Value.value(new NerTag(tag, type), prob));
                                 String name = at.getText().subSequence(start, end).toString();
                                 LOG.debug(" - Named Entity [{},{} | prob: {}, tag: {}, type: {}] {}",
                                         start, end, prob, tag, type, name);
@@ -242,16 +241,16 @@ public class OpenNlpNerProcessor extends Processor {
                         } //else no entities extracted
                     } //else no NameFinder available for this model 
                 } //end for all models of the contents language
-                
+
                 //set the lastEnd to the end of the current sentence
-                lastEnd = sentence.getEnd(); 
-            
+                lastEnd = sentence.getEnd();
+
             } //end for all content Sentences to process
         } finally { //finally we want to clear adaptive data from the use NameFinder
             //otherwise results of the previous Document might affect those of the next
-            for(NameFinderModel model : langNerModel.getNameFinders()){
+            for (NameFinderModel model : langNerModel.getNameFinders()) {
                 NameFinderME nameFinder = model.getNameFinder();
-                if(nameFinder != null){
+                if (nameFinder != null) {
                     nameFinder.clearAdaptiveData();
                 }
             }

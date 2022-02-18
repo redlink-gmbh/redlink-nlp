@@ -16,13 +16,13 @@
 
 package io.redlink.nlp.stemmer.lucene;
 
+import io.redlink.nlp.stemmer.StemmerRegistry;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
-
 import org.springframework.stereotype.Component;
 import org.tartarus.snowball.SnowballProgram;
 import org.tartarus.snowball.ext.DanishStemmer;
@@ -41,12 +41,11 @@ import org.tartarus.snowball.ext.SpanishStemmer;
 import org.tartarus.snowball.ext.SwedishStemmer;
 import org.tartarus.snowball.ext.TurkishStemmer;
 
-import io.redlink.nlp.stemmer.StemmerRegistry;
-
 @Component
 public class LuceneStemmerRegistry implements StemmerRegistry {
-    
+
     private static final Map<String, Class<? extends SnowballProgram>> SNOWBALL_CONFIG;
+
     static { //TODO: investigate the use of Light/Minimal stemmers
         Map<String, Class<? extends SnowballProgram>> conf = new HashMap<>();
         conf.put("en", EnglishStemmer.class);
@@ -66,18 +65,18 @@ public class LuceneStemmerRegistry implements StemmerRegistry {
         conf.put("tr", TurkishStemmer.class);
         SNOWBALL_CONFIG = Collections.unmodifiableMap(conf);
     }
-    
-    
+
+
     private final Map<String, LuceneStemmerModel> stemmerModels;
     private final ReadWriteLock stemmerModelsLock;
-    
-    
+
+
     public LuceneStemmerRegistry() {
         stemmerModels = new HashMap<>();
         stemmerModelsLock = new ReentrantReadWriteLock();
     }
-    
-    
+
+
     /* (non-Javadoc)
      * @see io.redlink.nlp.stemmer.StemmerRegistry#getStemmerModel(java.lang.String)
      */
@@ -92,14 +91,14 @@ public class LuceneStemmerRegistry implements StemmerRegistry {
         } finally {
             stemmerModelsLock.readLock().unlock();
         }
-        if(model == null){
+        if (model == null) {
             @SuppressWarnings("rawtypes")
             Class stemmerClass = SNOWBALL_CONFIG.get(lang);
-            if(stemmerClass != null){ //language supported
+            if (stemmerClass != null) { //language supported
                 stemmerModelsLock.writeLock().lock();
                 try {
                     model = stemmerModels.get(lang); //other thread initialized it in the meantime
-                    if(model == null){
+                    if (model == null) {
                         model = new LuceneStemmerModel(Locale.forLanguageTag(lang), stemmerClass);
                         stemmerModels.put(lang, model);
                     }
@@ -110,5 +109,5 @@ public class LuceneStemmerRegistry implements StemmerRegistry {
         }
         return model;
     }
-    
+
 }

@@ -17,13 +17,12 @@
 package io.redlink.nlp.opennlp.en;
 
 
-import static java.util.Locale.ENGLISH;
-
-import org.springframework.stereotype.Service;
-
 import io.redlink.nlp.model.ner.NerTag;
 import io.redlink.nlp.opennlp.NameFinderModel;
 import io.redlink.nlp.opennlp.OpenNlpNerModel;
+import org.springframework.stereotype.Service;
+
+import static java.util.Locale.ENGLISH;
 
 
 /**
@@ -35,15 +34,15 @@ import io.redlink.nlp.opennlp.OpenNlpNerModel;
  */
 @Service
 public class NerEnglish extends OpenNlpNerModel {
-    
+
     public NerEnglish() {
         super(ENGLISH,
                 new NameFinderModel(//"en-brown-conll03.bin", //model without clusters
                         "en-light-clusters-conll03.bin", //model with clusters adds ~600MByte heap
-                        "PER", NerTag.NAMED_ENTITY_PERSON, 
+                        "PER", NerTag.NAMED_ENTITY_PERSON,
                         "ORG", NerTag.NAMED_ENTITY_ORGANIZATION,
-                        "LOC", NerTag.NAMED_ENTITY_LOCATION, 
-                        "MISC",NerTag.NAMED_ENTITY_MISC));
+                        "LOC", NerTag.NAMED_ENTITY_LOCATION,
+                        "MISC", NerTag.NAMED_ENTITY_MISC));
         //can be used to set a custom tokenizer
         //setCustomTokenizer("none");
     }

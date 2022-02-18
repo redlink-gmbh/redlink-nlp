@@ -16,9 +16,22 @@
 
 package io.redlink.nlp.opennlp.es;
 
-import static java.util.Arrays.asList;
-import static java.util.Collections.unmodifiableList;
-
+import io.redlink.nlp.api.ProcessingData;
+import io.redlink.nlp.api.ProcessingException;
+import io.redlink.nlp.api.Processor;
+import io.redlink.nlp.api.annotation.Annotations;
+import io.redlink.nlp.api.content.StringContent;
+import io.redlink.nlp.api.model.Value;
+import io.redlink.nlp.langdetect.LangdetectProcessor;
+import io.redlink.nlp.langdetect.LanguageIdentifier;
+import io.redlink.nlp.model.AnalyzedText;
+import io.redlink.nlp.model.Chunk;
+import io.redlink.nlp.model.NlpAnnotations;
+import io.redlink.nlp.model.ner.NerTag;
+import io.redlink.nlp.model.util.NlpUtils;
+import io.redlink.nlp.opennlp.OpenNlpNerModel;
+import io.redlink.nlp.opennlp.OpenNlpNerProcessor;
+import io.redlink.nlp.opennlp.pos.OpenNlpPosProcessor;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.Charset;
@@ -36,9 +49,6 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
-
-import io.redlink.nlp.api.ProcessingException;
-import io.redlink.nlp.api.content.StringContent;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.math3.util.Precision;
 import org.junit.Assert;
@@ -47,74 +57,62 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import io.redlink.nlp.api.ProcessingData;
-import io.redlink.nlp.api.Processor;
-import io.redlink.nlp.api.annotation.Annotations;
-import io.redlink.nlp.langdetect.LangdetectProcessor;
-import io.redlink.nlp.langdetect.LanguageIdentifier;
-import io.redlink.nlp.model.AnalyzedText;
-import io.redlink.nlp.model.NlpAnnotations;
-import io.redlink.nlp.model.Chunk;
-import io.redlink.nlp.api.model.Value;
-import io.redlink.nlp.model.ner.NerTag;
-import io.redlink.nlp.model.util.NlpUtils;
-import io.redlink.nlp.opennlp.OpenNlpNerModel;
-import io.redlink.nlp.opennlp.OpenNlpNerProcessor;
-import io.redlink.nlp.opennlp.pos.OpenNlpPosProcessor;
+import static java.util.Arrays.asList;
+import static java.util.Collections.unmodifiableList;
 
 public class TestSpanishNerExtraction {
-    
+
     private static final Logger log = LoggerFactory.getLogger(TestSpanishNerExtraction.class);
 
     private static final Charset UTF8 = Charset.forName("UTF-8");
-    
+
     public static final List<String> FILES = unmodifiableList(asList(
             "docs/Detenido-el-expresidente-de-Osasuna-Miguel-Archanco.txt",
             "docs/El-PSOE-supera.txt",
             "docs/Peligra-el-clasico-del-Camp-Nou-para-Busquets.txt",
             "docs/Por-una-vez-el-heroe-no-es-el-artista.txt",
             "docs/Que-pasa-durante.txt"));
-    
+
     private static List<String> CONTENTS = new ArrayList<>(FILES.size());
 
     private static List<Processor> REQUIRED_PRE_PROCESSORS;
 
     private static LanguageSpanish nlpModel;
     private static OpenNlpNerModel nerModel;
-    
+
     private static OpenNlpNerProcessor nerPreprocessor;
-    
-    
+
+
     @BeforeClass
     public static void initClass() throws IOException {
         ClassLoader cl = TestSpanishNerExtraction.class.getClassLoader();
         //We need to store the contents in the ContentService. For that we need to generate ObjectIDs
-        for(String file : FILES){
+        for (String file : FILES) {
             InputStream in = cl.getResourceAsStream(file);
-            Assert.assertNotNull("Missing test resource '"+file+"'!",in);
+            Assert.assertNotNull("Missing test resource '" + file + "'!", in);
             String content = IOUtils.toString(in, UTF8);
             CONTENTS.add(content);
         }
 
         nlpModel = new LanguageSpanish();
         nerModel = new NerSpanish();
-        
+
         REQUIRED_PRE_PROCESSORS = Arrays.asList(
                 new LangdetectProcessor(new LanguageIdentifier()),
                 new OpenNlpPosProcessor(Collections.singletonList(nlpModel)));
 
         nerPreprocessor = new OpenNlpNerProcessor(Collections.singletonList(nerModel));
     }
-    
+
     private static final ProcessingData initTestData(int index) {
         return initTestData(index, new HashMap<>());
-    }    
-    
-    private static final ProcessingData initTestData(int index, Map<String,Object> config) {
+    }
+
+    private static final ProcessingData initTestData(int index, Map<String, Object> config) {
         Assert.assertTrue(index >= 0 && index < FILES.size());
         AnalyzedText at = new AnalyzedText(CONTENTS.get(index));
         //we just put here any language (no)
-        ProcessingData pd = new ProcessingData(new StringContent(at.getText()),config);
+        ProcessingData pd = new ProcessingData(new StringContent(at.getText()), config);
         pd.addAnnotation(Annotations.LANGUAGE, "es");
         pd.addAnnotation(AnalyzedText.ANNOTATION, at);
         return pd;
@@ -122,14 +120,14 @@ public class TestSpanishNerExtraction {
 
 
     private static final void prepairTestCase(ProcessingData pd) throws ProcessingException {
-        for(Processor p : REQUIRED_PRE_PROCESSORS){
+        for (Processor p : REQUIRED_PRE_PROCESSORS) {
             p.process(pd);
         }
     }
 
     @Test
     public void testSingle() throws ProcessingException {
-        int idx = Math.round((float)Math.random()*(FILES.size()-1));
+        int idx = Math.round((float) Math.random() * (FILES.size() - 1));
         ProcessingData pd = initTestData(idx);
         processTestCase(pd);
         assertNerProcessingResults(pd);
@@ -140,10 +138,10 @@ public class TestSpanishNerExtraction {
         log.trace(" - start OpenNLP NER extraction");
         long start = System.currentTimeMillis();
         nerPreprocessor.process(pd);
-        log.trace(" - processing time: {}",System.currentTimeMillis()-start);
+        log.trace(" - processing time: {}", System.currentTimeMillis() - start);
     }
 
-    
+
     @Test
     public void testMultiple() throws InterruptedException, ExecutionException {
         ExecutorService executor = Executors.newFixedThreadPool(4);
@@ -151,56 +149,56 @@ public class TestSpanishNerExtraction {
         int numWarmup = Math.max(FILES.size(), 20);
         log.info("> warnup ({} calls + assertion of results)", numWarmup);
         List<Future<TestCaseProcessor>> tasks = new LinkedList<>();
-        for(int i = 0; i < numWarmup; i++){
-            int idx = i%FILES.size();
+        for (int i = 0; i < numWarmup; i++) {
+            int idx = i % FILES.size();
             tasks.add(executor.submit(new TestCaseProcessor(idx)));
         }
-        while(!tasks.isEmpty()){ //wait for all the tasks to complete
+        while (!tasks.isEmpty()) { //wait for all the tasks to complete
             //during warmup we assert the NLP results
-            assertNerProcessingResults(tasks.remove(0).get().getProcessingData()); 
+            assertNerProcessingResults(tasks.remove(0).get().getProcessingData());
         }
         log.info("   ... done");
         log.info("> processing {} documents ...", numDoc);
         long min = Integer.MAX_VALUE;
         long max = Integer.MIN_VALUE;
         long sum = 0;
-        for(int i = 0; i < numDoc; i++){
-            int idx = i%FILES.size();
+        for (int i = 0; i < numDoc; i++) {
+            int idx = i % FILES.size();
             tasks.add(executor.submit(new TestCaseProcessor(idx)));
         }
         int i = 0;
-        while(!tasks.isEmpty()){ //wait for all the tasks to complete
+        while (!tasks.isEmpty()) { //wait for all the tasks to complete
             TestCaseProcessor completed = tasks.remove(0).get();
             i++;
-            if(i%10 == 0){
-                log.info(" ... {} documents processed",i);
+            if (i % 10 == 0) {
+                log.info(" ... {} documents processed", i);
             }
             int dur = completed.getDuration();
-            if(dur > max){
+            if (dur > max) {
                 max = dur;
             }
-            if(dur < min){
+            if (dur < min) {
                 min = dur;
             }
             sum = sum + dur;
         }
-        log.info("Processing Times after {} documents",numDoc);
-        log.info(" - average: {}ms",Precision.round(sum/(double)numDoc, 2));
-        log.info(" - max: {}ms",max);
-        log.info(" - min: {}ms",min);
+        log.info("Processing Times after {} documents", numDoc);
+        log.info(" - average: {}ms", Precision.round(sum / (double) numDoc, 2));
+        log.info(" - max: {}ms", max);
+        log.info(" - min: {}ms", min);
         executor.shutdown();
     }
-    
+
     private void assertNerProcessingResults(ProcessingData pd) {
         Optional<AnalyzedText> at = NlpUtils.getAnalyzedText(pd);
         Assert.assertTrue(at.isPresent());
         Iterator<Chunk> chunks = at.get().getChunks();
         int numNerAnno = 0;
-        while(chunks.hasNext()){
+        while (chunks.hasNext()) {
             Chunk chunk = chunks.next();
             List<Value<NerTag>> nerAnnotations = chunk.getValues(NlpAnnotations.NER_ANNOTATION);
             Assert.assertFalse(nerAnnotations.isEmpty());
-            for(Value<NerTag> nerAnno : nerAnnotations){
+            for (Value<NerTag> nerAnno : nerAnnotations) {
                 Assert.assertTrue(nerAnno.probability() > 0 && nerAnno.probability() <= 1);
                 NerTag nerTag = nerAnno.value();
                 Assert.assertNotNull(nerTag.getTag());
@@ -210,32 +208,32 @@ public class TestSpanishNerExtraction {
         }
         Assert.assertTrue(numNerAnno > 0);
     }
-    
+
     private class TestCaseProcessor implements Callable<TestCaseProcessor> {
 
         private final ProcessingData processingData;
         private int duration;
 
-        TestCaseProcessor(int idx){
+        TestCaseProcessor(int idx) {
             this.processingData = initTestData(idx);
         }
-        
+
 
         @Override
         public TestCaseProcessor call() throws Exception {
             long start = System.currentTimeMillis();
             processTestCase(processingData);
-            duration = (int)(System.currentTimeMillis() - start);
+            duration = (int) (System.currentTimeMillis() - start);
             return this;
         }
 
         public ProcessingData getProcessingData() {
             return processingData;
         }
-        
+
         public int getDuration() {
             return duration;
         }
     }
-        
+
 }

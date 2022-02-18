@@ -15,6 +15,13 @@
  */
 package io.redlink.nlp.time.duckling;
 
+import clojure.java.api.Clojure;
+import clojure.lang.IFn;
+import clojure.lang.IPersistentMap;
+import clojure.lang.LazySeq;
+import clojure.lang.PersistentArrayMap;
+import io.redlink.nlp.model.temporal.Temporal;
+import io.redlink.nlp.model.temporal.Temporal.Grain;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -34,7 +41,6 @@ import java.util.Locale;
 import java.util.Set;
 import java.util.TimeZone;
 import java.util.regex.Pattern;
-
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.time.DateUtils;
@@ -42,14 +48,6 @@ import org.apache.commons.lang3.tuple.ImmutableTriple;
 import org.apache.commons.lang3.tuple.Triple;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import clojure.java.api.Clojure;
-import clojure.lang.IFn;
-import clojure.lang.IPersistentMap;
-import clojure.lang.LazySeq;
-import clojure.lang.PersistentArrayMap;
-import io.redlink.nlp.model.temporal.Temporal;
-import io.redlink.nlp.model.temporal.Temporal.Grain;
 
 /**
  *
@@ -59,7 +57,7 @@ public class DucklingTimeParser {
     private static final Logger LOG = LoggerFactory.getLogger(DucklingTimeParser.class);
 
     // This is format how duckling sends the result
-    protected static final ThreadLocal<DateFormat> DATE_FORMAT = new ThreadLocal<DateFormat>(){
+    protected static final ThreadLocal<DateFormat> DATE_FORMAT = new ThreadLocal<DateFormat>() {
         @Override
         protected DateFormat initialValue() {
             return new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS");
@@ -75,11 +73,11 @@ public class DucklingTimeParser {
 
     private boolean includeLatent = false;
     private boolean initialized = false;
-    
+
     // References to functions
     private IFn parse;
     private IFn createTime;
-    
+
     private Object dims;
 
     private Object keyRefTime, keyMin, keyMax, keyDim, keyValue, keyStart, keyEnd, keyGrain, keyLatent, keyType, keyFrom, keyTo;
@@ -89,11 +87,11 @@ public class DucklingTimeParser {
     public DucklingTimeParser() {
         parse = null;
     }
-    
+
     public void setIncludeLatent(boolean includeLatent) {
         this.includeLatent = includeLatent;
     }
-    
+
     public boolean isIncludeLatent() {
         return includeLatent;
     }
@@ -107,6 +105,7 @@ public class DucklingTimeParser {
 
     /**
      * Initialize the parser. Calling this is optional.
+     *
      * @param classLoader the class-loader duckling should use to load language-resources.
      *                    Provide {@code null} to use the default of duckling.
      */
@@ -168,6 +167,7 @@ public class DucklingTimeParser {
 
     /**
      * Check if the language is supported
+     *
      * @param lang the language
      * @return {@code true} if time-parsing for the provided language is supported
      */
@@ -177,6 +177,7 @@ public class DucklingTimeParser {
 
     /**
      * Check if the language is supported
+     *
      * @param locale the language
      * @return {@code true} if time-parsing for the provided language is supported
      */
@@ -186,6 +187,7 @@ public class DucklingTimeParser {
 
     /**
      * Parse a message for DateTokens.
+     *
      * @param message the message to parse
      * @return a List of extracted {@link DateToken}s
      * @deprecated use {@link #parse(String, String)}
@@ -197,6 +199,7 @@ public class DucklingTimeParser {
 
     /**
      * Parse a message for DateTokens.
+     *
      * @param message the message to parse
      * @return a List of extracted {@link DateToken}s
      * @deprecated use {@link #parse(String, String, Date)}
@@ -208,7 +211,8 @@ public class DucklingTimeParser {
 
     /**
      * Parse a message for DateTokens.
-     * @param message the message to parse
+     *
+     * @param message  the message to parse
      * @param language the language of the message
      * @return a List of extracted {@link DateToken}s
      */
@@ -218,7 +222,8 @@ public class DucklingTimeParser {
 
     /**
      * Parse a message for DateTokens.
-     * @param message the message to parse
+     *
+     * @param message  the message to parse
      * @param language the language of the message
      * @return a List of extracted {@link DateToken}s
      */
@@ -228,8 +233,9 @@ public class DucklingTimeParser {
 
     /**
      * Parse a message for DateTokens.
-     * @param message the message to parse
-     * @param language the language of the message
+     *
+     * @param message       the message to parse
+     * @param language      the language of the message
      * @param referenceDate the context/reference date for relative times/dates (e.g. "next week")
      * @return a List of extracted {@link DateToken}s
      */
@@ -239,8 +245,9 @@ public class DucklingTimeParser {
 
     /**
      * Parse a message for DateTokens.
-     * @param message the message to parse
-     * @param language the language of the message
+     *
+     * @param message       the message to parse
+     * @param language      the language of the message
      * @param referenceDate the context/reference date for relative times/dates (e.g. "next week")
      * @param includeLatent if low confidence results should be considered
      * @return a List of extracted {@link DateToken}s
@@ -248,13 +255,15 @@ public class DucklingTimeParser {
     public List<DateToken> parse(String message, final String language, Date referenceDate) {
         return parse(message, language, referenceDate, null);
     }
+
     /**
      * Parse a message for DateTokens.
-     * @param message the message to parse
-     * @param language the language of the message
+     *
+     * @param message       the message to parse
+     * @param language      the language of the message
      * @param referenceDate the context/reference date for relative times/dates (e.g. "next week")
      * @param includeLatent if low confidence results should be considered. <code>null</code> will
-     * use the default set for the parser instance.
+     *                      use the default set for the parser instance.
      * @return a List of extracted {@link DateToken}s
      */
     public List<DateToken> parse(String message, final String language, Date referenceDate, Boolean includeLatent) {
@@ -266,21 +275,21 @@ public class DucklingTimeParser {
         int offset = 0;
         List<DateToken> contextualizedTokens = new LinkedList<>();
         List<DateToken> tokens = extractTokens(offset, message, language, context, includeLatent);
-        while(!tokens.isEmpty()){
+        while (!tokens.isEmpty()) {
             DateToken token = tokens.get(0);
             final Temporal value = ObjectUtils.firstNonNull(token.getStart(), token.getEnd());
-            if(!contextualizedTokens.isEmpty()){
-                if(contextGrain.ordinal() > value.getGrain().ordinal() &&
-                        saveTruncatedCompareTo(context, value.getDate(), contextGrain) == 0){
+            if (!contextualizedTokens.isEmpty()) {
+                if (contextGrain.ordinal() > value.getGrain().ordinal() &&
+                        saveTruncatedCompareTo(context, value.getDate(), contextGrain) == 0) {
                     //the current token has the same time as the context but with a finer grain
                     //so we want to replace the current context with the new one
-                    contextualizedTokens.remove(contextualizedTokens.size()-1);
-                } else if(token.isOpenInterval() && token.getStart() == null){
+                    contextualizedTokens.remove(contextualizedTokens.size() - 1);
+                } else if (token.isOpenInterval() && token.getStart() == null) {
                     //check if we can combine this open interval with the last contextualized token
                     DateToken last = contextualizedTokens.get(contextualizedTokens.size() - 1);
-                    if(last.isInstant() || last.isOpenInterval() && last.getEnd() == null &&
-                            token.getEnd().getDate().after(last.getStart().getDate())){
-                        contextualizedTokens.remove(contextualizedTokens.size()-1);
+                    if (last.isInstant() || last.isOpenInterval() && last.getEnd() == null &&
+                            token.getEnd().getDate().after(last.getStart().getDate())) {
+                        contextualizedTokens.remove(contextualizedTokens.size() - 1);
                         DateToken combined = new DateToken();
                         combined.setConfidence(Math.max(last.getConfidence(), token.getConfidence()));
                         combined.setOffsetStart(last.getOffsetStart());
@@ -288,7 +297,7 @@ public class DucklingTimeParser {
                         combined.setInstant(false);
                         combined.setStart(last.getStart());
                         combined.setEnd(token.getEnd());
-                        LOG.debug("combined {} wiht {} to interval {}", last,token,combined);
+                        LOG.debug("combined {} wiht {} to interval {}", last, token, combined);
                         token = combined;
                     }
                 }
@@ -296,9 +305,9 @@ public class DucklingTimeParser {
             contextualizedTokens.add(token); //add the first returned token to the contextualized tokens
             //search for more Tokens with the same mention (durations)
             int nextIdx = 1;
-            for(; nextIdx < tokens.size(); nextIdx++){
+            for (; nextIdx < tokens.size(); nextIdx++) {
                 DateToken next = tokens.get(nextIdx);
-                if(DateToken.IDX_START_END_COMPARATOR.compare(token, next) == 0){
+                if (DateToken.IDX_START_END_COMPARATOR.compare(token, next) == 0) {
                     contextualizedTokens.add(next);
                 } else {
                     break;
@@ -306,11 +315,11 @@ public class DucklingTimeParser {
             }
             //still more tokens ... we need to re-parse those with the last
             //extracted time as context
-            if(tokens.size() > nextIdx){
+            if (tokens.size() > nextIdx) {
                 context = value.getDate(); //use the extracted time as context
                 contextGrain = value.getGrain();
-                if(contextGrain.ordinal() >= Grain.day.ordinal()){
-                    if(DateUtils.truncatedEquals(referenceDate, context, Calendar.DAY_OF_MONTH)){
+                if (contextGrain.ordinal() >= Grain.day.ordinal()) {
+                    if (DateUtils.truncatedEquals(referenceDate, context, Calendar.DAY_OF_MONTH)) {
                         context = referenceDate; //keeo the time of the message as context
                     } else {
                         //Duckling time uses the hours of the context for
@@ -330,7 +339,7 @@ public class DucklingTimeParser {
         }
         return contextualizedTokens;
     }
-    
+
     /**
      * Woraround for {@link DateUtils#truncate(Date, int)} is not
      * supported for all {@link Grain}s ({@link Calendar#WEEK_OF_YEAR} in the case of
@@ -340,42 +349,42 @@ public class DucklingTimeParser {
      * until it succeeds or it has no longer a smaller {@link Grain} to try. In this
      * case it will just compare based on the parsed {@link Date}s
      */
-    private int saveTruncatedCompareTo(Date date1, Date date2, Grain parsedGrain){
+    private int saveTruncatedCompareTo(Date date1, Date date2, Grain parsedGrain) {
         Grain grain = parsedGrain;
         Date truncatedDate1 = null;
         Date truncatedDate2 = null;
-        while(truncatedDate2 == null && grain != null){
+        while (truncatedDate2 == null && grain != null) {
             try {
                 truncatedDate1 = DateUtils.truncate(date1, grain.getDateField());
                 truncatedDate2 = DateUtils.truncate(date2, grain.getDateField());
-            } catch (IllegalArgumentException e){
-                Grain smallerGrain = grain.ordinal() > 0 ? Grain.values()[grain.ordinal()-1] : null;
-                if(smallerGrain != null){
+            } catch (IllegalArgumentException e) {
+                Grain smallerGrain = grain.ordinal() > 0 ? Grain.values()[grain.ordinal() - 1] : null;
+                if (smallerGrain != null) {
                     LOG.debug("Can not turncate Dates with Grain {} will use {} instead", grain, smallerGrain);
                 }
                 grain = smallerGrain;
             }
         }
-        if(truncatedDate1 == null){
+        if (truncatedDate1 == null) {
             LOG.warn("Unable to turncate Date {} using Grain {} (will use original Date for comparision)", date1, parsedGrain);
             truncatedDate1 = date1;
         }
-        if(truncatedDate2 == null){
+        if (truncatedDate2 == null) {
             LOG.warn("Unable to turncate Date {} using Grain {} (will use original Date for comparision)", date2, parsedGrain);
             truncatedDate2 = date2;
         }
         return truncatedDate1.compareTo(truncatedDate2);
     }
-    
-    private List<DateToken> extractTokens(int offset, String content, String language, Date context, Boolean includeLatentState){
-        if(LOG.isDebugEnabled()){
+
+    private List<DateToken> extractTokens(int offset, String content, String language, Date context, Boolean includeLatentState) {
+        if (LOG.isDebugEnabled()) {
             LOG.debug("extract tokens [offset: {} | context: {} | content: {}]",
                     offset, DATE_FORMAT.get().format(context), content.substring(offset));
         }
         boolean includeLatent = includeLatentState == null ? this.includeLatent : includeLatentState.booleanValue();
         final Object referenceTime = createTime(context);
-        final Object[] minMaxTime =  createMinMaxTime(context);
-        
+        final Object[] minMaxTime = createMinMaxTime(context);
+
         final Calendar cal = new GregorianCalendar();
         cal.setTime(context);
         final TimeZone contextTimeZone = cal.getTimeZone();
@@ -390,11 +399,10 @@ public class DucklingTimeParser {
         final Object o = parse.invoke(language + "$core", content.substring(offset), dims, assoc);
 
         //noinspection unchecked
-        @SuppressWarnings("unchecked")
-        final Iterator<PersistentArrayMap> map = ((LazySeq)o).iterator();
+        @SuppressWarnings("unchecked") final Iterator<PersistentArrayMap> map = ((LazySeq) o).iterator();
 
-        Set<Triple<String,Integer, Integer>> matches = new HashSet<>();
-        
+        Set<Triple<String, Integer, Integer>> matches = new HashSet<>();
+
         final List<DateToken> tokens = new ArrayList<>();
         while (map.hasNext()) {
             try {
@@ -404,19 +412,19 @@ public class DucklingTimeParser {
                 final int startOffset = ((Long) next.valAt(keyStart)).intValue() + offset;
                 final int endOffset = ((Long) next.valAt(keyEnd)).intValue() + offset;
                 //check if we do have already a match for this span and dimension
-                if(matches.add(new ImmutableTriple<String,Integer,Integer>(dimension, startOffset, endOffset)) == false){
-                    LOG.debug("ignore {} because existing match for {}@[{},{}] {}", next, dimension,startOffset,endOffset);
+                if (matches.add(new ImmutableTriple<String, Integer, Integer>(dimension, startOffset, endOffset)) == false) {
+                    LOG.debug("ignore {} because existing match for {}@[{},{}] {}", next, dimension, startOffset, endOffset);
                     continue;
                 }
                 final boolean isLatent = BooleanUtils.isTrue((Boolean) next.valAt(keyLatent));
                 if (":time".equals(dimension)) {
-                    if(!includeLatent && isLatent){
+                    if (!includeLatent && isLatent) {
                         continue; //ignore latent times
                     }
                     float conf = isLatent ? 0.1f : 0.9f;
                     final IPersistentMap value = (IPersistentMap) next.valAt(keyValue);
                     final String valueType = String.valueOf(value.valAt(keyType, "date"));
-                    if("interval".equals(valueType)){
+                    if ("interval".equals(valueType)) {
                         final DateToken t = new DateToken();
                         t.setInstant(false);
                         t.setOffsetStart(startOffset);
@@ -436,9 +444,9 @@ public class DucklingTimeParser {
                         //t.setEnd(dateValue); //instants only have a start
                         tokens.add(t);
                     }
-                } else if(":duration".equals(dimension)){
+                } else if (":duration".equals(dimension)) {
                     //TODO: add support for durations
-                    if(!includeLatent && isLatent){
+                    if (!includeLatent && isLatent) {
                         continue; //ignore latent times
                     }
                     //noinspection unused
@@ -455,18 +463,19 @@ public class DucklingTimeParser {
         Collections.sort(tokens, DATE_TOKEN_COMP);
         return tokens;
     }
-    
+
     /**
      * Parsed a {@link DateValue} from an {@link IPersistentMap} supporting the
      * <ul>
      * <li>{@link #keyValue} expected to hold a Date parsed by {@link #DATE_FORMAT}
      * <li> {@link #keyGrain} with a value contained in {@link Grain}
      * </ul>
-     * @param value the {@link IPersistentMap} instance to parse the dateValue from
+     *
+     * @param value           the {@link IPersistentMap} instance to parse the dateValue from
      * @param contextTimeZone the {@link TimeZone} used as context for parsed dateTime values
      * @return the parsed Date value
      * @throws ParseException in case the value of the {@link #keyValue} can not
-     * be parsed by the {@link #DATE_FORMAT}
+     *                        be parsed by the {@link #DATE_FORMAT}
      */
     private Temporal parseDateValue(IPersistentMap value, TimeZone contextTimeZone) throws ParseException {
         if (value == null) return null;
@@ -487,15 +496,15 @@ public class DucklingTimeParser {
         dateValue.setDate(cal.getTime());
         //finally parse the grain
         final Object grain = value.valAt(keyGrain);
-        if(grain != null){
+        if (grain != null) {
             String sGrain = String.valueOf(grain);
-            if(sGrain.charAt(0) == ':'){
+            if (sGrain.charAt(0) == ':') {
                 sGrain = sGrain.substring(1);
             }
             try {
                 dateValue.setGrain(Grain.valueOf(sGrain));
-            } catch(RuntimeException e){
-                LOG.warn("Unknown Grain value {} (supported: {})",sGrain, Arrays.toString(Grain.values()));
+            } catch (RuntimeException e) {
+                LOG.warn("Unknown Grain value {} (supported: {})", sGrain, Arrays.toString(Grain.values()));
             }
         }
         LOG.debug("Parsed {} into {}", dateStr, dateValue);
@@ -515,13 +524,14 @@ public class DucklingTimeParser {
                 cal.get(Calendar.SECOND)
         );
     }
+
     protected Object[] createMinMaxTime(Date time) {
         final Calendar cal = Calendar.getInstance();
         cal.setTime(time);
         // Offsets are in millis
         int tzOffset = (cal.get(Calendar.ZONE_OFFSET) + cal.get(Calendar.DST_OFFSET)) / (60 * 60 * 1000);
-        return new Object[]{ 
+        return new Object[]{
                 createTime.invoke(tzOffset, cal.get(Calendar.YEAR) - 1),
-                createTime.invoke(tzOffset,cal.get(Calendar.YEAR) + 5)};
+                createTime.invoke(tzOffset, cal.get(Calendar.YEAR) + 5)};
     }
 }

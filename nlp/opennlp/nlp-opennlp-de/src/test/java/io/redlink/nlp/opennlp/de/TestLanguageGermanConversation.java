@@ -16,6 +16,20 @@
 
 package io.redlink.nlp.opennlp.de;
 
+import io.redlink.nlp.api.ProcessingData;
+import io.redlink.nlp.api.ProcessingException;
+import io.redlink.nlp.api.annotation.Annotations;
+import io.redlink.nlp.api.content.StringContent;
+import io.redlink.nlp.api.model.Value;
+import io.redlink.nlp.model.AnalyzedText;
+import io.redlink.nlp.model.AnalyzedText.AnalyzedTextBuilder;
+import io.redlink.nlp.model.NlpAnnotations;
+import io.redlink.nlp.model.Span;
+import io.redlink.nlp.model.Span.SpanTypeEnum;
+import io.redlink.nlp.model.pos.PosTag;
+import io.redlink.nlp.model.util.NlpUtils;
+import io.redlink.nlp.opennlp.pos.OpenNlpLanguageModel;
+import io.redlink.nlp.opennlp.pos.OpenNlpPosProcessor;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -31,11 +45,6 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
-
-import io.redlink.nlp.api.ProcessingException;
-import io.redlink.nlp.api.annotation.Annotations;
-
-import io.redlink.nlp.api.content.StringContent;
 import org.apache.commons.math3.util.Precision;
 import org.junit.Assert;
 import org.junit.Before;
@@ -44,37 +53,25 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import io.redlink.nlp.api.ProcessingData;
-import io.redlink.nlp.model.AnalyzedText;
-import io.redlink.nlp.model.AnalyzedText.AnalyzedTextBuilder;
-import io.redlink.nlp.model.NlpAnnotations;
-import io.redlink.nlp.model.Span;
-import io.redlink.nlp.model.Span.SpanTypeEnum;
-import io.redlink.nlp.api.model.Value;
-import io.redlink.nlp.model.pos.PosTag;
-import io.redlink.nlp.model.util.NlpUtils;
-import io.redlink.nlp.opennlp.pos.OpenNlpLanguageModel;
-import io.redlink.nlp.opennlp.pos.OpenNlpPosProcessor;
-
 /**
  * Similar to {@link TestLanguageGerman}, but this tests multiple text sections originating e.g.
  * for a conversation
- * @author Rupert Westenthaler
  *
+ * @author Rupert Westenthaler
  */
 public class TestLanguageGermanConversation {
-    
+
     private static final Logger log = LoggerFactory.getLogger(TestLanguageGermanConversation.class);
 
     private static List<String[]> CONTENTS = new ArrayList<>();
 
     private OpenNlpPosProcessor extractor;
-    
+
     private static LanguageGerman model;
 
-    
+
     @BeforeClass
-    public static void initClass() throws IOException{
+    public static void initClass() throws IOException {
         CONTENTS.add(new String[]{
                 "Ist der ICE 1526 von München heute verspätet?"});
         CONTENTS.add(new String[]{
@@ -96,11 +93,11 @@ public class TestLanguageGermanConversation {
 
     private static final ProcessingData initTestData(int index) {
         return initTestData(index, new HashMap<>());
-    }    
-    
-    private static final ProcessingData initTestData(int index, Map<String,Object> config) {
+    }
+
+    private static final ProcessingData initTestData(int index, Map<String, Object> config) {
         AnalyzedTextBuilder atb = AnalyzedText.build();
-        for(String section : CONTENTS.get(index)){
+        for (String section : CONTENTS.get(index)) {
             atb.appendSection(null, section, "\n");
         }
         AnalyzedText at = atb.create();
@@ -112,23 +109,23 @@ public class TestLanguageGermanConversation {
     }
 
     @Before
-    public void init(){
+    public void init() {
         extractor = new OpenNlpPosProcessor(
                 Collections.<OpenNlpLanguageModel>singleton(model));
     }
-    
+
     @Test
     public void testSingle() throws ProcessingException {
-        int idx = Math.round((float)Math.random()*(CONTENTS.size()-1));
+        int idx = Math.round((float) Math.random() * (CONTENTS.size() - 1));
         log.debug(" - using conversation (idx: {})", idx);
         long start = System.currentTimeMillis();
         ProcessingData pd = initTestData(idx);
         extractor.process(pd);
-        log.debug(" - processing time: {}",System.currentTimeMillis()-start);
+        log.debug(" - processing time: {}", System.currentTimeMillis() - start);
         assertNlpProcessingResults(pd);
     }
-    
-    private void assertNlpProcessingResults(ProcessingData pd){
+
+    private void assertNlpProcessingResults(ProcessingData pd) {
         Optional<AnalyzedText> at = NlpUtils.getAnalyzedText(pd);
         Assert.assertTrue(at.isPresent());
         Iterator<Span> spans = at.get().getEnclosed(EnumSet.allOf(SpanTypeEnum.class));
@@ -136,7 +133,7 @@ public class TestLanguageGermanConversation {
         boolean tokenPresent = false;
         int lastSentEnd = 0;
         int lastTokenEnd = 0;
-        while(spans.hasNext()){
+        while (spans.hasNext()) {
             Span span = spans.next();
             switch (span.getType()) {
                 case Sentence:
@@ -150,18 +147,18 @@ public class TestLanguageGermanConversation {
                     lastTokenEnd = span.getEnd();
                     List<Value<PosTag>> posAnnos = span.getValues(NlpAnnotations.POS_ANNOTATION);
                     Assert.assertFalse(posAnnos.isEmpty());
-                    for(Value<PosTag> posAnno : posAnnos){
+                    for (Value<PosTag> posAnno : posAnnos) {
                         Assert.assertTrue(posAnno.probability() != Value.UNKNOWN_PROBABILITY);
                         Assert.assertTrue(posAnno.probability() <= 1);
                         PosTag posTag = posAnno.value();
                         Assert.assertNotNull(posTag.getTag());
-                        Assert.assertFalse("PosTag "+ posTag + " is not mapped!", posTag.getCategories().isEmpty());
+                        Assert.assertFalse("PosTag " + posTag + " is not mapped!", posTag.getCategories().isEmpty());
                     }
                 default:
                     break;
             }
         }
-        
+
         Assert.assertTrue(sentencePresent);
         Assert.assertTrue(tokenPresent);
     }
@@ -173,68 +170,68 @@ public class TestLanguageGermanConversation {
         int numWarmup = Math.max(CONTENTS.size(), 20);
         log.info("> warnup ({} calls + assertion of results)", numWarmup);
         List<Future<TestCaseProcessor>> tasks = new LinkedList<>();
-        for(int i = 0; i < numWarmup; i++){
-            int idx = i%CONTENTS.size();
+        for (int i = 0; i < numWarmup; i++) {
+            int idx = i % CONTENTS.size();
             tasks.add(executor.submit(new TestCaseProcessor(idx)));
         }
-        while(!tasks.isEmpty()){ //wait for all the tasks to complete
+        while (!tasks.isEmpty()) { //wait for all the tasks to complete
             //during warmup we assert the NLP results
-            assertNlpProcessingResults(tasks.remove(0).get().getProcessingData()); 
+            assertNlpProcessingResults(tasks.remove(0).get().getProcessingData());
         }
         log.info("   ... done");
         log.info("> processing {} conversations ...", numDoc);
         long min = Integer.MAX_VALUE;
         long max = Integer.MIN_VALUE;
         long sum = 0;
-        for(int i = 0; i < numDoc; i++){
-            int idx = i%CONTENTS.size();
+        for (int i = 0; i < numDoc; i++) {
+            int idx = i % CONTENTS.size();
             tasks.add(executor.submit(new TestCaseProcessor(idx)));
         }
         int i = 0;
-        while(!tasks.isEmpty()){ //wait for all the tasks to complete
+        while (!tasks.isEmpty()) { //wait for all the tasks to complete
             TestCaseProcessor completed = tasks.remove(0).get();
             i++;
-            if(i%10 == 0){
-                log.info(" ... {} conversations processed",i);
+            if (i % 10 == 0) {
+                log.info(" ... {} conversations processed", i);
             }
             int dur = completed.getDuration();
-            if(dur > max){
+            if (dur > max) {
                 max = dur;
             }
-            if(dur < min){
+            if (dur < min) {
                 min = dur;
             }
             sum = sum + dur;
         }
-        log.info("Processing Times after {} conversations",numDoc);
-        log.info(" - average: {}ms",Precision.round(sum/(double)numDoc, 2));
-        log.info(" - max: {}ms",max);
-        log.info(" - min: {}ms",min);
+        log.info("Processing Times after {} conversations", numDoc);
+        log.info(" - average: {}ms", Precision.round(sum / (double) numDoc, 2));
+        log.info(" - max: {}ms", max);
+        log.info(" - min: {}ms", min);
         executor.shutdown();
     }
-    
+
     private class TestCaseProcessor implements Callable<TestCaseProcessor> {
 
         private final ProcessingData processingData;
         private int duration;
 
-        TestCaseProcessor(int idx){
+        TestCaseProcessor(int idx) {
             this.processingData = initTestData(idx);
         }
-        
+
 
         @Override
         public TestCaseProcessor call() throws Exception {
             long start = System.currentTimeMillis();
             extractor.process(processingData);
-            duration = (int)(System.currentTimeMillis() - start);
+            duration = (int) (System.currentTimeMillis() - start);
             return this;
         }
 
         public ProcessingData getProcessingData() {
             return processingData;
         }
-        
+
         public int getDuration() {
             return duration;
         }

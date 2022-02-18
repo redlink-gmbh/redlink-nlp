@@ -16,14 +16,13 @@
 package io.redlink.nlp.api.content;
 
 import io.redlink.nlp.api.Content;
-import org.apache.commons.io.input.CharSequenceInputStream;
-import org.apache.commons.lang3.StringUtils;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.Charset;
 import java.nio.file.Path;
 import java.util.Optional;
+import org.apache.commons.io.input.CharSequenceInputStream;
+import org.apache.commons.lang3.StringUtils;
 
 /**
  *

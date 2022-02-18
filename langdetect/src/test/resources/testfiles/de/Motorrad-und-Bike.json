@@ -1,43 +1,47 @@
 {
-  "spans" : [ {
-    "type" : "Text",
-    "start" : 0,
-    "end" : 645
-  }, {
-    "type" : "TextSection",
-    "start" : 29,
-    "end" : 171,
-    "stanbol.enhancer.nlp.section.stats" : {
-      "value" : {
-        "numChars" : 142,
-        "numAlpha" : 7,
-        "numDigit" : 17,
-        "numWhitespace" : 114
-      },
-      "class" : "io.redlink.nlp.model.section.SectionStats"
+  "spans": [
+    {
+      "type": "Text",
+      "start": 0,
+      "end": 645
     },
-    "stanbol.enhancer.nlp.section" : {
-      "tag" : "p",
-      "section" : 2,
-      "class" : "io.redlink.nlp.model.section.SectionTag"
-    }
-  }, {
-    "type" : "TextSection",
-    "start" : 236,
-    "end" : 278,
-    "stanbol.enhancer.nlp.section.stats" : {
-      "value" : {
-        "numChars" : 42,
-        "numAlpha" : 30,
-        "numDigit" : 4,
-        "numWhitespace" : 5
+    {
+      "type": "TextSection",
+      "start": 29,
+      "end": 171,
+      "stanbol.enhancer.nlp.section.stats": {
+        "value": {
+          "numChars": 142,
+          "numAlpha": 7,
+          "numDigit": 17,
+          "numWhitespace": 114
+        },
+        "class": "io.redlink.nlp.model.section.SectionStats"
       },
-      "class" : "io.redlink.nlp.model.section.SectionStats"
+      "stanbol.enhancer.nlp.section": {
+        "tag": "p",
+        "section": 2,
+        "class": "io.redlink.nlp.model.section.SectionTag"
+      }
     },
-    "stanbol.enhancer.nlp.section" : {
-      "tag" : "p",
-      "section" : 2,
-      "class" : "io.redlink.nlp.model.section.SectionTag"
+    {
+      "type": "TextSection",
+      "start": 236,
+      "end": 278,
+      "stanbol.enhancer.nlp.section.stats": {
+        "value": {
+          "numChars": 42,
+          "numAlpha": 30,
+          "numDigit": 4,
+          "numWhitespace": 5
+        },
+        "class": "io.redlink.nlp.model.section.SectionStats"
+      },
+      "stanbol.enhancer.nlp.section": {
+        "tag": "p",
+        "section": 2,
+        "class": "io.redlink.nlp.model.section.SectionTag"
+      }
     }
-  } ]
+  ]
 }

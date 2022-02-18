@@ -27,11 +27,11 @@ public class TestCase {
         this.atFile = atFile;
         this.cntFile = cntFile;
     }
-    
+
     public File getAtFile() {
         return atFile;
     }
-    
+
     public File getCntFile() {
         return cntFile;
     }

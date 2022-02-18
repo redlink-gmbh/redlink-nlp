@@ -16,9 +16,19 @@
 
 package io.redlink.nlp.opennlp.de;
 
-import static java.util.Arrays.asList;
-import static java.util.Collections.unmodifiableList;
-
+import io.redlink.nlp.api.ProcessingData;
+import io.redlink.nlp.api.ProcessingException;
+import io.redlink.nlp.api.annotation.Annotations;
+import io.redlink.nlp.api.content.StringContent;
+import io.redlink.nlp.api.model.Value;
+import io.redlink.nlp.model.AnalyzedText;
+import io.redlink.nlp.model.NlpAnnotations;
+import io.redlink.nlp.model.Span;
+import io.redlink.nlp.model.Span.SpanTypeEnum;
+import io.redlink.nlp.model.pos.PosTag;
+import io.redlink.nlp.model.util.NlpUtils;
+import io.redlink.nlp.opennlp.pos.OpenNlpLanguageModel;
+import io.redlink.nlp.opennlp.pos.OpenNlpPosProcessor;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.Charset;
@@ -36,11 +46,6 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
-
-import io.redlink.nlp.api.ProcessingException;
-import io.redlink.nlp.api.annotation.Annotations;
-
-import io.redlink.nlp.api.content.StringContent;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.math3.util.Precision;
 import org.junit.Assert;
@@ -50,47 +55,39 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import io.redlink.nlp.api.ProcessingData;
-import io.redlink.nlp.model.AnalyzedText;
-import io.redlink.nlp.model.NlpAnnotations;
-import io.redlink.nlp.model.Span;
-import io.redlink.nlp.model.Span.SpanTypeEnum;
-import io.redlink.nlp.api.model.Value;
-import io.redlink.nlp.model.pos.PosTag;
-import io.redlink.nlp.model.util.NlpUtils;
-import io.redlink.nlp.opennlp.pos.OpenNlpLanguageModel;
-import io.redlink.nlp.opennlp.pos.OpenNlpPosProcessor;
+import static java.util.Arrays.asList;
+import static java.util.Collections.unmodifiableList;
 
 public class TestLanguageGerman {
-    
+
     private static final Logger log = LoggerFactory.getLogger(TestLanguageGerman.class);
 
     private static final Charset UTF8 = Charset.forName("UTF-8");
-    
+
     public static final List<String> FILES = unmodifiableList(asList(
             "docs/leitstellen-pdf-extracted.txt",
             "docs/teppich.txt",
             "docs/Demonstration-in-Dresden.txt",
             "docs/Heta-Haftungen.txt",
             "docs/Remis-in-Unterzahl.txt",
-            "docs/vw-tiguan-preisliste-pdf.txt", 
+            "docs/vw-tiguan-preisliste-pdf.txt",
             "docs/Trauer-um-Nemzow.txt"
-            ));
-    
+    ));
+
     private static List<String> CONTENTS = new ArrayList<>(FILES.size());
 
-     
+
     private OpenNlpPosProcessor processor;
-    
+
     private static LanguageGerman model;
 
-    
+
     @BeforeClass
-    public static void initClass() throws IOException{
+    public static void initClass() throws IOException {
         ClassLoader cl = TestLanguageGerman.class.getClassLoader();
-        for(String file : FILES){
+        for (String file : FILES) {
             InputStream in = cl.getResourceAsStream(file);
-            Assert.assertNotNull("Missing test resource '"+file+"'!",in);
+            Assert.assertNotNull("Missing test resource '" + file + "'!", in);
             String content = IOUtils.toString(in, UTF8);
             CONTENTS.add(content);
         }
@@ -99,9 +96,9 @@ public class TestLanguageGerman {
 
     private static final ProcessingData initTestData(int index) {
         return initTestData(index, new HashMap<>());
-    }    
-    
-    private static final ProcessingData initTestData(int index, Map<String,Object> config) {
+    }
+
+    private static final ProcessingData initTestData(int index, Map<String, Object> config) {
         Assert.assertTrue(index >= 0 && index < FILES.size());
         AnalyzedText at = new AnalyzedText(CONTENTS.get(index));
         //we just put here any language (no)
@@ -110,24 +107,24 @@ public class TestLanguageGerman {
         pd.addAnnotation(AnalyzedText.ANNOTATION, at);
         return pd;
     }
-    
+
     @Before
-    public void init(){
+    public void init() {
         processor = new OpenNlpPosProcessor(Collections.<OpenNlpLanguageModel>singleton(model));
     }
-    
+
     @Test
     public void testSingle() throws ProcessingException {
-        int idx = Math.round((float)Math.random()*(FILES.size()-1));
+        int idx = Math.round((float) Math.random() * (FILES.size() - 1));
         log.debug(" - using file {} (idx: {})", FILES.get(idx), idx);
         long start = System.currentTimeMillis();
         ProcessingData pd = initTestData(idx);
         processor.process(pd);
-        log.debug(" - processing time: {}",System.currentTimeMillis()-start);
+        log.debug(" - processing time: {}", System.currentTimeMillis() - start);
         assertNlpProcessingResults(pd);
     }
-    
-    private void assertNlpProcessingResults(ProcessingData pd){
+
+    private void assertNlpProcessingResults(ProcessingData pd) {
         Optional<AnalyzedText> at = NlpUtils.getAnalyzedText(pd);
         Assert.assertTrue(at.isPresent());
         Iterator<Span> spans = at.get().getEnclosed(EnumSet.allOf(SpanTypeEnum.class));
@@ -135,7 +132,7 @@ public class TestLanguageGerman {
         boolean tokenPresent = false;
         int lastSentEnd = 0;
         int lastTokenEnd = 0;
-        while(spans.hasNext()){
+        while (spans.hasNext()) {
             Span span = spans.next();
             switch (span.getType()) {
                 case Sentence:
@@ -149,18 +146,18 @@ public class TestLanguageGerman {
                     lastTokenEnd = span.getEnd();
                     List<Value<PosTag>> posAnnos = span.getValues(NlpAnnotations.POS_ANNOTATION);
                     Assert.assertFalse(posAnnos.isEmpty());
-                    for(Value<PosTag> posAnno : posAnnos){
+                    for (Value<PosTag> posAnno : posAnnos) {
                         Assert.assertTrue(posAnno.probability() != Value.UNKNOWN_PROBABILITY);
                         Assert.assertTrue(posAnno.probability() <= 1);
                         PosTag posTag = posAnno.value();
                         Assert.assertNotNull(posTag.getTag());
-                        Assert.assertFalse("PosTag "+ posTag + " is not mapped!", posTag.getCategories().isEmpty());
+                        Assert.assertFalse("PosTag " + posTag + " is not mapped!", posTag.getCategories().isEmpty());
                     }
                 default:
                     break;
             }
         }
-        
+
         Assert.assertTrue(sentencePresent);
         Assert.assertTrue(tokenPresent);
     }
@@ -172,71 +169,71 @@ public class TestLanguageGerman {
         int numWarmup = Math.max(FILES.size(), 20);
         log.info("> warnup ({} calls + assertion of results)", numWarmup);
         List<Future<TestCaseProcessor>> tasks = new LinkedList<>();
-        for(int i = 0; i < numWarmup; i++){
-            int idx = i%FILES.size();
+        for (int i = 0; i < numWarmup; i++) {
+            int idx = i % FILES.size();
             tasks.add(executor.submit(new TestCaseProcessor(idx)));
         }
-        while(!tasks.isEmpty()){ //wait for all the tasks to complete
+        while (!tasks.isEmpty()) { //wait for all the tasks to complete
             //during warmup we assert the NLP results
-            assertNlpProcessingResults(tasks.remove(0).get().getProcessingData()); 
+            assertNlpProcessingResults(tasks.remove(0).get().getProcessingData());
         }
         log.info("   ... done");
         log.info("> processing {} documents ...", numDoc);
         long min = Integer.MAX_VALUE;
         long max = Integer.MIN_VALUE;
         long sum = 0;
-        for(int i = 0; i < numDoc; i++){
-            int idx = i%FILES.size();
+        for (int i = 0; i < numDoc; i++) {
+            int idx = i % FILES.size();
             tasks.add(executor.submit(new TestCaseProcessor(idx)));
         }
         int i = 0;
-        while(!tasks.isEmpty()){ //wait for all the tasks to complete
+        while (!tasks.isEmpty()) { //wait for all the tasks to complete
             TestCaseProcessor completed = tasks.remove(0).get();
             i++;
-            if(i%10 == 0){
-                log.info(" ... {} documents processed",i);
+            if (i % 10 == 0) {
+                log.info(" ... {} documents processed", i);
             }
             int dur = completed.getDuration();
-            if(dur > max){
+            if (dur > max) {
                 max = dur;
             }
-            if(dur < min){
+            if (dur < min) {
                 min = dur;
             }
             sum = sum + dur;
         }
-        log.info("Processing Times after {} documents",numDoc);
-        log.info(" - average: {}ms",Precision.round(sum/(double)numDoc, 2));
-        log.info(" - max: {}ms",max);
-        log.info(" - min: {}ms",min);
+        log.info("Processing Times after {} documents", numDoc);
+        log.info(" - average: {}ms", Precision.round(sum / (double) numDoc, 2));
+        log.info(" - max: {}ms", max);
+        log.info(" - min: {}ms", min);
         executor.shutdown();
     }
-    
+
     private class TestCaseProcessor implements Callable<TestCaseProcessor> {
 
         private ProcessingData pc;
         private int duration;
 
-        TestCaseProcessor(int idx){
+        TestCaseProcessor(int idx) {
             this.pc = initTestData(idx);
         }
-        
+
 
         @Override
         public TestCaseProcessor call() throws Exception {
             long start = System.currentTimeMillis();
             processor.process(pc);
-            duration = (int)(System.currentTimeMillis() - start);
+            duration = (int) (System.currentTimeMillis() - start);
             return this;
         }
 
-        public ProcessingData getProcessingData(){
+        public ProcessingData getProcessingData() {
             return pc;
         }
-        
+
         public int getDuration() {
             return duration;
         }
     }
-    
+
 }

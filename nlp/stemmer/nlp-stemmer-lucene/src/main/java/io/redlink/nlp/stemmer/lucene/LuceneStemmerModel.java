@@ -16,13 +16,11 @@
 
 package io.redlink.nlp.stemmer.lucene;
 
+import io.redlink.nlp.stemmer.StemmerModel;
 import java.util.Locale;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.tartarus.snowball.SnowballProgram;
-
-import io.redlink.nlp.stemmer.StemmerModel;
 
 /**
  * Stemmer model
@@ -33,7 +31,7 @@ import io.redlink.nlp.stemmer.StemmerModel;
 public class LuceneStemmerModel implements StemmerModel {
 
     private final Logger log = LoggerFactory.getLogger(LuceneStemmerModel.class);
-    
+
 
     /**
      * The stemmer class used for the {@link #language}
@@ -46,13 +44,14 @@ public class LuceneStemmerModel implements StemmerModel {
 
     private Locale language;
 
-    protected LuceneStemmerModel(Locale language, Class<? extends SnowballProgram> clazz){
+    protected LuceneStemmerModel(Locale language, Class<? extends SnowballProgram> clazz) {
         assert language != null;
         this.language = language;
         this.stemmerClass = clazz;
         log.info("  ... loading {} Snowball Stemmer", stemmerClass);
         stemmer = new ThreadLocal<SnowballProgram>() {
-            @Override protected SnowballProgram initialValue() {
+            @Override
+            protected SnowballProgram initialValue() {
                 try {
                     return stemmerClass.newInstance();
                 } catch (InstantiationException | IllegalAccessException e) {
@@ -61,17 +60,16 @@ public class LuceneStemmerModel implements StemmerModel {
             }
         };
     }
-    
+
     public final String getName() {
         return (language == null ? "default language" : language.getDisplayLanguage(language)) + " Stemmer";
     }
 
 
-    
     public Locale getLocale() {
         return language;
     }
-    
+
     /**
      * Perform stemming on the given token.
      */

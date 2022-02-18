@@ -15,26 +15,24 @@
  */
 package io.redlink.nlp.regex.ner;
 
+import io.redlink.nlp.model.SpanCollection;
+import io.redlink.nlp.model.ner.NerTag;
+import io.redlink.nlp.regex.ner.RegexNerProcessor.NamedEntity;
 import java.util.Collections;
 import java.util.List;
 import java.util.regex.MatchResult;
 import java.util.regex.Pattern;
-
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
-
-import io.redlink.nlp.model.SpanCollection;
-import io.redlink.nlp.model.ner.NerTag;
-import io.redlink.nlp.regex.ner.RegexNerProcessor.NamedEntity;
 
 /**
  * Adaption of the TrainDetector to be a RegexNamedEntityFactory to be used for Unit Testing.
  */
 @Component
 public class TrainDetector extends RegexNamedEntityFactory {
-    
+
     public static final NerTag TRAIN_TAG = new NerTag("train", "train");
-    
+
     //TODO: move to a different module!
     private static final String[] prefixes = {
             // from http://kursbuch.bahn.de/hafas-res/img/kbview/ContentPDFs/zeichenerkl.pdf
@@ -70,10 +68,10 @@ public class TrainDetector extends RegexNamedEntityFactory {
         log.debug("Create Train Named Entity for {}", match);
         if (StringUtils.isBlank(match.group())) return null;
         final String train = String.format("%S %s", match.group(1), StringUtils.defaultIfBlank(match.group(3), "")).trim();
-        
+
         final NamedEntity ne = new NamedEntity(match.start(), match.end(), TRAIN_TAG);
         ne.setConfidence(1f);
-        if(!match.group(0).equals(train)){
+        if (!match.group(0).equals(train)) {
             ne.setLemma(train);
         }
         return ne;

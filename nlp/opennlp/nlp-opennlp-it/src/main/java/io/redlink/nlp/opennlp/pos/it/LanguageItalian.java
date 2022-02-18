@@ -16,15 +16,14 @@
 
 package io.redlink.nlp.opennlp.pos.it;
 
-import static java.util.Locale.ITALIAN;
-
-import org.springframework.stereotype.Service;
-
 import io.redlink.nlp.model.pos.LexicalCategory;
 import io.redlink.nlp.model.pos.Pos;
 import io.redlink.nlp.model.pos.PosTag;
 import io.redlink.nlp.model.tag.TagSet;
 import io.redlink.nlp.opennlp.pos.OpenNlpLanguageModel;
+import org.springframework.stereotype.Service;
+
+import static java.util.Locale.ITALIAN;
 
 /**
  * Implementation of Italian-specific tools for natural language processing.
@@ -162,7 +161,7 @@ public class LanguageItalian extends OpenNlpLanguageModel {
         ITALIAN_TANL.addTag(new PosTag("VMps", Pos.ModalVerb, Pos.Participle, Pos.PastParticiple)); //modal verb participle past
         ITALIAN_TANL.addTag(new PosTag("X", LexicalCategory.Residual)); //residual class    }
     }
-    
+
     public LanguageItalian() {
         super(ITALIAN, ITALIAN_TANL, "it-sent.bin", "it-token.bin", "it-pos-maxent.bin");
     }

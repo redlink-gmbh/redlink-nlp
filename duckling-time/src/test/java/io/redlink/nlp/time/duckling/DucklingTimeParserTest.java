@@ -15,17 +15,13 @@
  */
 package io.redlink.nlp.time.duckling;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
-
+import io.redlink.nlp.model.temporal.Temporal;
+import io.redlink.nlp.model.temporal.Temporal.Grain;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
-
 import org.hamcrest.CoreMatchers;
 import org.junit.AfterClass;
 import org.junit.Assert;
@@ -38,18 +34,21 @@ import org.junit.runner.Description;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import io.redlink.nlp.model.temporal.Temporal;
-import io.redlink.nlp.model.temporal.Temporal.Grain;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
 
 /**
+ *
  */
 public class DucklingTimeParserTest {
 
     private static DucklingTimeParser ducklingTimeParser;
 
-    private Calendar refereceCal = new GregorianCalendar(2016,Calendar.APRIL,1,8,0);//Calendar.getInstance();
+    private Calendar refereceCal = new GregorianCalendar(2016, Calendar.APRIL, 1, 8, 0);//Calendar.getInstance();
     private Date referenceDate = refereceCal.getTime();
-    
+
     private static boolean defaultLatent;
 
     private Logger log = LoggerFactory.getLogger(DucklingTimeParserTest.class);
@@ -83,12 +82,12 @@ public class DucklingTimeParserTest {
     @Before
     public void setUp() {
         //ensure that Latent=false is the default
-        ducklingTimeParser.setIncludeLatent(defaultLatent); 
+        ducklingTimeParser.setIncludeLatent(defaultLatent);
     }
 
     @Test
     public void testSimpleDateDe() throws Exception {
-        final List<DateToken> tokens = ducklingTimeParser.parse("Morgen um 9 Uhr","de",referenceDate);
+        final List<DateToken> tokens = ducklingTimeParser.parse("Morgen um 9 Uhr", "de", referenceDate);
 
         assertEquals("Num of Tokens", 1, tokens.size());
         final DateToken token = tokens.get(0);
@@ -103,7 +102,7 @@ public class DucklingTimeParserTest {
 
     @Test
     public void testSimpleDateEn() throws Exception {
-        final List<DateToken> tokens = ducklingTimeParser.parse("Tomorrow at 9am","en",referenceDate);
+        final List<DateToken> tokens = ducklingTimeParser.parse("Tomorrow at 9am", "en", referenceDate);
 
         assertEquals("Num of Tokens", 1, tokens.size());
         final DateToken token = tokens.get(0);
@@ -122,9 +121,9 @@ public class DucklingTimeParserTest {
         List<DateToken> tokens;
         Calendar cal;
         DateToken token;
-        
+
         tokens = ducklingTimeParser.parse("Hallo, ich will am 27. Mai, gegen 18 Uhr mit dem ICE von Köln nach"
-        + " Berlin fahren und am 29. Abends zurück nach Bonn", "de", referenceDate);
+                + " Berlin fahren und am 29. Abends zurück nach Bonn", "de", referenceDate);
 
         Assert.assertTrue(tokens.size() > 1); //just make sure we do not run in an IooBE
         token = tokens.get(0);
@@ -138,7 +137,7 @@ public class DucklingTimeParserTest {
         assertEquals("27th", 27, cal.get(Calendar.DAY_OF_MONTH));
         assertEquals("18h", 18, cal.get(Calendar.HOUR_OF_DAY));
         assertEquals("00m", 0, cal.get(Calendar.MINUTE));
-        
+
         token = tokens.get(1);
         assertThat("Class/Type", token.getStart(), CoreMatchers.instanceOf(Temporal.class));
         assertTrue("interval", token.isInterval());
@@ -151,7 +150,7 @@ public class DucklingTimeParserTest {
         assertEquals("29th", 29, cal.get(Calendar.DAY_OF_MONTH));
         assertEquals("17h", 17, cal.get(Calendar.HOUR_OF_DAY));
         assertEquals("00m", 0, cal.get(Calendar.MINUTE));
-        
+
         cal = Calendar.getInstance();
         cal.setTime(token.getEnd().getDate());
         assertEquals("same year", refereceCal.get(Calendar.YEAR), cal.get(Calendar.YEAR));
@@ -159,15 +158,14 @@ public class DucklingTimeParserTest {
         assertEquals("29th", 29, cal.get(Calendar.DAY_OF_MONTH));
         assertEquals("22h", 22, cal.get(Calendar.HOUR_OF_DAY));
 
-        
-        
+
         assertEquals("Num of Tokens", 2, tokens.size());
 
-        
+
         tokens = ducklingTimeParser.parse((
                 "Hallo, ich brauche übermorgen ein Hotelzimmer im Hamburg ab 10 Uhr für zwei "
-                + "Nächte. Bitte in der Nähe des Hbf in Hamburg."), "de", referenceDate);
-        
+                        + "Nächte. Bitte in der Nähe des Hbf in Hamburg."), "de", referenceDate);
+
         Assert.assertTrue(tokens.size() > 0); //just make sure we do not run in an IooBE
         token = tokens.get(0);
         assertThat("Class/Type", token.getStart(), CoreMatchers.instanceOf(Temporal.class));
@@ -181,7 +179,7 @@ public class DucklingTimeParserTest {
         assertEquals("3rd", 3, cal.get(Calendar.DAY_OF_MONTH));
         assertEquals("10h", 10, cal.get(Calendar.HOUR_OF_DAY));
         assertEquals("00m", 0, cal.get(Calendar.MINUTE));
-        
+
 
         cal = Calendar.getInstance();
         cal.setTime(token.getEnd().getDate());
@@ -190,16 +188,15 @@ public class DucklingTimeParserTest {
         assertEquals("5th", 5, cal.get(Calendar.DAY_OF_MONTH));
         //TODO assertEquals("18h", 18, cal.get(Calendar.HOUR_OF_DAY));
         //TODO assertEquals("00m", 0, cal.get(Calendar.MINUTE));
-        
+
         assertEquals("Num of Tokens", 1, tokens.size());
-        
-        
+
 
         tokens = ducklingTimeParser.parse((
                 "Hallo, am Samstag 28.5. Komme ich um 12h im HBF "
-                + "Magdeburg an. Was könnte ich bis 16h Unternehmen"), "de", referenceDate);
-        
-        Assert.assertEquals(1,tokens.size());
+                        + "Magdeburg an. Was könnte ich bis 16h Unternehmen"), "de", referenceDate);
+
+        Assert.assertEquals(1, tokens.size());
         token = tokens.get(0);
         assertThat("Class/Type", token.getStart(), CoreMatchers.instanceOf(Temporal.class));
         assertFalse("interval", token.isInstant());
@@ -213,7 +210,7 @@ public class DucklingTimeParserTest {
         assertEquals("281h", 28, cal.get(Calendar.DAY_OF_MONTH));
         assertEquals("12h", 12, cal.get(Calendar.HOUR_OF_DAY));
         assertEquals("00m", 0, cal.get(Calendar.MINUTE));
-        
+
         cal = Calendar.getInstance();
         cal.setTime(token.getEnd().getDate());
         assertEquals("same year", refereceCal.get(Calendar.YEAR), cal.get(Calendar.YEAR));
@@ -237,7 +234,7 @@ public class DucklingTimeParserTest {
 
         Temporal startValue = token.getStart();
         assertEquals("Grain minute", Grain.hour, startValue.getGrain());
-        
+
         final Calendar startCal = Calendar.getInstance();
         startCal.setTime(startValue.getDate());
         assertEquals("+1 day", refereceCal.get(Calendar.YEAR), startCal.get(Calendar.YEAR));
@@ -248,19 +245,19 @@ public class DucklingTimeParserTest {
         assertThat("Class/Type", token.getEnd(), CoreMatchers.instanceOf(Temporal.class));
 
         Temporal endValue = token.getEnd();
-        assertEquals("Grain minute",Grain.hour, endValue.getGrain());
-        
+        assertEquals("Grain minute", Grain.hour, endValue.getGrain());
+
         final Calendar endCal = Calendar.getInstance();
         endCal.setTime(endValue.getDate());
         assertEquals("+1 day", refereceCal.get(Calendar.YEAR), endCal.get(Calendar.YEAR));
-        assertEquals("Sunday", refereceCal.get(Calendar.DAY_OF_MONTH)+2, endCal.get(Calendar.DAY_OF_MONTH));
+        assertEquals("Sunday", refereceCal.get(Calendar.DAY_OF_MONTH) + 2, endCal.get(Calendar.DAY_OF_MONTH));
         assertEquals("22h", 22, endCal.get(Calendar.HOUR_OF_DAY));
         assertEquals("00m", 0, endCal.get(Calendar.MINUTE));
-        
+
         final DateToken latentYear = tokens.get(1);
         Assert.assertTrue("latent (conf <= 0.1f", latentYear.getConfidence() <= .1f);
     }
-    
+
     @Test
     public void testOpenInterval() throws Exception {
         final List<DateToken> tokens = ducklingTimeParser.parse(("spätestens um 11:00"), "de", referenceDate);
@@ -271,8 +268,8 @@ public class DucklingTimeParserTest {
         assertThat("Class/Type", token.getEnd(), CoreMatchers.instanceOf(Temporal.class));
 
         Temporal value = token.getEnd();
-        assertEquals("Grain minute",Grain.minute, value.getGrain());
-        
+        assertEquals("Grain minute", Grain.minute, value.getGrain());
+
         final Calendar cal = Calendar.getInstance();
         cal.setTime(value.getDate());
         assertEquals("+1 day", refereceCal.get(Calendar.YEAR), cal.get(Calendar.YEAR));

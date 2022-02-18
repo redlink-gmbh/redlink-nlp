@@ -16,6 +16,10 @@
 
 package io.redlink.nlp.api;
 
+import io.redlink.nlp.api.annotation.Annotations;
+import io.redlink.nlp.api.model.Annotated;
+import io.redlink.nlp.api.model.Annotation;
+import io.redlink.nlp.api.model.Value;
 import java.io.Closeable;
 import java.io.IOException;
 import java.math.BigDecimal;
@@ -28,15 +32,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
-
 import org.apache.commons.io.IOUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import io.redlink.nlp.api.annotation.Annotations;
-import io.redlink.nlp.api.model.Annotated;
-import io.redlink.nlp.api.model.Annotation;
-import io.redlink.nlp.api.model.Value;
 
 /**
  * Class used to store all information related to
@@ -82,6 +78,7 @@ public class ProcessingData extends Annotated implements Closeable {
             }
         }
     }
+
     /**
      * Getter for all contents compatible with the parsed mime type.
      *

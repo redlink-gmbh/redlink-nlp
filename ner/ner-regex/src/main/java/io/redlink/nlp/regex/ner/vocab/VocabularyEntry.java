@@ -20,15 +20,14 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
-
 import org.apache.commons.lang3.StringUtils;
 
-public class VocabularyEntry implements Iterable<String>{
+public class VocabularyEntry implements Iterable<String> {
 
     final String name;
     final Set<String> synonyms;
     final Set<String> unmodSynonyms;
-    
+
     public VocabularyEntry(String name) {
         assert StringUtils.isNotBlank(name);
         this.name = name;
@@ -43,22 +42,22 @@ public class VocabularyEntry implements Iterable<String>{
     public final Set<String> getSynonyms() {
         return unmodSynonyms;
     }
-    
-    public final boolean addSynonym(String synonym){
-        if(name.equals(synonym)){
+
+    public final boolean addSynonym(String synonym) {
+        if (name.equals(synonym)) {
             return false;
         } else {
             return synonyms.add(synonym);
         }
     }
-    
+
     @Override
     public Iterator<String> iterator() {
         return new Iterator<String>() {
 
             boolean first = true;
             Iterator<String> it = synonyms.iterator();
-            
+
             @Override
             public boolean hasNext() {
                 return first || it.hasNext();
@@ -66,7 +65,7 @@ public class VocabularyEntry implements Iterable<String>{
 
             @Override
             public String next() {
-                if(first){
+                if (first) {
                     first = false;
                     return name;
                 } else {
@@ -102,5 +101,5 @@ public class VocabularyEntry implements Iterable<String>{
     public String toString() {
         return "VocabEntry [name=" + name + ", synonyms=" + synonyms + "]";
     }
-    
+
 }

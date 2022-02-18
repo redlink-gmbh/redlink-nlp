@@ -20,23 +20,23 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
 import opennlp.tools.sentdetect.SentenceDetector;
 import opennlp.tools.util.Span;
 
 public class RegexSentenceSplitter implements SentenceDetector {
 
-    
+
     private static final Pattern SENT_SPLIT_PATTERN = Pattern.compile("(?<=[.?!;])\\s+(?=\\p{Lu})");
-    
+
     private static final RegexSentenceSplitter INSTANCE = new RegexSentenceSplitter();
-    
-    public static RegexSentenceSplitter getInstance(){
+
+    public static RegexSentenceSplitter getInstance() {
         return INSTANCE;
     }
-    
-    private RegexSentenceSplitter() {}
-    
+
+    private RegexSentenceSplitter() {
+    }
+
     @Override
     public String[] sentDetect(String text) {
         return Span.spansToStrings(sentPosDetect(text), text);
@@ -47,14 +47,14 @@ public class RegexSentenceSplitter implements SentenceDetector {
         List<Span> sentences = new ArrayList<>();
         Matcher m = SENT_SPLIT_PATTERN.matcher(text);
         int index = 0;
-        while(m.find()){
+        while (m.find()) {
             sentences.add(new Span(index, m.end()));
             index = m.end();
         }
-        if(index < text.length()){
-            sentences.add(new Span(index,text.length()));
+        if (index < text.length()) {
+            sentences.add(new Span(index, text.length()));
         }
         return sentences.toArray(new Span[sentences.size()]);
     }
-    
+
 }

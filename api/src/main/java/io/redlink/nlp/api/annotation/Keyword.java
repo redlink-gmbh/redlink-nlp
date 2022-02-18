@@ -16,13 +16,11 @@
 
 package io.redlink.nlp.api.annotation;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
-
 import org.springframework.data.annotation.PersistenceConstructor;
-
-import com.fasterxml.jackson.annotation.JsonCreator;
 
 /**
  * Provides all information about an extracted keyword needed to write the

@@ -16,14 +16,13 @@
 
 package io.redlink.nlp.regex.ner;
 
+import io.redlink.nlp.model.ner.NerTag;
+import io.redlink.nlp.regex.ner.vocab.VocabularyDetector;
+import io.redlink.nlp.regex.ner.vocab.VocabularyEntry;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Locale;
-
-import io.redlink.nlp.model.ner.NerTag;
-import io.redlink.nlp.regex.ner.vocab.VocabularyDetector;
-import io.redlink.nlp.regex.ner.vocab.VocabularyEntry;
 
 public class BahnhofDetector extends VocabularyDetector {
 
@@ -71,7 +70,7 @@ public class BahnhofDetector extends VocabularyDetector {
         nordBf.addSynonym("Nordbf");
         nordBf.addSynonym("Nordbhf.");
         nordBf.addSynonym("Nordbhf");
-        
+
         return Arrays.asList(bahnhof, hbf, ostBf, westBf, suedBf, nordBf);
     }
 

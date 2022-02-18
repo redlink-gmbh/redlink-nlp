@@ -15,6 +15,10 @@
  */
 package io.redlink.nlp.regex.ner.vocab;
 
+import io.redlink.nlp.model.SpanCollection;
+import io.redlink.nlp.model.ner.NerTag;
+import io.redlink.nlp.regex.ner.RegexNamedEntityFactory;
+import io.redlink.nlp.regex.ner.RegexNerProcessor.NamedEntity;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.Collections;
@@ -29,16 +33,8 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 import java.util.regex.MatchResult;
 import java.util.regex.Pattern;
-
 import javax.annotation.PostConstruct;
-import javax.swing.text.html.HTMLDocument.HTMLReader.ParagraphAction;
-
 import org.apache.commons.lang3.StringUtils;
-
-import io.redlink.nlp.model.SpanCollection;
-import io.redlink.nlp.model.ner.NerTag;
-import io.redlink.nlp.regex.ner.RegexNamedEntityFactory;
-import io.redlink.nlp.regex.ner.RegexNerProcessor.NamedEntity;
 
 /**
  * Regex-Based detection of trains
@@ -52,10 +48,10 @@ public abstract class VocabularyDetector extends RegexNamedEntityFactory {
     private final String lang;
     private final Locale locale;
     private final CaseSensitivity cs;
-    private Map<String,List<VocabularyEntry>> words;
+    private Map<String, List<VocabularyEntry>> words;
 
     @SuppressWarnings("java:S115")
-    public static enum CaseSensitivity{
+    public static enum CaseSensitivity {
         /**
          * Vocabulary entries are matched fully case sensitive with the text
          */
@@ -74,59 +70,63 @@ public abstract class VocabularyDetector extends RegexNamedEntityFactory {
          */
         public final static CaseSensitivity DEFAULT = CaseSensitivity.off;
     }
-    
-    public VocabularyDetector(String name, NerTag type, Locale lang, CaseSensitivity caseSensitivity){
+
+    public VocabularyDetector(String name, NerTag type, Locale lang, CaseSensitivity caseSensitivity) {
         this.name = name;
         this.type = type;
         this.locale = lang == null ? Locale.ROOT : lang;
-        this.lang = lang == null ? null : lang.getLanguage().toLowerCase(Locale.ROOT).split("-_")[0];;
+        this.lang = lang == null ? null : lang.getLanguage().toLowerCase(Locale.ROOT).split("-_")[0];
+        ;
         this.cs = caseSensitivity == null ? CaseSensitivity.DEFAULT : caseSensitivity;
     }
 
-    public final String getName(){
+    public final String getName() {
         return name;
     }
-    
+
     /**
      * Normalizes labels by {@link StringUtils#trimToNull(String)} and
      * if {@link #isCaseSensitive()} converts the label to lower case
      * using {@link #getLanguage()} specific rules
+     *
      * @param label the label to normalize
      * @return the normalized label - <code>null</code> if the label is invalid
      */
-    protected String normalize(String label){
+    protected String normalize(String label) {
         String pWord = StringUtils.trimToNull(label);
-        if(pWord != null) {
+        if (pWord != null) {
             switch (cs) {
-            case off:
-                pWord = pWord.toLowerCase(locale);
-                break;
-            case smart:
-                pWord = isAllAlphaUpperCase(pWord) ? pWord : pWord.toLowerCase(locale);
-                break;
-            default: //full ... nothing to do
-                break;
+                case off:
+                    pWord = pWord.toLowerCase(locale);
+                    break;
+                case smart:
+                    pWord = isAllAlphaUpperCase(pWord) ? pWord : pWord.toLowerCase(locale);
+                    break;
+                default: //full ... nothing to do
+                    break;
             }
         }
         return pWord;
     }
+
     /**
      * Checks if all {@link Character#isAlphabetic(char)} are also
      * {@link Character#isUpperCase(char)}.
+     *
      * @param cs
      * @return the state. <code>false</code> if the parsed sequence does not
      * contain a single alphabetic char
      */
     private static boolean isAllAlphaUpperCase(final CharSequence cs) {
-        if(StringUtils.isBlank(cs)){
+        if (StringUtils.isBlank(cs)) {
             return false;
         }
         final int sz = cs.length();
         boolean hasAlpha = false;
         for (int i = 0; i < sz; i++) {
             char c = cs.charAt(i);
-            if(Character.isAlphabetic(c)){
-                if(!Character.isUpperCase(c)){
+            if (Character.isAlphabetic(c)) {
+                if (!Character.isUpperCase(c)) {
                     return false;
                 }
                 hasAlpha = true;
@@ -135,18 +135,18 @@ public abstract class VocabularyDetector extends RegexNamedEntityFactory {
         return hasAlpha; //return false if no alpha char is present
     }
 
-    
+
     public CaseSensitivity getCaseSensitivity() {
         return cs;
     }
-    
+
     public Locale getLanguage() {
         return locale;
     }
-    
+
     @PostConstruct
-    protected final void init() throws IOException{
-        log.info("load Vocabulary {} (type: {} | lang: {} | cases ensitivity: {}", 
+    protected final void init() throws IOException {
+        log.info("load Vocabulary {} (type: {} | lang: {} | cases ensitivity: {}",
                 name, type, locale.getDisplayName(), cs);
         words = new HashMap<>();
         Collection<VocabularyEntry> loadedEntries = loadEntries();
@@ -158,38 +158,38 @@ public abstract class VocabularyDetector extends RegexNamedEntityFactory {
 //                return s2.compareTo(s1);
 //            }
 //        });
-        int i=0;
-        for(VocabularyEntry vacabEntry : loadedEntries){
-            log.trace("{}. {}",++i, vacabEntry.getName());
+        int i = 0;
+        for (VocabularyEntry vacabEntry : loadedEntries) {
+            log.trace("{}. {}", ++i, vacabEntry.getName());
             boolean isName = true; //the first label is the name
-            for(String label : vacabEntry){
+            for (String label : vacabEntry) {
                 boolean isSmartCase = cs == CaseSensitivity.smart && isAllAlphaUpperCase(label);
                 String pWord = normalize(label);
                 Set<String> nameSet = isSmartCase ? sortedSmartCaseNames : sortedNames;
-                if(pWord != null) {
-                    if(!nameSet.contains(pWord)){
+                if (pWord != null) {
+                    if (!nameSet.contains(pWord)) {
                         nameSet.add(pWord);
                     } else {
-                        log.debug(" - ignore duplicate lower case {}: {} ({}:{})", 
+                        log.debug(" - ignore duplicate lower case {}: {} ({}:{})",
                                 isName ? "name" : "synonym", pWord, label, isName ? "name" : "synonym");
                     }
                 } //ignore blank words
                 List<VocabularyEntry> entries = words.get(pWord);
-                if(entries == null){
+                if (entries == null) {
                     entries = new LinkedList<>();
                     words.put(pWord, entries);
                 } else {
-                    log.warn("{} '{}' used by {} times ", 
-                            isName ? "name" : "synonym", pWord, entries.size() +1);
+                    log.warn("{} '{}' used by {} times ",
+                            isName ? "name" : "synonym", pWord, entries.size() + 1);
                 }
-                if(isName){
-                    log.trace(" - name   : {} (processed: {})",label, pWord);
-                    entries.add(0,vacabEntry); //add entries for names at the top
+                if (isName) {
+                    log.trace(" - name   : {} (processed: {})", label, pWord);
+                    entries.add(0, vacabEntry); //add entries for names at the top
                 } else {
-                    log.trace(" - synonym: {} (processed: {})",label, pWord);
+                    log.trace(" - synonym: {} (processed: {})", label, pWord);
                     entries.add(vacabEntry); //add entries for synonyms at the end
                 }
-                if(entries.size() > 1){
+                if (entries.size() > 1) {
                     log.warn(" - entries: {}", entries);
                 }
                 isName = false;
@@ -197,11 +197,11 @@ public abstract class VocabularyDetector extends RegexNamedEntityFactory {
         }
         //now build the regex pattern
         List<NamedPattern> patterns = new LinkedList<>();
-        if(!sortedNames.isEmpty()){
-            patterns.add(new NamedPattern(name, cs != CaseSensitivity.full ? Pattern.compile(buildNamesRegex(sortedNames),Pattern.CASE_INSENSITIVE) : 
-                Pattern.compile(buildNamesRegex(sortedNames))));
+        if (!sortedNames.isEmpty()) {
+            patterns.add(new NamedPattern(name, cs != CaseSensitivity.full ? Pattern.compile(buildNamesRegex(sortedNames), Pattern.CASE_INSENSITIVE) :
+                    Pattern.compile(buildNamesRegex(sortedNames))));
         }
-        if(!sortedSmartCaseNames.isEmpty()){ //samrt case patterns are always case insensitive
+        if (!sortedSmartCaseNames.isEmpty()) { //samrt case patterns are always case insensitive
             patterns.add(new NamedPattern(name, Pattern.compile(buildNamesRegex(sortedSmartCaseNames))));
         }
         this.patterns = Collections.unmodifiableList(patterns);
@@ -211,8 +211,8 @@ public abstract class VocabularyDetector extends RegexNamedEntityFactory {
         StringBuilder builder = new StringBuilder();
         boolean first = true;
         builder.append('(');
-        for(String word : names){
-            if(!first){
+        for (String word : names) {
+            if (!first) {
                 builder.append('|');
             } else {
                 first = false;
@@ -222,23 +222,23 @@ public abstract class VocabularyDetector extends RegexNamedEntityFactory {
         builder.append(')');
         return builder.toString();
     }
-    
+
     protected abstract Collection<VocabularyEntry> loadEntries() throws IOException;
-    
+
     @Override
     protected NamedEntity createNamedEntity(String patternName, MatchResult match) {
-        log.debug("Create {} Token for [{},{}] - {}", type, match.start(), match.end(),match.group());
+        log.debug("Create {} Token for [{},{}] - {}", type, match.start(), match.end(), match.group());
         if (StringUtils.isBlank(match.group())) return null;
         final String word = match.group();
         final String pWord = normalize(word);
         final List<VocabularyEntry> entries = words.get(pWord);
-        if(entries != null){
+        if (entries != null) {
             VocabularyEntry entry = entries.get(0);
-            if(log.isDebugEnabled() && entries.size() > 1){
+            if (log.isDebugEnabled() && entries.size() > 1) {
                 log.debug("Multiple Vocabulary Entries for matched Word {} (entries: {})", word, entries);
                 log.debug(" - create Token for {}", entry);
             }
-            final NamedEntity ne = new NamedEntity(match.start(), match.end(),type);
+            final NamedEntity ne = new NamedEntity(match.start(), match.end(), type);
             ne.setLemma(entry.name);
             ne.setConfidence(1);
             return ne;
@@ -251,7 +251,7 @@ public abstract class VocabularyDetector extends RegexNamedEntityFactory {
     @Override
     protected List<NamedPattern> getRegexes(SpanCollection section, String lang) {
         String normLang = lang == null ? null : lang.toLowerCase(Locale.ROOT).split("-_")[0];
-        if(this.lang == null || this.lang.equals(normLang)){
+        if (this.lang == null || this.lang.equals(normLang)) {
             return patterns;
         } else {
             return Collections.emptyList();

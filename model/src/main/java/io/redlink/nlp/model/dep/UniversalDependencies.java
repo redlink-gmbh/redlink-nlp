@@ -20,10 +20,10 @@ import io.redlink.nlp.model.tag.TagSet;
 
 public class UniversalDependencies {
 
-    private UniversalDependencies(){
+    private UniversalDependencies() {
         throw new UnsupportedOperationException("Do not use reflections to create instances of this class :(");
     }
-    
+
     /**
      * The {@link TagSet} for the <a href="http://universaldependencies.org/u/dep/index.html">Universal Dependencies</a>
      */
@@ -48,10 +48,10 @@ public class UniversalDependencies {
         REL_TAG_SET.addTag(new RelTag("dep", GrammaticalRelation.UnspecifiedDependency));
         REL_TAG_SET.addTag(new RelTag("det", GrammaticalRelation.Determiner));
         REL_TAG_SET.addTag(new RelTag("discourse", GrammaticalRelation.DiscourseElement));
-        REL_TAG_SET.addTag(new RelTag("dislocated", GrammaticalRelation.DislocatedElement)); 
+        REL_TAG_SET.addTag(new RelTag("dislocated", GrammaticalRelation.DislocatedElement));
         REL_TAG_SET.addTag(new RelTag("dobj", GrammaticalRelation.DirectObject));
         REL_TAG_SET.addTag(new RelTag("expl", GrammaticalRelation.Expletive));
-        REL_TAG_SET.addTag(new RelTag("foreign",GrammaticalRelation.Foreign));
+        REL_TAG_SET.addTag(new RelTag("foreign", GrammaticalRelation.Foreign));
         REL_TAG_SET.addTag(new RelTag("goeswith", GrammaticalRelation.GoesWith));
         REL_TAG_SET.addTag(new RelTag("iobj", GrammaticalRelation.IndirectObject));
         REL_TAG_SET.addTag(new RelTag("list", GrammaticalRelation.List));
@@ -71,5 +71,5 @@ public class UniversalDependencies {
         REL_TAG_SET.addTag(new RelTag("vocative", GrammaticalRelation.Vocative));
         REL_TAG_SET.addTag(new RelTag("xcomp", GrammaticalRelation.OpenClausalComplement));
     }
-    
+
 }

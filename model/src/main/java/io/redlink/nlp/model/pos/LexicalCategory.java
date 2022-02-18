@@ -1,19 +1,19 @@
 /*
-* Licensed to the Apache Software Foundation (ASF) under one or more
-* contributor license agreements.  See the NOTICE file distributed with
-* this work for additional information regarding copyright ownership.
-* The ASF licenses this file to You under the Apache License, Version 2.0
-* (the "License"); you may not use this file except in compliance with
-* the License.  You may obtain a copy of the License at
-*
-*     http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*/
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package io.redlink.nlp.model.pos;
 
 /**
@@ -25,7 +25,7 @@ public enum LexicalCategory {
     /**
      * A noun, or noun substantive, is a part of speech (a word or phrase) which can co-occur with
      * (in)definite articles and attributive adjectives, and function as the head of a noun phrase.
-     * 
+     * <p>
      * The word "noun" derives from the Latin 'nomen' meaning "name", and a traditional definition of nouns is
      * that they are all and only those expressions that refer to a person, place, thing, event, substance,
      * quality, idea or an appointment. They serve as the subject or object of a verb, and the object of a
@@ -50,7 +50,7 @@ public enum LexicalCategory {
      * grammatical and semantic relation to another unit within a clause.
      * (http://www.sil.org/linguistics/GlossaryOfLinguisticTerms/WhatIsAnAdposition.htm,
      * http://en.wikipedia.org/wiki/Adposition 19.09.06)
-     * 
+     * <p>
      * The majority of cases of adpositions we have to consider in European languages are prepositions.
      * (http://www.ilc.cnr.it/EAGLES96/annotate/node17.html#SECTION00062200000000000000 19.09.06)
      */

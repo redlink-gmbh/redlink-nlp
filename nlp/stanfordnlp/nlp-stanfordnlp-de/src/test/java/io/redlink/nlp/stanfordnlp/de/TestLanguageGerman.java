@@ -16,6 +16,23 @@
 
 package io.redlink.nlp.stanfordnlp.de;
 
+import io.redlink.nlp.api.ProcessingData;
+import io.redlink.nlp.api.ProcessingException;
+import io.redlink.nlp.api.Processor;
+import io.redlink.nlp.api.annotation.Annotations;
+import io.redlink.nlp.api.content.StringContent;
+import io.redlink.nlp.api.model.Value;
+import io.redlink.nlp.model.AnalyzedText;
+import io.redlink.nlp.model.AnalyzedText.AnalyzedTextBuilder;
+import io.redlink.nlp.model.Chunk;
+import io.redlink.nlp.model.NlpAnnotations;
+import io.redlink.nlp.model.Section;
+import io.redlink.nlp.model.Span;
+import io.redlink.nlp.model.Span.SpanTypeEnum;
+import io.redlink.nlp.model.ner.NerTag;
+import io.redlink.nlp.model.pos.PosTag;
+import io.redlink.nlp.model.util.NlpUtils;
+import io.redlink.nlp.stanfordnlp.StanfordNlpProcessor;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -33,9 +50,6 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
-
-import io.redlink.nlp.api.ProcessingException;
-import io.redlink.nlp.api.content.StringContent;
 import org.apache.commons.math3.util.Precision;
 import org.junit.Assert;
 import org.junit.Before;
@@ -44,24 +58,8 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import io.redlink.nlp.api.ProcessingData;
-import io.redlink.nlp.api.Processor;
-import io.redlink.nlp.api.annotation.Annotations;
-import io.redlink.nlp.model.AnalyzedText;
-import io.redlink.nlp.model.AnalyzedText.AnalyzedTextBuilder;
-import io.redlink.nlp.model.NlpAnnotations;
-import io.redlink.nlp.model.Chunk;
-import io.redlink.nlp.model.Section;
-import io.redlink.nlp.model.Span;
-import io.redlink.nlp.model.Span.SpanTypeEnum;
-import io.redlink.nlp.api.model.Value;
-import io.redlink.nlp.model.ner.NerTag;
-import io.redlink.nlp.model.pos.PosTag;
-import io.redlink.nlp.model.util.NlpUtils;
-import io.redlink.nlp.stanfordnlp.StanfordNlpProcessor;
-
 public class TestLanguageGerman {
-    
+
     private static final Logger log = LoggerFactory.getLogger(TestLanguageGerman.class);
 
     private static List<String[]> CONTENTS = new ArrayList<>();
@@ -69,10 +67,10 @@ public class TestLanguageGerman {
     private static List<Processor> REQUIRED_PROCESSORS = Collections.emptyList();
 
     private static LanguageGerman nlpModel;
-    
+
     private StanfordNlpProcessor processor;
-    
-    
+
+
     @BeforeClass
     public static void initClass() throws IOException {
         CONTENTS.add(new String[]{
@@ -81,7 +79,7 @@ public class TestLanguageGerman {
                 "Leck mich am Arsch"});
         CONTENTS.add(new String[]{
                 "Der ICE 12345 steht schon 15 Minuten auf der Strecke zwischen München und Nürnberg uns es gibt"
-                + "noch keine Durchsage."});
+                        + "noch keine Durchsage."});
         CONTENTS.add(new String[]{
                 "Essen in Linz."});
         CONTENTS.add(new String[]{
@@ -129,14 +127,14 @@ public class TestLanguageGerman {
         nlpModel = new LanguageGerman(new LanguageGermanConfiguration());
 
     }
-    
+
     private static final ProcessingData initTestData(int index) {
         return initTestData(index, new HashMap<>());
-    }    
-    
-    private static final ProcessingData initTestData(int index, Map<String,Object> config) {
+    }
+
+    private static final ProcessingData initTestData(int index, Map<String, Object> config) {
         AnalyzedTextBuilder atb = AnalyzedText.build();
-        for(String section : CONTENTS.get(index)){
+        for (String section : CONTENTS.get(index)) {
             atb.appendSection(null, section, "\n");
         }
         AnalyzedText at = atb.create();
@@ -148,24 +146,24 @@ public class TestLanguageGerman {
     }
 
     @Before
-    public void init() throws IllegalAccessException, IllegalArgumentException, InvocationTargetException, NoSuchMethodException, SecurityException{
+    public void init() throws IllegalAccessException, IllegalArgumentException, InvocationTargetException, NoSuchMethodException, SecurityException {
         processor = new StanfordNlpProcessor(Collections.singletonList(nlpModel));
         //call private postConstruct()
         Method init = StanfordNlpProcessor.class.getSuperclass().getDeclaredMethod("postConstruct");
         init.setAccessible(true);
         init.invoke(processor);
     }
-    
+
     private static final void prepairTestCase(ProcessingData pd) throws ProcessingException {
-        for(Processor qp : REQUIRED_PROCESSORS){
+        for (Processor qp : REQUIRED_PROCESSORS) {
             qp.process(pd);
         }
     }
 
-    
+
     @Test
     public void testSingle() throws ProcessingException {
-        int idx = Math.round((float)Math.random()*(CONTENTS.size()-1));
+        int idx = Math.round((float) Math.random() * (CONTENTS.size() - 1));
         idx = 0;
         ProcessingData processingData = initTestData(idx);
         processTestCase(processingData);
@@ -178,10 +176,10 @@ public class TestLanguageGerman {
         log.trace(" - start Stanford NER extraction");
         long start = System.currentTimeMillis();
         processor.process(processingData);
-        log.trace(" - processing time: {}",System.currentTimeMillis()-start);
+        log.trace(" - processing time: {}", System.currentTimeMillis() - start);
     }
 
-    
+
     @Test
     public void testMultiple() throws InterruptedException, ExecutionException {
         ExecutorService executor = Executors.newFixedThreadPool(4);
@@ -189,57 +187,57 @@ public class TestLanguageGerman {
         int numWarmup = Math.max(CONTENTS.size(), 20);
         log.info("> warnup ({} calls + assertion of results)", numWarmup);
         List<Future<TestCaseProcessor>> tasks = new LinkedList<>();
-        for(int i = 0; i < numWarmup; i++){
-            int idx = i%CONTENTS.size();
+        for (int i = 0; i < numWarmup; i++) {
+            int idx = i % CONTENTS.size();
             tasks.add(executor.submit(new TestCaseProcessor(idx)));
         }
-        while(!tasks.isEmpty()){ //wait for all the tasks to complete
+        while (!tasks.isEmpty()) { //wait for all the tasks to complete
             //during warmup we assert the NLP results
-            assertNerProcessingResults(tasks.remove(0).get().getProcessingData()); 
+            assertNerProcessingResults(tasks.remove(0).get().getProcessingData());
         }
         log.info("   ... done");
         log.info("> processing {} documents ...", numDoc);
         long min = Integer.MAX_VALUE;
         long max = Integer.MIN_VALUE;
         long sum = 0;
-        for(int i = 0; i < numDoc; i++){
-            int idx = i%CONTENTS.size();
+        for (int i = 0; i < numDoc; i++) {
+            int idx = i % CONTENTS.size();
             tasks.add(executor.submit(new TestCaseProcessor(idx)));
         }
         int i = 0;
-        while(!tasks.isEmpty()){ //wait for all the tasks to complete
+        while (!tasks.isEmpty()) { //wait for all the tasks to complete
             TestCaseProcessor completed = tasks.remove(0).get();
             i++;
-            if(i%10 == 0){
-                log.info(" ... {} documents processed",i);
+            if (i % 10 == 0) {
+                log.info(" ... {} documents processed", i);
             }
             int dur = completed.getDuration();
-            if(dur > max){
+            if (dur > max) {
                 max = dur;
             }
-            if(dur < min){
+            if (dur < min) {
                 min = dur;
             }
             sum = sum + dur;
         }
-        log.info("Processing Times after {} documents",numDoc);
-        log.info(" - average: {}ms",Precision.round(sum/(double)numDoc, 2));
-        log.info(" - max: {}ms",max);
-        log.info(" - min: {}ms",min);
+        log.info("Processing Times after {} documents", numDoc);
+        log.info(" - average: {}ms", Precision.round(sum / (double) numDoc, 2));
+        log.info(" - max: {}ms", max);
+        log.info(" - min: {}ms", min);
         executor.shutdown();
     }
-    
+
     private void assertNerProcessingResults(ProcessingData processingData) {
         Optional<AnalyzedText> at = NlpUtils.getAnalyzedText(processingData);
         Assert.assertTrue(at.isPresent());
-        
+
         //(1) assert the Sentences, Tokens and POS annotatons
         Iterator<Span> spans = at.get().getEnclosed(EnumSet.allOf(SpanTypeEnum.class));
         boolean sentencePresent = false;
         boolean tokenPresent = false;
         int lastSentEnd = 0;
         int lastTokenEnd = 0;
-        while(spans.hasNext()){
+        while (spans.hasNext()) {
             Span span = spans.next();
             switch (span.getType()) {
                 case Sentence:
@@ -253,71 +251,71 @@ public class TestLanguageGerman {
                     lastTokenEnd = span.getEnd();
                     List<Value<PosTag>> posAnnos = span.getValues(NlpAnnotations.POS_ANNOTATION);
                     Assert.assertFalse(posAnnos.isEmpty());
-                    for(Value<PosTag> posAnno : posAnnos){
+                    for (Value<PosTag> posAnno : posAnnos) {
                         Assert.assertTrue((posAnno.probability() > 0 && posAnno.probability() <= 1) || posAnno.probability() == Value.UNKNOWN_PROBABILITY);
                         PosTag posTag = posAnno.value();
                         Assert.assertNotNull(posTag.getTag());
-                        Assert.assertFalse("PosTag "+ posTag + " is not mapped!", posTag.getCategories().isEmpty());
+                        Assert.assertFalse("PosTag " + posTag + " is not mapped!", posTag.getCategories().isEmpty());
                     }
                 default:
                     break;
             }
         }
-        
+
         Assert.assertTrue(sentencePresent);
         Assert.assertTrue(tokenPresent);
 
         //(2) Assert the NER annotations
-        
+
         Iterator<Section> sections = at.get().getSections();
         int numNerAnno = 0;
-        while(sections.hasNext()){
+        while (sections.hasNext()) {
             Section section = sections.next();
             Iterator<Chunk> chunks = section.getChunks();
-            while(chunks.hasNext()){
+            while (chunks.hasNext()) {
                 Chunk chunk = chunks.next();
                 List<Value<NerTag>> nerAnnotations = chunk.getValues(NlpAnnotations.NER_ANNOTATION);
                 //Assert.assertFalse(nerAnnotations.isEmpty());
-                for(Value<NerTag> nerAnno : nerAnnotations){
+                for (Value<NerTag> nerAnno : nerAnnotations) {
                     Assert.assertTrue((nerAnno.probability() > 0 && nerAnno.probability() <= 1) || nerAnno.probability() == Value.UNKNOWN_PROBABILITY);
                     NerTag nerTag = nerAnno.value();
                     Assert.assertNotNull(nerTag.getTag());
                     Assert.assertNotNull(nerTag.getType());
                     numNerAnno++;
-                    log.debug(" - [{},{}] {} (type:{})",chunk.getStart()-section.getStart(), chunk.getEnd()-section.getStart(), chunk.getSpan(), nerTag.getType());
+                    log.debug(" - [{},{}] {} (type:{})", chunk.getStart() - section.getStart(), chunk.getEnd() - section.getStart(), chunk.getSpan(), nerTag.getType());
                 }
             }
             Assert.assertTrue(numNerAnno >= 0);
         }
     }
-    
-    
+
+
     private class TestCaseProcessor implements Callable<TestCaseProcessor> {
 
         private final ProcessingData processingData;
         private int duration;
 
-        TestCaseProcessor(int idx){
+        TestCaseProcessor(int idx) {
             this.processingData = initTestData(idx);
         }
-        
+
 
         @Override
         public TestCaseProcessor call() throws Exception {
             long start = System.currentTimeMillis();
             processor.process(processingData);
-            duration = (int)(System.currentTimeMillis() - start);
+            duration = (int) (System.currentTimeMillis() - start);
             return this;
         }
 
         public ProcessingData getProcessingData() {
             return processingData;
         }
-        
+
         public int getDuration() {
             return duration;
         }
     }
 
-    
+
 }

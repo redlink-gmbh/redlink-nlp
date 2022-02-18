@@ -16,19 +16,18 @@
 
 package io.redlink.nlp.regex.ner;
 
+import io.redlink.nlp.model.ner.NerTag;
+import io.redlink.nlp.regex.ner.vocab.VocabularyDetector;
+import io.redlink.nlp.regex.ner.vocab.VocabularyEntry;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Locale;
 
-import io.redlink.nlp.model.ner.NerTag;
-import io.redlink.nlp.regex.ner.vocab.VocabularyDetector;
-import io.redlink.nlp.regex.ner.vocab.VocabularyEntry;
-
 /**
  * Simple detector with entries to check the {@link CaseSensitivity#smart} functionality
- * @author westei
  *
+ * @author westei
  */
 public class SmartCaseTestDetector extends VocabularyDetector {
 
@@ -51,7 +50,7 @@ public class SmartCaseTestDetector extends VocabularyDetector {
 
         VocabularyEntry oft = new VocabularyEntry("Online Funktions Taste");
         oft.addSynonym("OFT");
-        
+
         return Arrays.asList(ist, das, oft);
     }
 

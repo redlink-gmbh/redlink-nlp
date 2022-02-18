@@ -22,7 +22,6 @@ import java.util.HashSet;
 import java.util.Locale;
 import java.util.Set;
 import java.util.stream.Collectors;
-
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
@@ -31,29 +30,29 @@ public class StanzaConfiguration {
 
     static final String PREFIX = "nlp.stanza";
     public static final String STANZA_URL = PREFIX + ".url";
-    
+
     private URI url = null;
     private Set<String> langs = new HashSet<>();
-    
-    
+
+
     public URI getUrl() {
         return url;
     }
-    
+
     public void setUrl(URI url) {
         this.url = url;
     }
-    
+
     public Set<String> getLangs() {
         return langs;
     }
-    
+
     public void setLangs(String langs) {
-        this.langs = langs == null ? new HashSet<>() : 
-            Arrays.stream(StringUtils.split(langs, ','))
-                .filter(StringUtils::isNotEmpty)
-                .map(l -> l.toLowerCase(Locale.ROOT))
-                .collect(Collectors.toSet());
+        this.langs = langs == null ? new HashSet<>() :
+                Arrays.stream(StringUtils.split(langs, ','))
+                        .filter(StringUtils::isNotEmpty)
+                        .map(l -> l.toLowerCase(Locale.ROOT))
+                        .collect(Collectors.toSet());
     }
 
     public boolean supports(String lang) {

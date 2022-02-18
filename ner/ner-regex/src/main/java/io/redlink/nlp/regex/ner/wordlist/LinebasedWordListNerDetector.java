@@ -16,44 +16,43 @@
 
 package io.redlink.nlp.regex.ner.wordlist;
 
+import io.redlink.nlp.model.ner.NerTag;
 import java.io.IOException;
 import java.io.Reader;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Locale;
 import java.util.Set;
-
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
-
-import io.redlink.nlp.model.ner.NerTag;
 
 /**
  * Variant of the {@link WordListDetector} that reads from a {@link Reader}
  * expecting one word per line.
- * @author Rupert Westenthaler
  *
+ * @author Rupert Westenthaler
  */
 public abstract class LinebasedWordListNerDetector extends WordListDetector {
 
-    protected LinebasedWordListNerDetector(String name, NerTag type, Locale lang, boolean caseSensitive){
-        super(name, type,lang,caseSensitive);
+    protected LinebasedWordListNerDetector(String name, NerTag type, Locale lang, boolean caseSensitive) {
+        super(name, type, lang, caseSensitive);
     }
+
     @Override
     protected final Set<String> loadWords() throws IOException {
         Set<String> words = new HashSet<>();
-        try (Reader r = readFrom()){
+        try (Reader r = readFrom()) {
             Iterator<String> lines = IOUtils.lineIterator(r);
-            while(lines.hasNext()){
+            while (lines.hasNext()) {
                 String word = StringUtils.trimToNull(lines.next());
-                if(word != null){
+                if (word != null) {
                     words.add(word);
                 }
             }
         }
         return words;
     }
-    
+
     protected abstract Reader readFrom();
 
 }

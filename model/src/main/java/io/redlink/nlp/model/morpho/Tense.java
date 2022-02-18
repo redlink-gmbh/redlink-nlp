@@ -1,19 +1,19 @@
 /*
-* Licensed to the Apache Software Foundation (ASF) under one or more
-* contributor license agreements.  See the NOTICE file distributed with
-* this work for additional information regarding copyright ownership.
-* The ASF licenses this file to You under the Apache License, Version 2.0
-* (the "License"); you may not use this file except in compliance with
-* the License.  You may obtain a copy of the License at
-*
-*     http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*/
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package io.redlink.nlp.model.morpho;
 
 import java.util.EnumMap;
@@ -53,7 +53,7 @@ public enum Tense {
     AbsoluteRelative("AbsoluteRelativeTense"),
     FutureInFuture(AbsoluteRelative),
     FutureInPast(AbsoluteRelative),
-    PastPerfect("PastPerfectTense",AbsoluteRelative),
+    PastPerfect("PastPerfectTense", AbsoluteRelative),
     PastInFuture(AbsoluteRelative),
     PluperfectTense(AbsoluteRelative),
     Relative("RelativeTense"),
@@ -64,50 +64,55 @@ public enum Tense {
     static final String OLIA_NAMESPACE = "http://purl.org/olia/olia.owl#";
     String uri;
     Tense parent;
-    
+
     Tense() {
-        this(null,null);
+        this(null, null);
     }
+
     Tense(Tense parent) {
-        this(null,parent);
+        this(null, parent);
     }
 
     Tense(String name) {
-        this(name,null);
+        this(name, null);
     }
-    Tense(String name,Tense parent) {
+
+    Tense(String name, Tense parent) {
         uri = OLIA_NAMESPACE + (name == null ? name() : name);
         this.parent = parent;
     }
+
     /**
      * Getter for the parent tense (e.g.
      * {@link Tense#Future} for {@link Tense#NearFuture})
+     *
      * @return the direct parent or <code>null</code> if none
      */
     public Tense getParent() {
         return parent;
     }
-    
+
     /**
      * Returns the transitive closure over
      * the {@link #getParent() parent} tenses including
      * this instance (e.g.
      * [{@link Tense#Absolute}, {@link Tense#Future}, {@link Tense#NearFuture}] for
      * {@link Tense#NearFuture}).<p>
-     * Implementation Note: Internally an {@link EnumSet} is used 
+     * Implementation Note: Internally an {@link EnumSet} is used
      * to represent the transitive closure. As the iteration order
      * of an {@link EnumSet} is based on the natural order (the
      * {@link Enum#ordinal()} values) AND the ordering of the
      * Tenses in this enumeration is from generic to specific the
      * ordering of the Tenses in the returned Set is guaranteed
      * to be from generic to specific.
+     *
      * @return the transitive closure over parent
      * tenses.
      */
     public Set<Tense> getTenses() {
         return transitiveClosureMap.get(this);
     }
-    
+
     public String getUri() {
         return uri;
     }
@@ -116,7 +121,7 @@ public enum Tense {
     public String toString() {
         return "olia" + uri.substring(OLIA_NAMESPACE.length());
     }
-    
+
     /**
      * This is needed because one can not create EnumSet instances before the
      * initialization of an Enum has finished.<p>
@@ -124,16 +129,16 @@ public enum Tense {
      * in an static {} block is used as a workaround. The {@link Tense#getTenses()}
      * method does use this static member instead of a member variable
      */
-    private static final Map<Tense,Set<Tense>> transitiveClosureMap;
-    
+    private static final Map<Tense, Set<Tense>> transitiveClosureMap;
+
     static {
-        transitiveClosureMap = new EnumMap<Tense,Set<Tense>>(Tense.class);
-        for(Tense tense : Tense.values()){
+        transitiveClosureMap = new EnumMap<Tense, Set<Tense>>(Tense.class);
+        for (Tense tense : Tense.values()) {
             Set<Tense> parents = EnumSet.of(tense);
             Set<Tense> transParents = transitiveClosureMap.get(tense.getParent());
-            if(transParents != null){
+            if (transParents != null) {
                 parents.addAll(transParents);
-            } else if(tense.getParent() != null){
+            } else if (tense.getParent() != null) {
                 parents.add(tense.getParent());
             } // else no parent
             transitiveClosureMap.put(tense, parents);

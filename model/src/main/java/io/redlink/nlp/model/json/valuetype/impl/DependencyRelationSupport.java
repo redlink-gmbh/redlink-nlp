@@ -16,12 +16,9 @@
  */
 package io.redlink.nlp.model.json.valuetype.impl;
 
-import org.springframework.stereotype.Component;
-
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-
 import io.redlink.nlp.model.AnalyzedText;
 import io.redlink.nlp.model.Span;
 import io.redlink.nlp.model.Span.SpanTypeEnum;
@@ -30,6 +27,7 @@ import io.redlink.nlp.model.dep.RelTag;
 import io.redlink.nlp.model.dep.Relation;
 import io.redlink.nlp.model.json.valuetype.ValueTypeParser;
 import io.redlink.nlp.model.json.valuetype.ValueTypeSerializer;
+import org.springframework.stereotype.Component;
 
 @Component
 public class DependencyRelationSupport implements ValueTypeParser<Relation>,
@@ -77,15 +75,15 @@ public class DependencyRelationSupport implements ValueTypeParser<Relation>,
     public Class<Relation> getType() {
         return Relation.class;
     }
-    
+
     @Override
     public Relation parse(ObjectNode jDependencyRelation, AnalyzedText at) {
         JsonNode tag = jDependencyRelation.path(RELATION_TYPE_TAG);
 
         if (!tag.isTextual()) {
             throw new IllegalStateException("Unable to parse GrammaticalRelationTag. The value of the "
-                                            + "'tag' field MUST have a textual value (json: "
-                                            + jDependencyRelation + ")");
+                    + "'tag' field MUST have a textual value (json: "
+                    + jDependencyRelation + ")");
         }
 
         GrammaticalRelation grammaticalRelation = GrammaticalRelation.class.getEnumConstants()[jDependencyRelation

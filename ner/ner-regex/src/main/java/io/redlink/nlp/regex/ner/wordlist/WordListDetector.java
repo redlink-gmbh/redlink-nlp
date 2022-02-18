@@ -15,6 +15,8 @@
  */
 package io.redlink.nlp.regex.ner.wordlist;
 
+import io.redlink.nlp.model.ner.NerTag;
+import io.redlink.nlp.regex.ner.RegexNerDetector;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.Comparator;
@@ -26,11 +28,7 @@ import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 import java.util.regex.Pattern;
-
 import org.apache.commons.lang3.StringUtils;
-
-import io.redlink.nlp.model.ner.NerTag;
-import io.redlink.nlp.regex.ner.RegexNerDetector;
 
 /**
  * Regex-Based detection of trains
@@ -43,7 +41,7 @@ public abstract class WordListDetector extends RegexNerDetector {
     private final boolean caseSensitive;
     private Set<String> words;
 
-    public WordListDetector(String name, NerTag type, Locale lang, boolean caseSensitive){
+    public WordListDetector(String name, NerTag type, Locale lang, boolean caseSensitive) {
         super(name, type);
         this.locale = lang == null ? Locale.ROOT : lang;
         this.lang = lang == null ? null : lang.getLanguage().toLowerCase(Locale.ROOT).split("-_")[0];
@@ -51,7 +49,7 @@ public abstract class WordListDetector extends RegexNerDetector {
     }
 
     @Override
-    protected Map<String,List<Pattern>> initPatterns() throws IOException {
+    protected Map<String, List<Pattern>> initPatterns() throws IOException {
         Set<String> loadedWords = loadWords();
         SortedSet<String> sortedWords = new TreeSet<>(new Comparator<String>() {
             @Override
@@ -59,11 +57,11 @@ public abstract class WordListDetector extends RegexNerDetector {
                 return s2.compareTo(s1);
             }
         });
-        for(String word : loadedWords){
+        for (String word : loadedWords) {
             String pWord = StringUtils.trimToNull(word);
-            if(pWord != null) {
+            if (pWord != null) {
                 pWord = caseSensitive ? pWord : pWord.toLowerCase(locale);
-                if(!sortedWords.contains(pWord)){
+                if (!sortedWords.contains(pWord)) {
                     sortedWords.add(pWord);
                 } else {
                     log.info(" - ignore duplicate lower case word: {} (word:{})", pWord, word);
@@ -73,8 +71,8 @@ public abstract class WordListDetector extends RegexNerDetector {
         StringBuilder builder = new StringBuilder();
         boolean first = true;
         builder.append('(');
-        for(String word : sortedWords){
-            if(!first){
+        for (String word : sortedWords) {
+            if (!first) {
                 builder.append('|');
             } else {
                 first = false;
@@ -84,18 +82,18 @@ public abstract class WordListDetector extends RegexNerDetector {
         builder.append(')');
         words = new HashSet<>(sortedWords);
         int flags = 0;
-        if(!caseSensitive){
+        if (!caseSensitive) {
             flags = flags | Pattern.CASE_INSENSITIVE;
         }
         return Collections.singletonMap(lang, Collections.singletonList(Pattern.compile(builder.toString(), flags)));
     }
-    
+
     protected abstract Set<String> loadWords() throws IOException;
-    
+
     public boolean isCaseSensitive() {
         return caseSensitive;
     }
- 
+
     /**
      * Ensure that only matches are accepted that are actual words in the word list
      */

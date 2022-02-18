@@ -18,23 +18,23 @@ package io.redlink.nlp.stanfordnlp.de;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
-@ConfigurationProperties(prefix="nlp.stanfordnlp.de")
+@ConfigurationProperties(prefix = "nlp.stanfordnlp.de")
 public class LanguageGermanConfiguration {
     /**
      * Configuration property for defining the annoators pipeline for German
      */
     private String annotators = "tokenize, atSection, ssplit, pos, ner, parse";
-    
+
     private boolean defaults = true;
-    
+
     private String posModel;
-    
+
     private String nerModel;
-    
+
     private String parseModel;
-    
+
     private int parseMaxLen = -1;
-    
+
     private boolean casesensitive = true;
 
     public String getAnnotators() {
@@ -93,6 +93,5 @@ public class LanguageGermanConfiguration {
         this.casesensitive = casesensitive;
     }
 
-    
-    
+
 }
