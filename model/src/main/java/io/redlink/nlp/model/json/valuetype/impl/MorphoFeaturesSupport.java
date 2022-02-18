@@ -52,13 +52,18 @@ import io.redlink.nlp.model.pos.PosTag;
 @Component
 public class MorphoFeaturesSupport implements ValueTypeParser<MorphoFeatures>, ValueTypeSerializer<MorphoFeatures> {
 
-    private final Logger log = LoggerFactory.getLogger(MorphoFeaturesSupport.class);
+    private static final Logger LOG = LoggerFactory.getLogger(MorphoFeaturesSupport.class);
     
     public static final String TYPE_VALUE = "org.apache.stanbol.enhancer.nlp.morpho.MorphoFeatures";
 
-    protected final ValueTypeSerializerRegistry serializerRegistry = ValueTypeSerializerRegistry.getInstance();
-    protected final ValueTypeParserRegistry parserRegistry = ValueTypeParserRegistry.getInstance();
-    
+    protected final ValueTypeSerializerRegistry serializerRegistry;
+    protected final ValueTypeParserRegistry parserRegistry;
+
+    public MorphoFeaturesSupport() {
+        serializerRegistry = ValueTypeSerializerRegistry.getInstance();
+        parserRegistry = ValueTypeParserRegistry.getInstance();
+    }
+
     protected ValueTypeSerializer<PosTag> getPosTagSerializer(){
         return serializerRegistry.getSerializer(PosTagSupport.TYPE_VALUE);
     }
@@ -207,15 +212,15 @@ public class MorphoFeaturesSupport implements ValueTypeParser<MorphoFeatures>, V
                             morpho.addCase(new CaseTag(tag.asText(),type.iterator().next()));
                         }
                     } else {
-                        log.warn("Unable to parse CaseTag becuase 'tag' value is "
+                        LOG.warn("Unable to parse CaseTag becuase 'tag' value is "
                             + "missing or is not a String (json: "+jCase.toString()+")");
                     }
                 } else {
-                    log.warn("Unable to parse CaseTag from "+member.toString());
+                    LOG.warn("Unable to parse CaseTag from "+member.toString());
                 }
             }
         } else if(!node.isMissingNode()) {
-            log.warn("Unable to parse CaseTags (Json Array expected as value for field 'case' but was "
+            LOG.warn("Unable to parse CaseTags (Json Array expected as value for field 'case' but was "
                 + node);
         }
         if(jMorpho.has("definitness")){
@@ -239,15 +244,15 @@ public class MorphoFeaturesSupport implements ValueTypeParser<MorphoFeatures>, V
                             morpho.addGender(new GenderTag(tag.asText(),type.iterator().next()));
                         }
                     } else {
-                        log.warn("Unable to parse GenderTag becuase 'tag' value is "
+                        LOG.warn("Unable to parse GenderTag becuase 'tag' value is "
                                 + "missing or is not a String (json: "+jGender.toString()+")");
                     }
                 } else {
-                    log.warn("Unable to parse GenderTag from "+member.toString());
+                    LOG.warn("Unable to parse GenderTag from "+member.toString());
                 }
             }
         } else if(!node.isMissingNode()) {
-            log.warn("Unable to parse GenderTag (Json Array expected as value for field 'case' but was "
+            LOG.warn("Unable to parse GenderTag (Json Array expected as value for field 'case' but was "
                     + node);
         }
         
@@ -267,15 +272,15 @@ public class MorphoFeaturesSupport implements ValueTypeParser<MorphoFeatures>, V
                             morpho.addNumber(new NumberTag(tag.asText(),type.iterator().next()));
                         }
                     } else {
-                        log.warn("Unable to parse NumberTag becuase 'tag' value is "
+                        LOG.warn("Unable to parse NumberTag becuase 'tag' value is "
                                 + "missing or is not a String (json: "+jNumber.toString()+")");
                     }
                 } else {
-                    log.warn("Unable to parse NumberTag from "+member.toString());
+                    LOG.warn("Unable to parse NumberTag from "+member.toString());
                 }
             }
         } else if(!node.isMissingNode()) {
-            log.warn("Unable to parse NumberTag (Json Array expected as value for field 'case' but was "
+            LOG.warn("Unable to parse NumberTag (Json Array expected as value for field 'case' but was "
                     + node);
         }
         
@@ -294,11 +299,11 @@ public class MorphoFeaturesSupport implements ValueTypeParser<MorphoFeatures>, V
                     ObjectNode jPosTag = (ObjectNode)member;
                     morpho.addPos(getPosTagParser().parse(jPosTag, at));
                 } else {
-                    log.warn("Unable to parse PosTag from "+member.toString());
+                    LOG.warn("Unable to parse PosTag from "+member.toString());
                 }
             }
         } else if(!node.isMissingNode()){
-            log.warn("Unable to parse PosTag (Json Array expected as value for field 'case' but was "
+            LOG.warn("Unable to parse PosTag (Json Array expected as value for field 'case' but was "
                     + node);
         }
         
@@ -318,15 +323,15 @@ public class MorphoFeaturesSupport implements ValueTypeParser<MorphoFeatures>, V
                             morpho.addTense(new TenseTag(tag.asText(),type.iterator().next()));
                         }
                     } else {
-                        log.warn("Unable to parse TenseTag becuase 'tag' value is "
+                        LOG.warn("Unable to parse TenseTag becuase 'tag' value is "
                                 + "missing or is not a String (json: "+jTense.toString()+")");
                     }
                 } else {
-                    log.warn("Unable to parse TenseTag from "+member.toString());
+                    LOG.warn("Unable to parse TenseTag from "+member.toString());
                 }
             }
         } else if(!node.isMissingNode()) {
-            log.warn("Unable to parse TenseTag (Json Array expected as value for field 'case' but was "
+            LOG.warn("Unable to parse TenseTag (Json Array expected as value for field 'case' but was "
                     + node);
         }
         
@@ -346,15 +351,15 @@ public class MorphoFeaturesSupport implements ValueTypeParser<MorphoFeatures>, V
                             morpho.addVerbForm(new VerbMoodTag(tag.asText(),type.iterator().next()));
                         }
                     } else {
-                        log.warn("Unable to parse VerbMoodTag becuase 'tag' value is "
+                        LOG.warn("Unable to parse VerbMoodTag becuase 'tag' value is "
                                 + "missing or is not a String (json: "+jVerbMood.toString()+")");
                     }
                 } else {
-                    log.warn("Unable to parse VerbMoodTag from "+member.toString());
+                    LOG.warn("Unable to parse VerbMoodTag from "+member.toString());
                 }
             }
         } else if(!node.isMissingNode()) {
-            log.warn("Unable to parse VerbMoodTag (Json Array expected as value for field 'case' but was "
+            LOG.warn("Unable to parse VerbMoodTag (Json Array expected as value for field 'case' but was "
                     + node);
         }
         

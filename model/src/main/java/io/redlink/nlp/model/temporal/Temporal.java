@@ -36,6 +36,7 @@ public class Temporal {
      * @author Rupert Westenthaler
      *
      */
+    @SuppressWarnings("java:S115")
     public enum Grain {
         millisecond(ChronoUnit.MILLIS, Calendar.MILLISECOND),
         second(ChronoUnit.SECONDS, Calendar.SECOND),

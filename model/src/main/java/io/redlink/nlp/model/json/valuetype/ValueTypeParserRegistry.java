@@ -37,7 +37,7 @@ import org.springframework.stereotype.Component;
  */
 @Component
 public class ValueTypeParserRegistry {
-    private final Logger log = LoggerFactory.getLogger(ValueTypeParserRegistry.class);
+    private static final Logger LOG = LoggerFactory.getLogger(ValueTypeParserRegistry.class);
 
     private static ValueTypeParserRegistry instance;
     /**
@@ -52,17 +52,20 @@ public class ValueTypeParserRegistry {
         return instance;
     }
 
-    ReadWriteLock parserLock = new ReentrantReadWriteLock();
+    final ReadWriteLock parserLock;
     /**
      * Used outside OSGI
      */
     Map<String,ValueTypeParser<?>> valueTypeParsers;
 
     
-    protected ValueTypeParserRegistry(){}
+    protected ValueTypeParserRegistry(){
+        parserLock = new ReentrantReadWriteLock();
+    }
     
     @Autowired(required=false)
     public ValueTypeParserRegistry(Collection<ValueTypeParser<?>> parsers){
+        this();
         if(parsers != null && !parsers.isEmpty()){
             valueTypeParsers = new HashMap<>();
             for(ValueTypeParser<?> parser : parsers){
@@ -78,8 +81,8 @@ public class ValueTypeParserRegistry {
         }
         parserLock.readLock().lock();
         try {
-            if(log.isTraceEnabled()){
-                log.trace(" - lookup parser for {} -> {}",type, valueTypeParsers.get(type));
+            if(LOG.isTraceEnabled()){
+                LOG.trace(" - lookup parser for {} -> {}",type, valueTypeParsers.get(type));
             }
             return (ValueTypeParser<T>)valueTypeParsers.get(type);
         } finally {
@@ -98,7 +101,7 @@ public class ValueTypeParserRegistry {
             if(valueTypeParsers == null){
                 valueTypeParsers = new HashMap<>();
                 ServiceLoader<ValueTypeParser> loader = ServiceLoader.load(ValueTypeParser.class);
-                log.debug("load ValueTypeParsers ...");
+                LOG.debug("load ValueTypeParsers ...");
                 for(Iterator<ValueTypeParser> it = loader.iterator();it.hasNext();){
                     try {
                         ValueTypeParser vtp = it.next();
@@ -111,7 +114,7 @@ public class ValueTypeParserRegistry {
                         //It is better to throw an exception if an Node for the failed
                         //ValueTypeParser appears in the JSON as when loading all
                         //registered services
-                        log.warn("Unable to load a ValueTypeParser service because class '"
+                        LOG.warn("Unable to load a ValueTypeParser service because class '"
                             +e.getMessage()+" could not be loaded! This may happen if the "
                             + "classpath mixes different versions of o.a.stanbol.enhancer.nlp* "
                             + "modules!");
@@ -126,17 +129,17 @@ public class ValueTypeParserRegistry {
     private void addParser(ValueTypeParser<?> vtp) {
         ValueTypeParser<?> parser = valueTypeParsers.get(vtp.getKey());
         if(parser != null){
-            log.warn("Multiple Parsers for key {} (keep: {}, ignoreing: {}",
+            LOG.warn("Multiple Parsers for key {} (keep: {}, ignoreing: {}",
                 new Object[]{vtp.getKey(),parser,vtp});
         } else {
-            log.debug("   {} -> {}", vtp.getKey(), vtp.getClass().getName());
+            LOG.debug("   {} -> {}", vtp.getKey(), vtp.getClass().getName());
             valueTypeParsers.put(vtp.getKey(), vtp);
         }
         String className = vtp.getType().getName();
         if(className != null && !className.equals(vtp.getKey())){
             parser = valueTypeParsers.get(className);
             if(parser != null){
-                log.warn("Multiple Parsers for type {} (keep: {}, ignoreing: {}",
+                LOG.warn("Multiple Parsers for type {} (keep: {}, ignoreing: {}",
                     new Object[]{className,parser,vtp});
             } else {
                 valueTypeParsers.put(className, vtp);

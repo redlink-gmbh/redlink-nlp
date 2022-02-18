@@ -1,27 +1,28 @@
 /*
-* Licensed to the Apache Software Foundation (ASF) under one or more
-* contributor license agreements.  See the NOTICE file distributed with
-* this work for additional information regarding copyright ownership.
-* The ASF licenses this file to You under the Apache License, Version 2.0
-* (the "License"); you may not use this file except in compliance with
-* the License.  You may obtain a copy of the License at
-*
-*     http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*/
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package io.redlink.nlp.model.morpho;
 
 
 /**
  * Defines verb tenses as defined by the OLIA Ontology.
  */
+@SuppressWarnings("java:S115")
 public enum Case {
-	
+
     /**
      * AbessiveCase expresses the lack or absence of the referent of the noun it marks. It has the meaning of
      * the English preposition 'without' (Pei and Gaynor 1954: 3,35; Gove, et al. 1966: 3).
@@ -30,7 +31,7 @@ public enum Case {
     Abessive,
     /**
      * Case used to indicate locative or instrumental function. (http://www.isocat.org/datcat/DC-1224)
-     * 
+     * <p>
      * AblativeCase expresses that the referent of the noun it marks is the location from which another
      * referent is moving. It has the meaning 'from'. (http://purl.org/linguistics/gold/Ablative)
      */
@@ -122,7 +123,7 @@ public enum Case {
      * The distributive case is used on nouns for the meanings of per or each, e.g., Hungarian egyenként/egy,
      * hetenként/hét, ilyenként/ily, kéthetenként/kéthét, rekordonként/rekord, tömbönként/tömb,
      * vércsoportonként/vércsoport
-     * 
+     * <p>
      * In Hungarian it is -nként and expresses the manner when something happens to each member of a set one
      * by one (e.g., fejenként "per head", esetenként "in some case"), or the frequency in time (hetenként
      * "once a week", tízpercenként "every ten minutes"). In the Finnish language, this adverb type is rare,
@@ -166,8 +167,8 @@ public enum Case {
      * "formativus, or essivus-formalis `-ként' ... usually expresses a position, task and manner of the person or the thing."
      * (Nose 2003), e.g., Hungarian 'katonaként' - [serves] as a soldier. (Csaba Oravecz, email 2010/06/15)
      * <p>
-     * "Haspelmath &amp; Buchholz (1998:321) explained the function of the essive case as ``role phrases''. 
-     * Role phrases represent the role of the function in which a participant appears. 
+     * "Haspelmath &amp; Buchholz (1998:321) explained the function of the essive case as ``role phrases''.
+     * Role phrases represent the role of the function in which a participant appears.
      * They regard the role phrases as adverbial."
      * (Nose 2003, p. 117)
      * <p>
@@ -180,7 +181,7 @@ public enum Case {
      * "A magyar esetrendszer" (1961) do not consider the essive/formal to be a case.
      * (http://en.wikipedia.org/wiki/Essive-formal_case)
      * <p>
-     * 
+     * <p>
      * cf. Masahiko Nose (2003), Adverbial Usage of the Hungarian Essive Case
      */
     EssiveFormal,
@@ -322,7 +323,7 @@ public enum Case {
      * "without specific identity".
      * (http://languagelink.let.uu.nl/tds/onto/LinguisticOntology.owl#partitiveCase with reference to
      * http://en.wikipedia.org/wiki/Partitive)
-     * 
+     * <p>
      * PartitiveCase expresses the partial nature of the referent of the noun it marks, as opposed to
      * expressing the whole unit or class of which the referent is a part. This case may be found in items
      * such as the following: existential clauses, nouns that are accompanied by numerals or units of measure,
@@ -362,7 +363,7 @@ public enum Case {
      * FOR (i.e. to eat) FOOD'. The common purposive suffix -gu is a recurrent suffix on verbs ... The
      * purposive case suffix is often used on a nominalised clause (and this may possibly be the origin of the
      * verbal purposive). (Dixon 2002, p.134, on purposive case in [several] Australian languages)
-     * 
+     * <p>
      * R.M.W. Dixon (2002), Australian Languages. CUP, Cambridge
      */
     Purposive,
@@ -449,7 +450,7 @@ public enum Case {
     Temporalis,
     /**
      * Case that indicates to what or where something ends. (http://www.isocat.org/datcat/DC-1401)
-     * 
+     * <p>
      * TerminativeCase expresses the notion of something into but not further than (ie, not through) the
      * referent of the noun it marks. It has the meaning 'into but not through'.
      * (http://purl.org/linguistics/gold/TerminativeCase)
@@ -463,8 +464,8 @@ public enum Case {
     Translative,
     /**
      * In many inflecting languages, there occur lexemes whose form does not change throughout the paradigm, e.g.,
-	 * Russian papa "dad". For such forms, the category uninflected may be assigned. However, Uninflected is not to be confused with BaseForm 
-	 * that applies to forms in a paradigm where overt marking exists. Uninflected is a characteristic of lexemes, not individual tokens.
+     * Russian papa "dad". For such forms, the category uninflected may be assigned. However, Uninflected is not to be confused with BaseForm
+     * that applies to forms in a paradigm where overt marking exists. Uninflected is a characteristic of lexemes, not individual tokens.
      */
     Uninflected,
     /**

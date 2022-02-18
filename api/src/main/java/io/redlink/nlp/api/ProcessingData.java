@@ -46,8 +46,6 @@ import io.redlink.nlp.api.model.Value;
  */
 public class ProcessingData extends Annotated implements Closeable {
 
-    private final Logger log = LoggerFactory.getLogger(getClass());
-
     private final Content content;
     private List<Content> extrContents = new LinkedList<Content>();
 

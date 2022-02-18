@@ -33,6 +33,7 @@ import io.redlink.nlp.model.morpho.Tense;
  * @author Rupert Westenthaler
  * 
  */
+@SuppressWarnings("java:S115")
 public enum GrammaticalRelation {
 
     NominalDependency("Nominal Dependencies"),

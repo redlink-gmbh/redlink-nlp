@@ -26,8 +26,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
-import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.ImmutablePair;
@@ -53,12 +51,12 @@ import io.redlink.nlp.model.util.NlpUtils;
 
 @Component
 public class LangdetectProcessor extends Processor {
+
+    private static final Logger LOG = LoggerFactory.getLogger(LangdetectProcessor.class);
     
     private static final int MAX_CONTENT_SECTIONS = 20;
 
     private static final float MIN_RANKING = 0.5f;
-
-    private final Logger log = LoggerFactory.getLogger(getClass());
 
     private static final String KEY = "nlp.langdetect";
     public static final String LANGDETECT_MIN_CONF = KEY + ".min-conf";
@@ -96,16 +94,16 @@ public class LangdetectProcessor extends Processor {
 
         AnalyzedText at = NlpUtils.getOrInitAnalyzedText(pd);
         if(at == null){
-            log.debug("Unable to detect language for {} because no AnalyzedText is present or can be created", pd);
+            LOG.debug("Unable to detect language for {} because no AnalyzedText is present or can be created", pd);
             return;
         }
         
         float minConf = pd.getConfiguration(LANGDETECT_MIN_CONF, DEFAULT_MIN_CONF);
         if(minConf <= 0.5){
-            log.warn("configured '{}'={} MUST BE > 0.5f (using default: {})",LANGDETECT_MIN_CONF, minConf, DEFAULT_MIN_CONF);
+            LOG.warn("configured '{}'={} MUST BE > 0.5f (using default: {})",LANGDETECT_MIN_CONF, minConf, DEFAULT_MIN_CONF);
             minConf = DEFAULT_MIN_CONF;
         }
-        log.trace("  - minConf: {}", minConf);
+        LOG.trace("  - minConf: {}", minConf);
         float inclConf = 1-minConf;
 
         //process the sections and collect the content to be used for detection the language on Document level
@@ -131,7 +129,7 @@ public class LangdetectProcessor extends Processor {
                 Pair<Float, Section> p = it.next();
                 ranking = p.getKey();
                 if(ranking > 0.5){
-                    log.debug("{} -> {}: {}", p.getKey(), p.getValue(), p.getValue().getSpan());
+                    LOG.debug("{} -> {}: {}", p.getKey(), p.getValue(), p.getValue().getSpan());
                     content.append(p.getValue().getSpan()).append('\n');
                     numSections++;
                 }
@@ -141,7 +139,7 @@ public class LangdetectProcessor extends Processor {
         }
 
         if(content.length() < MIN_CONTENT_LENGTH){
-            log.debug(" - unable to detect language for {} because content "
+            LOG.debug(" - unable to detect language for {} because content "
                     + "is to short (length: {}, required: {})", pd, content.length(), MIN_CONTENT_LENGTH);
             return;
         }
@@ -150,7 +148,7 @@ public class LangdetectProcessor extends Processor {
             //try to get the content from the content sections in the analyzed text
             for(Language lang : langIdentifier.getLanguages(content.toString())){
                 if(lang.prob >= inclConf){
-                    log.debug(" - language: {} (conf: {})", lang.lang, lang.prob);
+                    LOG.debug(" - language: {} (conf: {})", lang.lang, lang.prob);
                     Value<String> langValue = Value.value(lang.lang, lang.prob);
                     at.addValue(NlpAnnotations.LANGUAGE_ANNOTATION, langValue);
                     if(lang.prob >= minConf){
@@ -161,12 +159,12 @@ public class LangdetectProcessor extends Processor {
                         //      some refactoring)
                     }
                 } else {
-                    log.trace(" - low confidence language: {} (conf: {})", lang.lang, lang.prob);
+                    LOG.trace(" - low confidence language: {} (conf: {})", lang.lang, lang.prob);
                 }
             }
         } catch (LangDetectException e) {
-            log.debug("Unable to detect language for document {} (message: {})", pd, e.getMessage());
-            log.trace("STACKTRACE:", e);
+            LOG.debug("Unable to detect language for document {} (message: {})", pd, e.getMessage());
+            LOG.trace("STACKTRACE:", e);
         }
     }
 
@@ -176,16 +174,16 @@ public class LangdetectProcessor extends Processor {
                     .filter(lang -> lang.prob >= inclConf)
                     .map(lang -> Value.value(lang.lang, lang.prob))
                     .forEach(detected -> section.addValue(LANGUAGE_ANNOTATION, detected));
-            if(log.isDebugEnabled()){
-                log.debug(" > {} (langs: {})", section, section.getValues(LANGUAGE_ANNOTATION));
-            } else if(log.isTraceEnabled()){
-                log.debug(" > {}: {} (langs: {})", section, StringUtils.abbreviate(section.getSpan(), 60), section.getValues(LANGUAGE_ANNOTATION));
+            if(LOG.isDebugEnabled()){
+                LOG.debug(" > {} (langs: {})", section, section.getValues(LANGUAGE_ANNOTATION));
+            } else if(LOG.isTraceEnabled()){
+                LOG.debug(" > {}: {} (langs: {})", section, StringUtils.abbreviate(section.getSpan(), 60), section.getValues(LANGUAGE_ANNOTATION));
             }
         } catch (LangDetectException e) {
-            if(log.isDebugEnabled()){
-                log.debug("Unable to detect language for section {} (message: {})", section, e.getMessage());
-            } else if(log.isTraceEnabled()){
-                log.debug("Unable to detect language for section {} (content: {})", section, section.getSpan(), e);
+            if(LOG.isDebugEnabled()){
+                LOG.debug("Unable to detect language for section {} (message: {})", section, e.getMessage());
+            } else if(LOG.isTraceEnabled()){
+                LOG.debug("Unable to detect language for section {} (content: {})", section, section.getSpan(), e);
             }
         }
     }
@@ -198,8 +196,8 @@ public class LangdetectProcessor extends Processor {
             Value<SectionTag> sectionTag = section.getValue(NlpAnnotations.SECTION_ANNOTATION);
             Value<SectionStats> sectionStatsValue = section.getValue(NlpAnnotations.SECTION_STATS_ANNOTATION);
             SectionStats sectionStats = sectionStatsValue == null ? null : sectionStatsValue.value();
-            if(log.isTraceEnabled()){
-                log.trace(" - {}: {} {} - {}", section, sectionTag, sectionStats, StringUtils.abbreviate(section.getSpan(), 60));
+            if(LOG.isTraceEnabled()){
+                LOG.trace(" - {}: {} {} - {}", section, sectionTag, sectionStats, StringUtils.abbreviate(section.getSpan(), 60));
             }
             //assume all sections with >= 80 chars and headings as content sections
             Boolean contentSection = null;
@@ -223,7 +221,7 @@ public class LangdetectProcessor extends Processor {
             }
             section.addAnnotation(SECTION_CLASSIFICATION_CONTENT_SECTION, contentSection);
             if(contentSection){
-                log.trace("  ... content section ({})", sectionStats);
+                LOG.trace("  ... content section ({})", sectionStats);
                 contentSections.add(new ImmutablePair<Float, Section>(contentRank(sectionStats), section));
             }
         }

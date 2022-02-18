@@ -65,7 +65,7 @@ import io.redlink.nlp.stanfordnlp.annotators.AnalyzedTextSectionAnnotator;
 @ConditionalOnClass(AnnotationPipeline.class)
 public class GermanTrueCaseExtractor extends Processor {
 
-    private final static Logger log = LoggerFactory.getLogger(GermanTrueCaseExtractor.class);
+    private static final Logger LOG = LoggerFactory.getLogger(GermanTrueCaseExtractor.class);
     
     private AnnotatorPool pool;
     private AnnotationPipeline pipeline;
@@ -102,18 +102,18 @@ public class GermanTrueCaseExtractor extends Processor {
 
     @Override
     protected void doProcessing(ProcessingData processingData) {
-        log.debug("> process {} with {}", processingData, getClass().getSimpleName());
+        LOG.debug("> process {} with {}", processingData, getClass().getSimpleName());
         
         Optional<AnalyzedText> at = NlpUtils.getAnalyzedText(processingData);
-        if(at == null){ //create a new AnalyzedText
-            log.warn("Unable to preprocess {} because no AnalyzedText is present "
+        if(at.isEmpty()){ //create a new AnalyzedText
+            LOG.warn("Unable to preprocess {} because no AnalyzedText is present "
                     + "and this QueryPreperator requires Tokens and Sentences!",
                     processingData);
             return;
         }
         String language = processingData.getLanguage();
         if(language == null || !"de".equals(language.toLowerCase(Locale.ROOT))){
-            log.debug("language {} not supported (supported: de)", language);
+            LOG.debug("language {} not supported (supported: de)", language);
             return; //language not supported
         }
 
@@ -132,7 +132,7 @@ public class GermanTrueCaseExtractor extends Processor {
             int tokenIdx = -1;
             for (CoreLabel token : tokens) {
                 if(token.beginPosition() >= token.endPosition()){
-                    log.warn("Illegal Token start:{}/end:{} values -> ignored", token.beginPosition(), token.endPosition());
+                    LOG.warn("Illegal Token start:{}/end:{} values -> ignored", token.beginPosition(), token.endPosition());
                     continue;
                 }
                 tokenIdx++;
@@ -179,7 +179,7 @@ public class GermanTrueCaseExtractor extends Processor {
         AnnotatorImplementations aImpl = new AnnotatorImplementations();
         pool = new AnnotatorPool();
         // if the pool already exists reuse!
-        log.debug("Initializing Annotator Pool");
+        LOG.debug("Initializing Annotator Pool");
         pool.register(STANFORD_TOKENIZE, properties, Lazy.cache(() -> aImpl.tokenizer(properties)));
         pool.register(STANFORD_SSPLIT, properties, Lazy.cache(() -> aImpl.wordToSentences(properties)));
         pool.register(STANFORD_POS, properties, Lazy.cache(() -> aImpl.posTagger(properties)));

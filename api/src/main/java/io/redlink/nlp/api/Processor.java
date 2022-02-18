@@ -33,6 +33,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
  */
 public abstract class Processor implements Comparable<Processor> {
 
+    @SuppressWarnings("java:S115")
     public enum Phase {
         /**
          * pre-processing of the parsed content

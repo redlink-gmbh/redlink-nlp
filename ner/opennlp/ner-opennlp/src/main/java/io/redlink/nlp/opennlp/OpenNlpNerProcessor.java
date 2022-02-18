@@ -60,20 +60,21 @@ import opennlp.tools.util.Span;
 @Component
 public class OpenNlpNerProcessor extends Processor {
 
-    private final static Logger log = LoggerFactory.getLogger(OpenNlpNerProcessor.class);
-    
-    private final static int CONTENT_INTERRUPTION = 80;
+    private static final Logger LOG = LoggerFactory.getLogger(OpenNlpNerProcessor.class);
+
+    private static final int CONTENT_INTERRUPTION = 80;
 
     private final List<OpenNlpNerModel> nerModels;
 
-    private Map<String, OpenNlpNerModel> lang2NerModel;
+    private final Map<String, OpenNlpNerModel> lang2NerModel;
     
 
     @Autowired
     public OpenNlpNerProcessor(List<OpenNlpNerModel> nerModels) {
         super("opennlp.ner", "OpenNLP Named Entity Recognition", Phase.ner);
-        log.debug("Create {} (with {} NER Models)", getClass().getSimpleName(), nerModels.size());
+        LOG.debug("Create {} (with {} NER Models)", getClass().getSimpleName(), nerModels.size());
         this.nerModels = nerModels;
+        lang2NerModel = new HashMap<>();
     }
 
     @Override
@@ -83,24 +84,23 @@ public class OpenNlpNerProcessor extends Processor {
     
     @Override
     protected void init() {
-        log.debug("Initializing {} NER Models", nerModels.size());
-        lang2NerModel = new HashMap<>();
+        LOG.debug("Initializing {} NER Models", nerModels.size());
         for(OpenNlpNerModel nerModel : nerModels){
             if(lang2NerModel.containsKey(nerModel.getLanguage())){
-                log.warn("Multiple NER Models for Language {} (in-use: {} | ignored: {})",
+                LOG.warn("Multiple NER Models for Language {} (in-use: {} | ignored: {})",
                         nerModel.getLanguage(), lang2NerModel.get(nerModel.getLanguage()).getName(), nerModel.getName());
             } else {
-                log.debug("  {}: {}", nerModel.getLanguage(), nerModel.getName());
+                LOG.debug("  {}: {}", nerModel.getLanguage(), nerModel.getName());
                 try {
                     nerModel.activate();
                     lang2NerModel.put(nerModel.getLanguage(), nerModel);
                 } catch (IOException e) {
-                    log.warn("Unable to activate NER Model for Language " + nerModel.getLanguage()
+                    LOG.warn("Unable to activate NER Model for Language " + nerModel.getLanguage()
                             + " (name: " + nerModel.getName() + ")!", e);
                 }
             }
         }
-        log.debug("NER Models loaded: {}", lang2NerModel.keySet());
+        LOG.debug("NER Models loaded: {}", lang2NerModel.keySet());
     }
 
 
@@ -130,26 +130,26 @@ public class OpenNlpNerProcessor extends Processor {
     @Override
     protected void doProcessing(ProcessingData processingData) {
 
-        log.debug("> process {} with {}", processingData, getClass().getSimpleName());
+        LOG.debug("> process {} with {}", processingData, getClass().getSimpleName());
         
         Optional<AnalyzedText> at = NlpUtils.getAnalyzedText(processingData);
         if(!at.isPresent()) {
-            log.warn("Unable to preprocess conversation {} because no AnalyzedText is present "
+            LOG.warn("Unable to preprocess conversation {} because no AnalyzedText is present "
                     + "and this QueryPreperator requires Tokens and Sentences!",
                     processingData);
             return;
         }
         String language = processingData.getLanguage();
-        log.debug(" - language: {}", language);
+        LOG.debug(" - language: {}", language);
         if(language == null || language.length() < 2){
-            log.warn("Unable to process {} because missing/invalid language {}", processingData, language);
+            LOG.warn("Unable to process {} because missing/invalid language {}", processingData, language);
             return;
         }
 
         OpenNlpNerModel model = getModel(language);
 
         if(model == null){
-            log.debug("Unable to preprocess conversation {} because language {} "
+            LOG.debug("Unable to preprocess conversation {} because language {} "
                     + "is not supported", processingData, language);
             return;
         }
@@ -177,7 +177,7 @@ public class OpenNlpNerProcessor extends Processor {
     private void extractNamedEntities(OpenNlpNerModel langNerModel, Iterable<SpanCollection> sentences) {
         AnalyzedText at = null;
         int lastEnd = 0; //the end of the last processed sentence (used to track if we need to reset adaptive data in the NameFinder)
-        log.trace("> extract Named Entities");
+        LOG.trace("> extract Named Entities");
         try {
             nextSentence : for(SpanCollection sentence : sentences){
                 if(at == null){ //init the Analyzed Text field
@@ -186,7 +186,7 @@ public class OpenNlpNerProcessor extends Processor {
                 int offset = sentence.getStart();
                 Iterator<io.redlink.nlp.model.Token> tokenIt = sentence.getTokens();
                 if(!tokenIt.hasNext()){
-                    log.warn("{} {} has not Tokens. Will not extract Named Entities",
+                    LOG.warn("{} {} has not Tokens. Will not extract Named Entities",
                             sentence, StringUtils.abbreviate(sentence.getSpan(), 40));
                     continue nextSentence;
                 }
@@ -202,7 +202,7 @@ public class OpenNlpNerProcessor extends Processor {
                                 tokens.get(i).getSpan().toLowerCase(langNerModel.getLocale()); //to lower case
                 }
                 if((offset - lastEnd) > CONTENT_INTERRUPTION){ //reset statistics
-                    log.trace(" - content interuption (clear adaptive data of NER models)");
+                    LOG.trace(" - content interuption (clear adaptive data of NER models)");
                     for(NameFinderModel model : langNerModel.getNameFinders()){
                         NameFinderME nameFinder = model.getNameFinder();
                         if(nameFinder != null){ //might be null if deactivating
@@ -210,8 +210,8 @@ public class OpenNlpNerProcessor extends Processor {
                         }
                     }
                 }
-                if(log.isTraceEnabled()){
-                    log.trace("> sentence: {}: {}", sentence, Arrays.toString(spans));
+                if(LOG.isTraceEnabled()){
+                    LOG.trace("> sentence: {}: {}", sentence, Arrays.toString(spans));
                 }
                 for(NameFinderModel model : langNerModel.getNameFinders()){
                     NameFinderME nameFinder = model.getNameFinder();
@@ -224,7 +224,7 @@ public class OpenNlpNerProcessor extends Processor {
                                 String tag = entitySpan.getType();
                                 String type = model.getType(tag);
                                 if(type == null){
-                                    log.warn("Unmapped Type '{}' for OpenNLP Name Finder "
+                                    LOG.warn("Unmapped Type '{}' for OpenNLP Name Finder "
                                             + "Model '{}' (lang: {}). Setting type to '{}'",
                                             entitySpan.getType(), model,
                                             langNerModel.getLanguage(), NerTag.NAMED_ENTITY_MISC);
@@ -236,7 +236,7 @@ public class OpenNlpNerProcessor extends Processor {
                                 Chunk chunk = at.addChunk(start, end); // add a chunk for the Named Entity
                                 chunk.addValue(NlpAnnotations.NER_ANNOTATION, Value.value(new NerTag(tag, type),prob));
                                 String name = at.getText().subSequence(start, end).toString();
-                                log.debug(" - Named Entity [{},{} | prob: {}, tag: {}, type: {}] {}",
+                                LOG.debug(" - Named Entity [{},{} | prob: {}, tag: {}, type: {}] {}",
                                         start, end, prob, tag, type, name);
                             } //end for all extracted named entities
                         } //else no entities extracted

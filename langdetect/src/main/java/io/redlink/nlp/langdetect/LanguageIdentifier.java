@@ -19,6 +19,7 @@ package io.redlink.nlp.langdetect;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -36,14 +37,12 @@ import com.cybozu.labs.langdetect.Language;
 
 @Component
 public class LanguageIdentifier {
+
+    private static final Logger LOG = LoggerFactory.getLogger(LanguageIdentifier.class);
     
     private static final String PROFILE_PATH = "profiles";
 
-    private final Logger log = LoggerFactory.getLogger(getClass());
-    
-    private Charset UTF8 = Charset.forName("UTF-8");
-    
-    private final static String[] LANGUAGES = new String [] {"af", "ar", "bg", 
+    private final static String[] LANGUAGES = new String [] {"af", "ar", "bg",
             "bn", "cs", "da", "de", "el", "en", "es", "et", "fa", "fi", "fr", 
             "gu", "he", "hi", "hr", "hu", "id", "it", "ja", "kn", "ko", "lt", 
             "lv", "mk", "ml", "mr", "ne", "nl", "no", "pa", "pl", "pt", "ro", 
@@ -82,17 +81,17 @@ public class LanguageIdentifier {
             InputStream is = getClass().getClassLoader().getResourceAsStream(profileFile);
             if(is != null){
                 try {
-                    String profile = IOUtils.toString(is, UTF8);
+                    String profile = IOUtils.toString(is, StandardCharsets.UTF_8);
                     if(StringUtils.isNotBlank(profile)){
                         profiles.add(profile);
                     }
                 } catch (IOException e) {
-                    log.warn("Unable to load Langauge Detection Profile for language '"+lang+"'", e);
+                    LOG.warn("Unable to load Langauge Detection Profile for language '"+lang+"'", e);
                 } finally {
                     IOUtils.closeQuietly(is);
                 }
             } else {
-                log.warn("Missing Language Detection Profile for language profile "
+                LOG.warn("Missing Language Detection Profile for language profile "
                         + "for language '{}' (resource: {})",lang, profileFile);
             }
         }

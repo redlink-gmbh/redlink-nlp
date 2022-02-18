@@ -16,7 +16,7 @@
 */
 package io.redlink.nlp.model.morpho;
 
-
+@SuppressWarnings("java:S115")
 public enum NumberFeature {
     /**
      * MULTEXT-East feature Number="count" (Nouns in Serbian, Macedonian, Bulgarian), 

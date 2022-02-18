@@ -38,7 +38,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class ValueTypeSerializerRegistry {
     
-    private final Logger log = LoggerFactory.getLogger(ValueTypeSerializerRegistry.class);
+    private static final Logger LOG = LoggerFactory.getLogger(ValueTypeSerializerRegistry.class);
 
     private static ValueTypeSerializerRegistry instance;
     /**
@@ -53,14 +53,17 @@ public class ValueTypeSerializerRegistry {
         return instance;
     }
     
-    ReadWriteLock serializerLock = new ReentrantReadWriteLock();
+    final ReadWriteLock serializerLock;
 
     Map<String,ValueTypeSerializer<?>> valueTypeSerializers;
     
-    protected ValueTypeSerializerRegistry(){}
+    protected ValueTypeSerializerRegistry(){
+        serializerLock = new ReentrantReadWriteLock();
+    }
     
     @Autowired(required=false)
     public ValueTypeSerializerRegistry(Collection<ValueTypeSerializer<?>> serializers){
+        this();
         if(serializers != null && !serializers.isEmpty()){
             valueTypeSerializers = new HashMap<>();
             for(ValueTypeSerializer<?> serializer : serializers){
@@ -77,7 +80,7 @@ public class ValueTypeSerializerRegistry {
         serializerLock.readLock().lock();
         try {
             ValueTypeSerializer<T> serializer = (ValueTypeSerializer<T>)valueTypeSerializers.get(type);
-            log.trace(" - lookup serializer for {} -> {}",type, serializer);
+            LOG.trace(" - lookup serializer for {} -> {}",type, serializer);
             return serializer;
         } finally {
             serializerLock.readLock().unlock();
@@ -94,7 +97,7 @@ public class ValueTypeSerializerRegistry {
             if(valueTypeSerializers == null){
                 valueTypeSerializers = new HashMap<String,ValueTypeSerializer<?>>();
                 ServiceLoader<ValueTypeSerializer> loader = ServiceLoader.load(ValueTypeSerializer.class);
-                log.debug("load ValueTypeSerializers ...");
+                LOG.debug("load ValueTypeSerializers ...");
                 for(Iterator<ValueTypeSerializer> it = loader.iterator();it.hasNext();){
                     addSerializer(it.next());
                 }
@@ -107,20 +110,20 @@ public class ValueTypeSerializerRegistry {
     private void addSerializer(ValueTypeSerializer<?> vts) {
         ValueTypeSerializer<?> serializer = valueTypeSerializers.get(vts.getKey());
         if(serializer != null){
-            log.warn("Multiple Serializers for key {} (keep: {}, ignoreing: {}",
+            LOG.warn("Multiple Serializers for key {} (keep: {}, ignoreing: {}",
                 new Object[]{vts.getKey(),serializer,vts});
         } else {
-                log.debug("   {} -> {}", vts.getKey(), vts.getClass().getName());
+                LOG.debug("   {} -> {}", vts.getKey(), vts.getClass().getName());
                 valueTypeSerializers.put(vts.getKey(), vts);
         }
         String className = vts.getType().getName();
         if(className != null && !className.equals(vts.getKey())){
             serializer = valueTypeSerializers.get(className);
             if(serializer != null){
-                log.warn("Multiple Serializers for type {} (keep: {}, ignoreing: {}",
+                LOG.warn("Multiple Serializers for type {} (keep: {}, ignoreing: {}",
                     new Object[]{className,serializer,vts});
             } else {
-                log.debug("   {} -> {}", className, vts.getClass().getName());
+                LOG.debug("   {} -> {}", className, vts.getClass().getName());
                 valueTypeSerializers.put(className, vts);
             }
         }

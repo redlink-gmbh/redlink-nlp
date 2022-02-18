@@ -24,6 +24,7 @@ import java.util.Set;
 /**
  * Defines verb tenses as defined by the OLIA Ontology.
  */
+@SuppressWarnings("java:S115")
 public enum Tense {
     NotAnchored("NotTemporallyAnchored"),
     Absolute("AbsoluteTense"),

@@ -54,6 +54,7 @@ public abstract class VocabularyDetector extends RegexNamedEntityFactory {
     private final CaseSensitivity cs;
     private Map<String,List<VocabularyEntry>> words;
 
+    @SuppressWarnings("java:S115")
     public static enum CaseSensitivity{
         /**
          * Vocabulary entries are matched fully case sensitive with the text

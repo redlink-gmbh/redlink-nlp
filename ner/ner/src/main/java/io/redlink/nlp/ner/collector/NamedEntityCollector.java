@@ -72,8 +72,8 @@ import io.redlink.nlp.model.util.NlpUtils;
 @Component
 public class NamedEntityCollector extends Processor {
 
-    private final Logger log = LoggerFactory.getLogger(getClass());
-    
+    private static final Logger LOG = LoggerFactory.getLogger(NamedEntityCollector.class);
+
     private static final float DEFAULT_PROB = 0.8f;
     
     public NamedEntityCollector(){
@@ -98,7 +98,7 @@ public class NamedEntityCollector extends Processor {
             if(!sections.hasNext()){
                 sections = Collections.singleton(at.get()).iterator();
             }
-            log.trace("collect NamedEntity mentions:");
+            LOG.trace("collect NamedEntity mentions:");
             Map<String, List<NamedEntityData>> neMap = new HashMap<>();
             while(sections.hasNext()){
                 SpanCollection section = sections.next();
@@ -106,10 +106,10 @@ public class NamedEntityCollector extends Processor {
             }
             for(Entry<String,List<NamedEntityData>> neds : neMap.entrySet()){
                 Map<String, NamedEntityData> byType = new HashMap<>();
-                log.debug("{}", neds.getKey());
+                LOG.debug("{}", neds.getKey());
                 //merge by type
                 for(NamedEntityData ned : neds.getValue()){
-                    log.debug("  {}", ned);
+                    LOG.debug("  {}", ned);
                     NamedEntityData tned = byType.get(ned.type);
                     if(tned == null){
                         byType.put(ned.type, ned);
@@ -148,7 +148,7 @@ public class NamedEntityCollector extends Processor {
             for(Value<NerTag> nerAnno : nerAnnotations){
                 NerTag nerTag = nerAnno.value();
                 String type = getType(nerTag);
-                log.trace(" - [{},{}] {} (type:{})", chunk.getStart(), chunk.getEnd(), chunk.getSpan(), type);
+                LOG.trace(" - [{},{}] {} (type:{})", chunk.getStart(), chunk.getEnd(), chunk.getSpan(), type);
                 NamedEntityData ned = activeTokens.get(type);
                 if(ned != null){
                     if(ned.end <= chunk.getStart()){ //none overlapping start
@@ -161,7 +161,7 @@ public class NamedEntityCollector extends Processor {
                         }
                         nes.add(ned);
                     } else { //overlapping
-                        log.trace("    merge {}: {} with {}", chunk, nerAnno, ned);
+                        LOG.trace("    merge {}: {} with {}", chunk, nerAnno, ned);
                         ned.merge(chunk, nerAnno);
                         continue; //processed this one
                     }
@@ -171,11 +171,11 @@ public class NamedEntityCollector extends Processor {
                     boolean c = active.contained(chunk, nerAnno);
                     if(c){
                         contained = true;
-                        log.trace("    {}: {} contained in {}", chunk, nerAnno, ned);
+                        LOG.trace("    {}: {} contained in {}", chunk, nerAnno, ned);
                     }
                 }
                 if(!contained){
-                    log.trace("    created {} for {}:{}", ned, chunk, nerAnno);
+                    LOG.trace("    created {} for {}:{}", ned, chunk, nerAnno);
                     activeTokens.put(type, new NamedEntityData(chunk, nerAnno));
                 }
             }

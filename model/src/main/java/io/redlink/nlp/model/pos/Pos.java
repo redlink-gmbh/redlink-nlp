@@ -44,6 +44,7 @@ import io.redlink.nlp.model.morpho.Tense;
  * Enumeration elements that represent classes that are deprecated within the Olia
  * Ontology are also deprecated within this Enumeration.
  */
+@SuppressWarnings("java:S115")
 public enum Pos {
     /**
      * 

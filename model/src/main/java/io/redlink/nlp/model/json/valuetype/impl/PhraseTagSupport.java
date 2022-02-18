@@ -38,7 +38,7 @@ import io.redlink.nlp.model.pos.LexicalCategory;
 @Component
 public class PhraseTagSupport implements ValueTypeParser<PhraseTag>, ValueTypeSerializer<PhraseTag> {
 
-    private final Logger log = LoggerFactory.getLogger(PhraseTagSupport.class);
+    private static final Logger LOG = LoggerFactory.getLogger(PhraseTagSupport.class);
     
     public static final String TYPE_VALUE = "org.apache.stanbol.enhancer.nlp.ner.PhraseTag";
 
@@ -88,13 +88,13 @@ public class PhraseTagSupport implements ValueTypeParser<PhraseTag>, ValueTypeSe
                 try {
                     lc = LexicalCategory.valueOf(jLexCat.asText());
                 } catch (IllegalArgumentException e) {
-                    log.warn("Unable to parse category for PhraseTag from '" 
+                    LOG.warn("Unable to parse category for PhraseTag from '"
                             +jLexCat.asText()+"' (will create with tag only)!",e);
                 }
             } else if(jLexCat.isInt()){
                 lc = LexicalCategory.values()[jLexCat.asInt()];
             } else if(!jLexCat.isMissingNode()){
-                log.warn("Unable to parse category for PhraseTag from "+jLexCat
+                LOG.warn("Unable to parse category for PhraseTag from "+jLexCat
                     +"(will create with tag only)");
             }
             if(lc != null){

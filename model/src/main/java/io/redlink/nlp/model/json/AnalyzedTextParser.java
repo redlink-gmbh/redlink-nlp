@@ -20,6 +20,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.EnumSet;
@@ -51,16 +53,16 @@ import io.redlink.nlp.model.json.valuetype.ValueTypeParserRegistry;
 
 @Component
 public class AnalyzedTextParser {
-    
-    private final Logger log = LoggerFactory.getLogger(AnalyzedTextParser.class);
-    
-    private final static Charset UTF8 = Charset.forName("UTF-8");
+
+    private static final Logger LOG = LoggerFactory.getLogger(AnalyzedTextParser.class);
+
+    private static final Charset UTF8 = StandardCharsets.UTF_8;
     
     private static AnalyzedTextParser defaultInstance;
     
     protected ValueTypeParserRegistry valueTypeParserRegistry;
     
-    protected ObjectMapper mapper = new ObjectMapper();    
+    protected ObjectMapper mapper;
     /**
      * Can be used when running outside of OSGI or Spring to obtain the 
      * default (singleton) instance.
@@ -77,7 +79,9 @@ public class AnalyzedTextParser {
     /**
      * Default constructor used by OSGI
      */
-    public AnalyzedTextParser() {}
+    public AnalyzedTextParser() {
+        mapper = new ObjectMapper();
+    }
     
     /**
      * Constructs a new Parser instance for the parsed {@link ValueTypeParserRegistry}
@@ -89,6 +93,7 @@ public class AnalyzedTextParser {
      */
     @Autowired(required=false)
     public AnalyzedTextParser(ValueTypeParserRegistry vtpr){
+        this();
         if(vtpr == null){
             throw new IllegalArgumentException("The parsed ValueTypeParserRegistry MUST NOT be NULL!");
         }
@@ -187,14 +192,14 @@ public class AnalyzedTextParser {
             Collection<Entry<String,JsonNode>> jAnnotations = new ArrayList<Entry<String,JsonNode>>(4);
             SpanTypeEnum spanType = parseSpanData(jSpan, spanPos, jAnnotations);
             if(spanType == null || spanPos[0] < 0 || spanPos[1] < 0){
-                log.warn("Illegal or missing span type, start and/or end position (ignored, json: "+jSpan);
+                LOG.warn("Illegal or missing span type, start and/or end position (ignored, json: "+jSpan);
                 return;
             }
             //now create the Span
             Span span;
             switch (spanType) {
                 case Text:
-                    log.warn("Encounterd 'Text' span that is not the first span in the "
+                    LOG.warn("Encounterd 'Text' span that is not the first span in the "
                         + "'spans' array (ignored, json: "+node+")");
                     return;
                 case TextSection:
@@ -210,7 +215,7 @@ public class AnalyzedTextParser {
                     span = at.addToken(spanPos[0], spanPos[1]);
                     break;
                 default:
-                    log.warn("Unsupported SpanTypeEnum  '"+spanType+"'!. Please "
+                    LOG.warn("Unsupported SpanTypeEnum  '"+spanType+"'!. Please "
                             + "update this implementation (ignored, json: "+node+")"); 
                     return;
             }
@@ -218,7 +223,7 @@ public class AnalyzedTextParser {
                 parseAnnotations(span,jAnnotations);
             }
         } else {
-            log.warn("Unable to parse Span form JsonNode "+node+" (expected JSON object)!");
+            LOG.warn("Unable to parse Span form JsonNode "+node+" (expected JSON object)!");
         }
     }
 
@@ -239,23 +244,21 @@ public class AnalyzedTextParser {
                 } else if(field.getValue().isInt()){
                     spanType = SpanTypeEnum.values()[field.getValue().asInt()];
                 } else {
-                    log.warn("Unable to parse SpanType form JSON field "+field +" (ignored, json: "+jSpan+")");
+                    LOG.warn("Unable to parse SpanType form JSON field "+field +" (ignored, json: "+jSpan+")");
                     return null;
                 }
             } else if("start".equals(field.getKey())){
                 if(field.getValue().isInt()){
                     spanPos[0] = field.getValue().asInt();
                 } else {
-                    log.warn("Unable to parse span start position form JSON field "
-                            +field +" (ignored, json: "+jSpan+")");
+                    LOG.warn("Unable to parse span start position form JSON field {} (ignored, json: {})", field, jSpan);
                     return null;
                 }
             } else if("end".equals(field.getKey())){
                 if(field.getValue().isInt()){
                     spanPos[1] = field.getValue().asInt();
                 } else {
-                    log.warn("Unable to parse span end position form JSON field "
-                            +field +" (ignored, json: "+jSpan+")");
+                    LOG.warn("Unable to parse span end position form JSON field {} (ignored, json: {})", field, jSpan);
                     return null;
                 }
             } else {
@@ -263,7 +266,7 @@ public class AnalyzedTextParser {
             }
         }
         if(spanType == null){
-            log.warn("Missing required field 'type' defining the type of the Span!");
+            LOG.warn("Missing required field 'type' defining the type of the Span!");
         }
         return spanType;
     }
@@ -280,13 +283,13 @@ public class AnalyzedTextParser {
                     if(jValue.isObject()){
                         parseAnnotation(span, jAnnotation.getKey(), (ObjectNode)jValue);
                     } else {
-                        log.warn("unable to parse the {} value of the annotation {} "
+                        LOG.warn("unable to parse the {} value of the annotation {} "
                             + "because value is no JSON object (ignored, json: {}",
                             new Object[]{i,jAnnotation.getKey(),jAnnotation.getValue()});
                     }
                 }
             } else {
-                log.warn("unable to parse Annotation {} because value is no JSON object (ignored, json: {}",
+                LOG.warn("unable to parse Annotation {} because value is no JSON object (ignored, json: {}",
                     jAnnotation.getKey(),jAnnotation.getValue());
             }
         }
@@ -296,7 +299,7 @@ public class AnalyzedTextParser {
     private void parseAnnotation(Span span, String key, ObjectNode jValue) throws IOException {
         JsonNode jClass = jValue.path("class");
         if(!jClass.isTextual()){
-            log.warn("unable to parse Annotation {} because 'class' field "
+            LOG.warn("unable to parse Annotation {} because 'class' field "
                 + "is not set or not a stringis no JSON object (ignored, json: {}",
                 key,jValue);
             return;
@@ -308,7 +311,7 @@ public class AnalyzedTextParser {
         } else {
             JsonNode valueNode = jValue.path("value");
             if(valueNode.isMissingNode()){
-                log.warn("unable to parse value for annotation {} because the "
+                LOG.warn("unable to parse value for annotation {} because the "
                     + "field 'value' is not present (ignored, json: {}",
                     key,jValue);
                 return;
@@ -317,7 +320,7 @@ public class AnalyzedTextParser {
                 try {
                     clazz = AnalyzedTextParser.class.getClassLoader().loadClass(jClass.asText());
                 } catch (ClassNotFoundException e) {
-                    log.warn("Unable to parse Annotation "+key 
+                    LOG.warn("Unable to parse Annotation "+key
                         + " because the 'class' "+jClass.asText()+" of the "
                         + "the value can not be resolved (ignored, json: "+jValue+")",e);
                     return;
@@ -325,13 +328,13 @@ public class AnalyzedTextParser {
                 try {
                     value = mapper.treeToValue(valueNode, clazz);
                 } catch (JsonParseException e) {
-                    log.warn("unable to parse value for annotation "
+                    LOG.warn("unable to parse value for annotation "
                             + key+ " because the value can"
                             + "not be converted to the class "+ clazz.getName()
                             + "(ignored, json: "+jValue+")",e);
                     return;
                 } catch (JsonMappingException e) {
-                    log.warn("unable to parse value for annotation "
+                    LOG.warn("unable to parse value for annotation "
                             + key+ " because the value can"
                             + "not be converted to the class "+ clazz.getName()
                             + "(ignored, json: "+jValue+")",e);
@@ -357,11 +360,11 @@ public class AnalyzedTextParser {
     private SpanTypeEnum parseSpanType(ObjectNode jSpan) {
         EnumSet<SpanTypeEnum> spanTypes = JsonUtils.parseEnum(jSpan, "type", SpanTypeEnum.class);
         if(spanTypes.isEmpty()){
-            log.warn("Unable to parse Span with missing 'type' (json: "+jSpan+")!");
+            LOG.warn("Unable to parse Span with missing 'type' (json: "+jSpan+")!");
             return null;
         }
         if(spanTypes.size() > 1){
-            log.warn("Found Span with multiple 'types' (Json:"+jSpan+")!");
+            LOG.warn("Found Span with multiple 'types' (Json:"+jSpan+")!");
         }
         return spanTypes.iterator().next();
     }

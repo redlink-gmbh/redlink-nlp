@@ -20,6 +20,7 @@ package io.redlink.nlp.model.pos;
  * Lexical categories used by the Stanbol Enhancer NLP module. Defined based on the top level
  * MorphosyntacticCategory as defined by the <a href="http://olia.nlp2rdf.org/">Olia</a> Ontology.
  */
+@SuppressWarnings("java:S115")
 public enum LexicalCategory {
     /**
      * A noun, or noun substantive, is a part of speech (a word or phrase) which can co-occur with

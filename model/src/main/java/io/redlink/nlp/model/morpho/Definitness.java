@@ -16,6 +16,7 @@
 */
 package io.redlink.nlp.model.morpho;
 
+@SuppressWarnings("java:S115")
 public enum Definitness {
     /**
      * Value referring to the capacity of identification of an entity. (http://www.isocat.org/datcat/DC-2004)

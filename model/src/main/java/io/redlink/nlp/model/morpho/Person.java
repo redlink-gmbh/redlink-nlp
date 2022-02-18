@@ -22,6 +22,7 @@ package io.redlink.nlp.model.morpho;
  * <a href="http://purl.org/olia/olia.owl">OLIA</a> Ontology
  * 
  */
+@SuppressWarnings("java:S115")
 public enum Person {
 
     /**

@@ -22,6 +22,7 @@ package io.redlink.nlp.model.morpho;
  * href="http://purl.org/olia/olia.owl">OLIA</a> Ontology
  * 
  */
+@SuppressWarnings("java:S115")
 public enum Gender {
     /**
      * One of the two grammatical genders, or classes of nouns, the other being inanimate. Membership in the

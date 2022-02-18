@@ -51,12 +51,12 @@ import io.redlink.nlp.model.json.valuetype.ValueTypeSerializerRegistry;
 @Component
 public class AnalyzedTextSerializer {
     
-    private final Logger log = LoggerFactory.getLogger(AnalyzedTextSerializer.class);
+    private static final Logger LOG = LoggerFactory.getLogger(AnalyzedTextSerializer.class);
 
-    private final static Charset UTF8 = Charset.forName("UTF-8");
+    private static final Charset UTF8 = Charset.forName("UTF-8");
     
     private static AnalyzedTextSerializer defaultInstance;
-    protected ObjectMapper mapper = new ObjectMapper();  
+    protected ObjectMapper mapper;
     
     protected final ValueTypeSerializerRegistry valueTypeSerializerRegistry;
 
@@ -93,6 +93,7 @@ public class AnalyzedTextSerializer {
             vtsr = ValueTypeSerializerRegistry.getInstance();
         }
         this.valueTypeSerializerRegistry = vtsr;
+        mapper = new ObjectMapper();
     }
     
     /**
@@ -143,7 +144,7 @@ public class AnalyzedTextSerializer {
     }
 
     private ObjectNode writeSpan(Span span) throws IOException {
-        log.trace("wirte {}",span);
+        LOG.trace("wirte {}",span);
         ObjectNode jSpan = mapper.createObjectNode();
         jSpan.put("type", span.getType().name());
         jSpan.put("start", span.getStart());
@@ -163,7 +164,7 @@ public class AnalyzedTextSerializer {
                 jSpan.set(key, jValues);
             }
         }
-        log.trace(" ... {}",jSpan);
+        LOG.trace(" ... {}",jSpan);
         return jSpan;
     }
 

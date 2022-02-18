@@ -38,7 +38,6 @@ import com.sun.management.VMOption.Origin;
 
 import io.redlink.nlp.api.ProcessingData;
 import io.redlink.nlp.api.Processor;
-import io.redlink.nlp.api.model.Value;
 import io.redlink.nlp.model.AnalyzedText;
 import io.redlink.nlp.model.NlpAnnotations;
 import io.redlink.nlp.model.Chunk;
@@ -63,7 +62,7 @@ import io.redlink.nlp.model.util.NlpUtils;
 @Component
 public class NegationProcessor extends Processor {
 
-    private final Logger log = LoggerFactory.getLogger(getClass());
+    private static final Logger LOG = LoggerFactory.getLogger(NegationProcessor.class);
 
     /**
      * All tokens indicating a new section within an sentence
@@ -88,7 +87,7 @@ public class NegationProcessor extends Processor {
     private static final int CONJUCTION_CONTEXT = 1;
 
 
-    private final Map<String,Collection<NegationRule>> negationRules = new HashMap<>();
+    private final Map<String,Collection<NegationRule>> negationRules;
     
     @Autowired
     public NegationProcessor(Collection<NegationRule> rules){
@@ -96,6 +95,7 @@ public class NegationProcessor extends Processor {
         for(NegationRule nr : rules){
             addNegationRule(nr);
         }
+        negationRules = new HashMap<>();
     }
     
     @Override
@@ -119,7 +119,7 @@ public class NegationProcessor extends Processor {
     private Collection<NegationRule> getNegationRules(String lang) {
         Collection<NegationRule> negationRules = this.negationRules.get(lang);
         if(negationRules == null){
-            log.trace("no specific negation rules for language {} (using default ruleset)", lang);
+            LOG.trace("no specific negation rules for language {} (using default ruleset)", lang);
             negationRules = Collections.singleton(DefaultNegationRule.INSTANCE);
         }
         return negationRules;
@@ -146,13 +146,13 @@ public class NegationProcessor extends Processor {
                 markNegations(negationRules, sentences.next());
             }
         } else {
-            log.trace("Unable to process {} because no AnalyzedText is present");
+            LOG.trace("Unable to process {} because no AnalyzedText is present");
         }
     }
 
     private void markNegations(Collection<NegationRule> negationRules, Sentence sentence) {
-        if(log.isTraceEnabled()){
-            log.trace("Sentence  [{},{}]: {}", sentence.getStart(), sentence.getEnd(), sentence.getSpan());
+        if(LOG.isTraceEnabled()){
+            LOG.trace("Sentence  [{},{}]: {}", sentence.getStart(), sentence.getEnd(), sentence.getSpan());
         }
         Iterator<Token> tokens = sentence.getTokens();
         NavigableMap<Integer,Token> negations = new TreeMap<Integer,Token>();
@@ -166,7 +166,7 @@ public class NegationProcessor extends Processor {
             final Token token = tokens.next();
             Integer idx = tokenList.size();
             tokenList.add(token);
-            log.trace(" {}. {}: {}", idx, token, token.getValues(NlpAnnotations.POS_ANNOTATION));
+            LOG.trace(" {}. {}: {}", idx, token, token.getValues(NlpAnnotations.POS_ANNOTATION));
             if(isNegation(negationRules,token)){
                 negations.put(idx, token);
             }
@@ -221,8 +221,8 @@ public class NegationProcessor extends Processor {
             }
             int startChar = tokenList.get(start).getStart();
             int endChar = tokenList.get(end).getEnd();
-            if(log.isDebugEnabled()){
-                log.debug("  - negation: [{},{} | neg: {}] '{}'", startChar, endChar, negation.getValue(), 
+            if(LOG.isDebugEnabled()){
+                LOG.debug("  - negation: [{},{} | neg: {}] '{}'", startChar, endChar, negation.getValue(),
                         sentence.getSpan().substring(startChar - sentence.getStart(), endChar - sentence.getStart()));
             }
             Chunk negatedChunk = sentence.addChunk(startChar - sentence.getStart(), endChar - sentence.getStart());

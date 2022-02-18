@@ -36,6 +36,7 @@ import io.redlink.nlp.model.pos.LexicalCategory;
  * <a href="http://purl.org/olia/olia.owl#Phrase">olia:Phrase</a> however it also
  * includes an entry for <a href="http://purl.org/olia/olia.owl#Sentence">olia:Sentence</a>
  */
+@SuppressWarnings("java:S115")
 public enum PhraseCategory {
     
     Phrase,

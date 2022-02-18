@@ -38,9 +38,7 @@ import java.util.regex.Pattern;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.time.DateUtils;
-import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.ImmutableTriple;
-import org.apache.commons.lang3.tuple.Pair;
 import org.apache.commons.lang3.tuple.Triple;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -58,7 +56,7 @@ import io.redlink.nlp.model.temporal.Temporal.Grain;
  */
 public class DucklingTimeParser {
 
-    private final Logger log = LoggerFactory.getLogger(this.getClass());
+    private static final Logger LOG = LoggerFactory.getLogger(DucklingTimeParser.class);
 
     // This is format how duckling sends the result
     protected static final ThreadLocal<DateFormat> DATE_FORMAT = new ThreadLocal<DateFormat>(){
@@ -114,7 +112,7 @@ public class DucklingTimeParser {
      */
     public synchronized void init(ClassLoader classLoader) {
         if (initialized) return;
-        log.debug("Initializing duckling time");
+        LOG.debug("Initializing duckling time");
         final long initStart = System.currentTimeMillis();
         final Runnable clojureLoader = () -> {
             final IFn require = Clojure.var("clojure.core", "require");
@@ -149,16 +147,17 @@ public class DucklingTimeParser {
         final Thread clojureLoaderThread = new Thread(clojureLoader);
 
         if (classLoader != null) {
-            log.debug("Using ClassLoader {} for context", classLoader);
+            LOG.debug("Using ClassLoader {} for context", classLoader);
             clojureLoaderThread.setContextClassLoader(classLoader);
         }
         clojureLoaderThread.start();
         try {
             clojureLoaderThread.join();
-            log.debug("DucklingTime loaded in {}ms", System.currentTimeMillis() - initStart);
+            LOG.debug("DucklingTime loaded in {}ms", System.currentTimeMillis() - initStart);
             initialized = true;
         } catch (InterruptedException e) {
-            log.warn("Interrupted while waiting for DucklingTime to initialize", e);
+            LOG.warn("Interrupted while waiting for DucklingTime to initialize", e);
+            Thread.currentThread().interrupt();
         }
     }
 
@@ -260,7 +259,7 @@ public class DucklingTimeParser {
      */
     public List<DateToken> parse(String message, final String language, Date referenceDate, Boolean includeLatent) {
         init();
-        log.debug("Analyzing ({}) {}", language, message);
+        LOG.debug("Analyzing ({}) {}", language, message);
         // Reference-Time
         Date context = referenceDate;
         Grain contextGrain = Grain.second;
@@ -289,7 +288,7 @@ public class DucklingTimeParser {
                         combined.setInstant(false);
                         combined.setStart(last.getStart());
                         combined.setEnd(token.getEnd());
-                        log.debug("combined {} wiht {} to interval {}", last,token,combined);
+                        LOG.debug("combined {} wiht {} to interval {}", last,token,combined);
                         token = combined;
                     }
                 }
@@ -352,25 +351,25 @@ public class DucklingTimeParser {
             } catch (IllegalArgumentException e){
                 Grain smallerGrain = grain.ordinal() > 0 ? Grain.values()[grain.ordinal()-1] : null;
                 if(smallerGrain != null){
-                    log.debug("Can not turncate Dates with Grain {} will use {} instead", grain, smallerGrain);
+                    LOG.debug("Can not turncate Dates with Grain {} will use {} instead", grain, smallerGrain);
                 }
                 grain = smallerGrain;
             }
         }
         if(truncatedDate1 == null){
-            log.warn("Unable to turncate Date {} using Grain {} (will use original Date for comparision)", date1, parsedGrain);
+            LOG.warn("Unable to turncate Date {} using Grain {} (will use original Date for comparision)", date1, parsedGrain);
             truncatedDate1 = date1;
         }
         if(truncatedDate2 == null){
-            log.warn("Unable to turncate Date {} using Grain {} (will use original Date for comparision)", date2, parsedGrain);
+            LOG.warn("Unable to turncate Date {} using Grain {} (will use original Date for comparision)", date2, parsedGrain);
             truncatedDate2 = date2;
         }
         return truncatedDate1.compareTo(truncatedDate2);
     }
     
     private List<DateToken> extractTokens(int offset, String content, String language, Date context, Boolean includeLatentState){
-        if(log.isDebugEnabled()){
-            log.debug("extract tokens [offset: {} | context: {} | content: {}]",
+        if(LOG.isDebugEnabled()){
+            LOG.debug("extract tokens [offset: {} | context: {} | content: {}]",
                     offset, DATE_FORMAT.get().format(context), content.substring(offset));
         }
         boolean includeLatent = includeLatentState == null ? this.includeLatent : includeLatentState.booleanValue();
@@ -400,13 +399,13 @@ public class DucklingTimeParser {
         while (map.hasNext()) {
             try {
                 final PersistentArrayMap next = map.next();
-                log.trace("Duckling-Match: {}", next);
+                LOG.trace("Duckling-Match: {}", next);
                 String dimension = String.valueOf(next.valAt(keyDim));
                 final int startOffset = ((Long) next.valAt(keyStart)).intValue() + offset;
                 final int endOffset = ((Long) next.valAt(keyEnd)).intValue() + offset;
                 //check if we do have already a match for this span and dimension
                 if(matches.add(new ImmutableTriple<String,Integer,Integer>(dimension, startOffset, endOffset)) == false){
-                    log.debug("ignore {} because existing match for {}@[{},{}] {}", next, dimension,startOffset,endOffset);
+                    LOG.debug("ignore {} because existing match for {}@[{},{}] {}", next, dimension,startOffset,endOffset);
                     continue;
                 }
                 final boolean isLatent = BooleanUtils.isTrue((Boolean) next.valAt(keyLatent));
@@ -447,10 +446,10 @@ public class DucklingTimeParser {
                     //noinspection unused
                     final IPersistentMap value = (IPersistentMap) next.valAt(keyValue);
 
-                    log.debug("Duration not supported");
+                    LOG.debug("Duration not supported");
                 }
             } catch (ParseException e) {
-                log.error("Duckling returned invalid date-string: {}", e.getMessage(), e);
+                LOG.error("Duckling returned invalid date-string: {}", e.getMessage(), e);
             }
         }
         Collections.sort(tokens, DATE_TOKEN_COMP);
@@ -474,11 +473,11 @@ public class DucklingTimeParser {
 
         final Temporal dateValue = new Temporal();
         String dateStr = String.valueOf(value.valAt(keyValue));
-        log.debug("Parsing duckling time-string {} into a DateValue", dateStr);
+        LOG.debug("Parsing duckling time-string {} into a DateValue", dateStr);
 
         //cut the time zone
         dateStr = TIMEZONE_PATTERN.matcher(dateStr).replaceFirst("");
-        log.trace("Stripped time-zone: {}", dateStr);
+        LOG.trace("Stripped time-zone: {}", dateStr);
 
         //now parse the date (without TimeZone) and set the TimeZone to the one
         //used by the client
@@ -496,10 +495,10 @@ public class DucklingTimeParser {
             try {
                 dateValue.setGrain(Grain.valueOf(sGrain));
             } catch(RuntimeException e){
-                log.warn("Unknown Grain value {} (supported: {})",sGrain, Arrays.toString(Grain.values()));
+                LOG.warn("Unknown Grain value {} (supported: {})",sGrain, Arrays.toString(Grain.values()));
             }
         }
-        log.debug("Parsed {} into {}", dateStr, dateValue);
+        LOG.debug("Parsed {} into {}", dateStr, dateValue);
         return dateValue;
     }
 

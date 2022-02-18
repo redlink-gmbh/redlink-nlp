@@ -50,14 +50,14 @@ import opennlp.tools.util.Span;
 @Component
 public class OpenNlpPosProcessor extends Processor {
 
-    private final Logger log = LoggerFactory.getLogger(getClass());
-    
+    private static final Logger LOG = LoggerFactory.getLogger(OpenNlpPosProcessor.class);
+
     /**
      * Map holding language to language model mappings. Built up dynamically based
      * on languages parsed to {@link #lookupModel(String)}
      */
-    private final Map<String, OpenNlpLanguageModel> _languageModels = new HashMap<>();
-    private final ReadWriteLock languageModelLock = new ReentrantReadWriteLock();
+    private final Map<String, OpenNlpLanguageModel> _languageModels;
+    private final ReadWriteLock languageModelLock;
     private final Collection<OpenNlpLanguageModel> models;
     
     
@@ -68,6 +68,8 @@ public class OpenNlpPosProcessor extends Processor {
         //we need to sort based on their priority
         Arrays.sort(modelArray);
         this.models = Arrays.asList(modelArray);
+        _languageModels = new HashMap<>();
+        languageModelLock = new ReentrantReadWriteLock();
     }
     
     @Override
@@ -85,13 +87,13 @@ public class OpenNlpPosProcessor extends Processor {
                 model.activate();
                 initLangs.add(String.valueOf(model.getLocale()));
             } catch(IOException e){
-                log.warn("Unable to activate OpenNLP model for language {} ({}: {})", 
+                LOG.warn("Unable to activate OpenNLP model for language {} ({}: {})",
                         model.getLocale(), e.getClass().getSimpleName(), e.getMessage());
-                log.debug("STACKTRACE", e);
+                LOG.debug("STACKTRACE", e);
                 it.remove();
             }
         }
-        log.info("initialized {}/{} models (lang: {})", models.size(), modelCount, initLangs);
+        LOG.info("initialized {}/{} models (lang: {})", models.size(), modelCount, initLangs);
     }
     
     @Override
@@ -101,7 +103,7 @@ public class OpenNlpPosProcessor extends Processor {
         OpenNlpLanguageModel model = lookupModel(language);
         
         if(model == null || !model.supports(language)){
-            log.debug("No Model for Language '{}' available. Unable to POS tag {}", language, processingData);
+            LOG.debug("No Model for Language '{}' available. Unable to POS tag {}", language, processingData);
             return;
         }
         
@@ -113,7 +115,7 @@ public class OpenNlpPosProcessor extends Processor {
         while(contentSections.hasNext()){
             SpanCollection section = contentSections.next();
             if(prevSection != null && section.getStart() < prevSection.getStart()){ //overlapping sections
-                log.warn("will ignore overlapping Section in Document {} (prev: {} | overlapping: {})", prevSection, section);
+                LOG.warn("will ignore overlapping Section in Document {} (prev: {} | overlapping: {})", prevSection, section);
                 continue;
             }
             process(model, section);
@@ -142,7 +144,7 @@ public class OpenNlpPosProcessor extends Processor {
             String normLanguage = language == null ? null : Locale.forLanguageTag(language).getLanguage();
             for(OpenNlpLanguageModel m : models){
                 if(m.supports(normLanguage)){
-                    log.debug(" - will use Model {} for language {}", m.getName(), language);
+                    LOG.debug(" - will use Model {} for language {}", m.getName(), language);
                     model = m;
                     break;
                 }
@@ -153,15 +155,15 @@ public class OpenNlpPosProcessor extends Processor {
                 if(normLangParts.length > 1){
                     for(OpenNlpLanguageModel m : models){
                         if(m.supports(normLangParts[0])){
-                            log.debug(" - will use Model {} for language {}", m.getName(), language);
+                            LOG.debug(" - will use Model {} for language {}", m.getName(), language);
                             model = m;
                             break;
                         }
                     }
                 }
             }
-            if(log.isDebugEnabled() && model == null){
-                log.debug(" - no suiting Model registered for language {}", language);
+            if(LOG.isDebugEnabled() && model == null){
+                LOG.debug(" - no suiting Model registered for language {}", language);
             }
             _languageModels.put(language, model); // NOTE: this will also add NULL models for unsupported languages
             return model;

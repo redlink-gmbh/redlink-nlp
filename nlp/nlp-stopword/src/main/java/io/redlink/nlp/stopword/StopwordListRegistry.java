@@ -42,7 +42,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class StopwordListRegistry {
 
-    private final Logger log = LoggerFactory.getLogger(StopwordListRegistry.class);
+    private static final Logger LOG = LoggerFactory.getLogger(StopwordListRegistry.class);
 
     /**
      * The pattern used to load stopword lists for {@link Locale}s from the classpath
@@ -52,8 +52,13 @@ public class StopwordListRegistry {
     /**
      * Stopwords for different languages
      */
-    private Map<Key,Set<String>> stopwords = new HashMap<>();
-    private final ReadWriteLock stopwordsLock = new ReentrantReadWriteLock();
+    private final Map<Key,Set<String>> stopwords;
+    private final ReadWriteLock stopwordsLock;
+
+    public StopwordListRegistry() {
+        stopwords = new HashMap<>();
+        stopwordsLock = new ReentrantReadWriteLock();
+    }
 
     /**
      * Initializes the OpenNLP language model based on the parsed parameters
@@ -67,14 +72,14 @@ public class StopwordListRegistry {
      */
     protected final Set<String> init(final Locale locale) {
         //NOTE tokenModelResource may be null (to use the SimpleTokenizer
-        log.debug("> loading stopwords for {}", locale == null ? "default language" : locale.getDisplayLanguage());
+        LOG.debug("> loading stopwords for {}", locale == null ? "default language" : locale.getDisplayLanguage());
 
-        log.info("  ... loading Stopwords");
+        LOG.info("  ... loading Stopwords");
         String stopwordListResource = String.format(STOPWORD_LIST_NAME, 
                 locale == null ? "default" : locale.getLanguage());
         try (InputStream in = getClass().getClassLoader().getResourceAsStream(stopwordListResource)){
             if(in == null){
-                log.warn("Unable to load stopword list for language {} (resource: '{}') via classpath", locale, stopwordListResource);
+                LOG.warn("Unable to load stopword list for language {} (resource: '{}') via classpath", locale, stopwordListResource);
                 return null;
             } else {
                 LineIterator stopwordIt = IOUtils.lineIterator(in,"UTF-8");
@@ -91,9 +96,9 @@ public class StopwordListRegistry {
                 return stopwords.isEmpty() ? null : Collections.unmodifiableSet(stopwords);
             }
         } catch (IOException e) {
-            log.warn("Unable to load Stopwords for Locale {} (message: {})", locale, e.getMessage());
-            if(log.isDebugEnabled()){
-                log.debug("Exception ",e);
+            LOG.warn("Unable to load Stopwords for Locale {} (message: {})", locale, e.getMessage());
+            if(LOG.isDebugEnabled()){
+                LOG.debug("Exception ",e);
             }
             return null;
         }

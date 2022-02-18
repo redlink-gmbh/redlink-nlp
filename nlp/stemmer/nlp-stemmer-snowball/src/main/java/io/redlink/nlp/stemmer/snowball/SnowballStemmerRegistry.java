@@ -68,11 +68,14 @@ public class SnowballStemmerRegistry implements StemmerRegistry {
     }
     
     
-    private final Map<String, SnowballStemmerModel> stemmerModels = new HashMap<>();
-    private final ReadWriteLock stemmerModelsLock = new ReentrantReadWriteLock();
+    private final Map<String, SnowballStemmerModel> stemmerModels;
+    private final ReadWriteLock stemmerModelsLock;
     
     
-    public SnowballStemmerRegistry() { }
+    public SnowballStemmerRegistry() {
+        stemmerModels = new HashMap<>();
+        stemmerModelsLock = new ReentrantReadWriteLock();
+    }
     
     
     /* (non-Javadoc)

@@ -16,6 +16,7 @@
 
 package io.redlink.nlp.model.section;
 
+@SuppressWarnings("java:S115")
 public enum SectionType {
 
     /**

@@ -20,6 +20,7 @@ package io.redlink.nlp.model.morpho;
  * Enumeration representing the different verbal moods based on the <a href="http://purl.org/olia/olia.owl">OLIA</a> Ontology
  * 
  */
+@SuppressWarnings("java:S115")
 public enum VerbMood {
     
     /**

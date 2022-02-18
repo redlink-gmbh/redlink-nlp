@@ -68,11 +68,14 @@ public class LuceneStemmerRegistry implements StemmerRegistry {
     }
     
     
-    private final Map<String, LuceneStemmerModel> stemmerModels = new HashMap<>();
-    private final ReadWriteLock stemmerModelsLock = new ReentrantReadWriteLock();
+    private final Map<String, LuceneStemmerModel> stemmerModels;
+    private final ReadWriteLock stemmerModelsLock;
     
     
-    public LuceneStemmerRegistry() { }
+    public LuceneStemmerRegistry() {
+        stemmerModels = new HashMap<>();
+        stemmerModelsLock = new ReentrantReadWriteLock();
+    }
     
     
     /* (non-Javadoc)

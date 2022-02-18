@@ -62,7 +62,7 @@ public class AnalyzedText extends SpanCollection implements Iterable<Span> {
     @Transient //the text is saved in Document#getContent()
     private CharSequence text;
     @Transient //the spans collection is used instead
-    protected NavigableMap<Span, Span> spansMap = new TreeMap<Span, Span>();
+    protected NavigableMap<Span, Span> spansMap = new TreeMap<>();
 
     @AccessType(Type.PROPERTY)
     private Collection<Span> spans; //not used just to make spring data happy
@@ -104,6 +104,7 @@ public class AnalyzedText extends SpanCollection implements Iterable<Span> {
      * @see Span#getType()
      * @see SpanTypeEnum#Text
      */
+    @Override
     public SpanTypeEnum getType() {
         return SpanTypeEnum.Text;
     }
@@ -246,7 +247,7 @@ public class AnalyzedText extends SpanCollection implements Iterable<Span> {
      *
      * @author Rupert Westenthaler
      */
-    public static class AnalyzedTextBuilder extends Writer {
+    public static final class AnalyzedTextBuilder extends Writer {
 
         /**
          * temporarily used to collect sections
@@ -390,7 +391,8 @@ public class AnalyzedText extends SpanCollection implements Iterable<Span> {
          * @param off  Offset from which to start writing characters
          * @param len  Number of characters to write
          */
-        public void write(char cbuf[], int off, int len) {
+        @Override
+        public void write(char[] cbuf, int off, int len) {
             if ((off < 0) || (off > cbuf.length) || (len < 0) ||
                     ((off + len) > cbuf.length) || ((off + len) < 0)) {
                 throw new IndexOutOfBoundsException();
@@ -403,6 +405,7 @@ public class AnalyzedText extends SpanCollection implements Iterable<Span> {
         /**
          * Write a single character.
          */
+        @Override
         public void write(int c) {
             textBuilder.append((char) c);
         }
@@ -410,6 +413,7 @@ public class AnalyzedText extends SpanCollection implements Iterable<Span> {
         /**
          * Write a string.
          */
+        @Override
         public void write(String str) {
             textBuilder.append(str);
         }
@@ -421,6 +425,7 @@ public class AnalyzedText extends SpanCollection implements Iterable<Span> {
          * @param off Offset from which to start writing characters
          * @param len Number of characters to write
          */
+        @Override
         public void write(String str, int off, int len) {
             textBuilder.append(str.substring(off, off + len));
         }
@@ -431,6 +436,7 @@ public class AnalyzedText extends SpanCollection implements Iterable<Span> {
          * @param csq the char sequence to add
          * @return this
          */
+        @Override
         public AnalyzedTextBuilder append(CharSequence csq) {
             if (csq != null) {
                 write(csq.toString());
@@ -446,6 +452,7 @@ public class AnalyzedText extends SpanCollection implements Iterable<Span> {
          * @param end   the end offset
          * @return this
          */
+        @Override
         public AnalyzedTextBuilder append(CharSequence csq, int start, int end) {
             if (csq != null) {
                 write(csq.subSequence(start, end).toString());
@@ -459,6 +466,7 @@ public class AnalyzedText extends SpanCollection implements Iterable<Span> {
          * @param c the char
          * @return this
          */
+        @Override
         public AnalyzedTextBuilder append(char c) {
             write(c);
             return this;
@@ -467,6 +475,7 @@ public class AnalyzedText extends SpanCollection implements Iterable<Span> {
         /**
          * Flush the stream.
          */
+        @Override
         public void flush() { /* no op */ }
 
         /**
@@ -474,6 +483,7 @@ public class AnalyzedText extends SpanCollection implements Iterable<Span> {
          * class can be called after the stream has been closed without generating
          * an <tt>IOException</tt>.
          */
+        @Override
         public void close() throws IOException { /* no op */ }
 
         /**

@@ -40,17 +40,21 @@ import io.redlink.nlp.model.pos.PosTag;
 public class PosTagSupport implements ValueTypeParser<PosTag>, ValueTypeSerializer<PosTag> {
 
     public static final String TYPE_VALUE = "org.apache.stanbol.enhancer.nlp.pos.PosTag";
-    
-    Map<PosTagInfo,PosTag> posTagCache = Collections.synchronizedMap(
-        new LinkedHashMap<PosTagInfo,PosTag>(16,0.75f,true){
-            private static final long serialVersionUID = 1L;
-    
-            @Override
-            protected boolean removeEldestEntry(java.util.Map.Entry<PosTagInfo,PosTag> arg0) {
-                return size() > 1024;
-            }
-    });
-        
+
+    final Map<PosTagInfo, PosTag> posTagCache;
+
+    public PosTagSupport() {
+        posTagCache = Collections.synchronizedMap(
+            new LinkedHashMap<PosTagInfo,PosTag>(16,0.75f,true){
+                private static final long serialVersionUID = 1L;
+
+                @Override
+                protected boolean removeEldestEntry(Map.Entry<PosTagInfo,PosTag> arg0) {
+                    return size() > 1024;
+                }
+        });
+    }
+
     @Override
     public String getKey() {
         return TYPE_VALUE;
