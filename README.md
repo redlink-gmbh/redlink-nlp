@@ -1,5 +1,13 @@
 # Redlink NLP
 
+[![Build, Test & Publish](https://github.com/redlink-gmbh/redlink-nlp/actions/workflows/maven-build-and-deploy.yaml/badge.svg)](https://github.com/redlink-gmbh/redlink-nlp/actions/workflows/maven-build-and-deploy.yaml)
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=redlink-gmbh_redlink-nlp&metric=alert_status)](https://sonarcloud.io/dashboard?id=redlink-gmbh_redlink-nlp)
+
+[![Maven Central](https://img.shields.io/maven-central/v/io.redlink.nlp/redlink-nlp.png)](https://search.maven.org/#search%7Cga%7C1%7Cg%3A%22io.redlink.nlp%22)
+[![Sonatype Nexus (Snapshots)](https://img.shields.io/nexus/s/https/oss.sonatype.org/io.redlink.nlp/redlink-nlp.png)](https://oss.sonatype.org/#nexus-search;gav~io.redlink.nlp~~~~)
+[![Javadocs](https://www.javadoc.io/badge/io.redlink.nlp/redlink-nlp.svg)](https://www.javadoc.io/doc/io.redlink.nlp/redlink-nlp)
+[![Apache 2.0 License](https://img.shields.io/github/license/redlink-gmbh/redlink-nlp.svg)](https://www.apache.org/licenses/LICENSE-2.0)
+
 Redlink NLP was started based on code from [Apache Stanbol](https://stanbol.apache.org/) but with
 the following changes:
 
