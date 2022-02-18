@@ -1,0 +1,49 @@
+name: Build & Test
+
+on:
+  push:
+    branches-ignore:
+      - "main"
+      - "maintenance/v*"
+  pull_request:
+    types: [ opened, synchronize, reopened ]
+
+permissions:
+  checks: write
+  pull-requests: write
+
+jobs:
+  build:
+    name: Build and Test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      - name: Set up Java/Maven
+        uses: actions/setup-java@v2
+        with:
+          java-version: '11'
+          distribution: 'temurin'
+          cache: maven
+      - name: Compile & Test
+        run: mvn -V -B --no-transfer-progress
+          clean
+          org.jacoco:jacoco-maven-plugin:prepare-agent
+          package verify
+          org.jacoco:jacoco-maven-plugin:report
+          org.sonarsource.scanner.maven:sonar-maven-plugin:sonar
+          -Dlow-mem-tests=true
+          -Dsonar.organization=redlink
+          -Dsonar.host.url=https://sonarcloud.io
+          -Dsonar.projectKey=redlink-gmbh_redlink-nlp
+          -Dsonar.skip=${{ github.actor == 'dependabot[bot]' }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+      - name: Publish Test Results
+        uses: EnricoMi/publish-unit-test-result-action@v1
+        if: always()
+        with:
+          files: '**/TEST-*.xml'

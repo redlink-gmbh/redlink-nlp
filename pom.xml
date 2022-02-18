@@ -93,6 +93,7 @@
         <!-- per default run all test groups-->
         <!-- see low-mem-tests profile -->
         <junit.testgroup>all</junit.testgroup>
+        <low-mem-test.jvmArgs/>
 
         <spring.boot.version>2.5.4</spring.boot.version>
 
@@ -395,7 +396,7 @@
                             <testgroup>${junit.testgroup}</testgroup>
                         </systemPropertyVariables>
                         <argLine>
-                            @{argLine} --illegal-access=permit
+                            @{argLine} ${low-mem-test.jvmArgs} --illegal-access=permit
                         </argLine>
                     </configuration>
                 </plugin>
@@ -405,7 +406,7 @@
                     <version>3.0.0-M5</version>
                     <configuration>
                         <argLine>
-                            @{argLine} --illegal-access=permit
+                            @{argLine} ${low-mem-test.jvmArgs} --illegal-access=permit
                         </argLine>
                     </configuration>
                 </plugin>
@@ -484,6 +485,7 @@
             </activation>
             <properties>
                 <junit.testgroup/>
+                <low-mem-test.jvmArgs>-Xmx2g</low-mem-test.jvmArgs>
             </properties>
         </profile>
         <profile>

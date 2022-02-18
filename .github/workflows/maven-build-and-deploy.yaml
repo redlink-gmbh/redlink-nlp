@@ -1,0 +1,98 @@
+name: Build, Test & Publish
+
+on:
+  push:
+    branches:
+      - "main"
+      - "maintenance/*"
+    tags:
+      - "v*"
+
+jobs:
+  version:
+    name: Determine Version
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+    steps:
+      - uses: actions/checkout@v2
+        name: Checkout
+        with:
+          fetch-depth: 2
+      - name: Set up Java/Maven
+        uses: actions/setup-java@v2
+        with:
+          java-version: '11'
+          distribution: 'temurin'
+          cache: maven
+      - name: Detect Version
+        id: version
+        run: VERSION=$(mvn -B -q -N exec:exec -Dexec.executable=echo -Dexec.args='${project.version}')
+          echo "::set-output name=version::${VERSION}"
+
+  build:
+    name: Build and Test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      - name: Set up Java/Maven
+        uses: actions/setup-java@v2
+        with:
+          java-version: '11'
+          distribution: 'temurin'
+          cache: maven
+      - name: Compile & Test
+        run: mvn -V -B --no-transfer-progress
+          clean
+          org.jacoco:jacoco-maven-plugin:prepare-agent
+          package verify
+          org.jacoco:jacoco-maven-plugin:report
+          org.sonarsource.scanner.maven:sonar-maven-plugin:sonar
+          -Dlow-mem-tests=true
+          -Dsonar.organization=redlink
+          -Dsonar.host.url=https://sonarcloud.io
+          -Dsonar.projectKey=redlink-gmbh_redlink-nlp
+          -Dsonar.skip=${{ github.actor == 'dependabot[bot]' }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+      - name: Publish Test Results
+        uses: EnricoMi/publish-unit-test-result-action@v1
+        if: always()
+        with:
+          files: '**/TEST-*.xml'
+
+  deploy:
+    name: Publish
+    needs:
+      - version
+      - build
+    runs-on: ubuntu-latest
+    if: github.repository == 'redlink-gmbh/redlink-nlp'
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Set up Java/Maven
+        uses: actions/setup-java@v2
+        with:
+          java-version: '11'
+          distribution: 'temurin'
+          cache: 'maven'
+          server-id: ossrh
+          server-username: MAVEN_USERNAME
+          server-password: MAVEN_PASSWORD
+          gpg-private-key: ${{ secrets.MAVEN_GPG_PRIVATE_KEY }}
+          gpg-passphrase: MAVEN_GPG_PASSPHRASE
+
+      - name: Publish Packages
+        run: mvn -B --no-transfer-progress
+          package javadoc:aggregate-jar deploy
+          -Prelease
+          -Dquick
+        env:
+          MAVEN_USERNAME: ${{ secrets.OSSRH_USERNAME }}
+          MAVEN_PASSWORD: ${{ secrets.OSSRH_TOKEN }}
+          MAVEN_GPG_PASSPHRASE: ${{ secrets.MAVEN_GPG_PASSPHRASE }}
