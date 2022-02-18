@@ -1,0 +1,25 @@
+{
+  "spans" : [ {
+    "type" : "Text",
+    "start" : 0,
+    "end" : 970
+  }, {
+    "type" : "TextSection",
+    "start" : 0,
+    "end" : 816,
+    "stanbol.enhancer.nlp.section.stats" : {
+      "value" : {
+        "numChars" : 816,
+        "numAlpha" : 665,
+        "numDigit" : 9,
+        "numWhitespace" : 122
+      },
+      "class" : "io.redlink.nlp.model.section.SectionStats"
+    },
+    "stanbol.enhancer.nlp.section" : {
+      "tag" : "p",
+      "section" : 2,
+      "class" : "io.redlink.nlp.model.section.SectionTag"
+    }
+  } ]
+}

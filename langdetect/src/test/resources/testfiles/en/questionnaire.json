@@ -1,0 +1,241 @@
+{
+  "spans" : [ {
+    "type" : "Text",
+    "start" : 0,
+    "end" : 1308
+  }, {
+    "type" : "TextSection",
+    "start" : 1,
+    "end" : 49,
+    "stanbol.enhancer.nlp.section.stats" : {
+      "value" : {
+        "numChars" : 48,
+        "numAlpha" : 41,
+        "numDigit" : 0,
+        "numWhitespace" : 6
+      },
+      "class" : "io.redlink.nlp.model.section.SectionStats"
+    },
+    "stanbol.enhancer.nlp.section" : {
+      "tag" : "p",
+      "section" : 2,
+      "class" : "io.redlink.nlp.model.section.SectionTag"
+    }
+  }, {
+    "type" : "TextSection",
+    "start" : 53,
+    "end" : 80,
+    "stanbol.enhancer.nlp.section.stats" : {
+      "value" : {
+        "numChars" : 27,
+        "numAlpha" : 19,
+        "numDigit" : 4,
+        "numWhitespace" : 4
+      },
+      "class" : "io.redlink.nlp.model.section.SectionStats"
+    },
+    "stanbol.enhancer.nlp.section" : {
+      "tag" : "p",
+      "section" : 2,
+      "class" : "io.redlink.nlp.model.section.SectionTag"
+    }
+  }, {
+    "type" : "TextSection",
+    "start" : 84,
+    "end" : 216,
+    "stanbol.enhancer.nlp.section.stats" : {
+      "value" : {
+        "numChars" : 132,
+        "numAlpha" : 104,
+        "numDigit" : 0,
+        "numWhitespace" : 22
+      },
+      "class" : "io.redlink.nlp.model.section.SectionStats"
+    },
+    "stanbol.enhancer.nlp.section" : {
+      "tag" : "p",
+      "section" : 2,
+      "class" : "io.redlink.nlp.model.section.SectionTag"
+    }
+  }, {
+    "type" : "TextSection",
+    "start" : 220,
+    "end" : 491,
+    "stanbol.enhancer.nlp.section.stats" : {
+      "value" : {
+        "numChars" : 271,
+        "numAlpha" : 218,
+        "numDigit" : 0,
+        "numWhitespace" : 45
+      },
+      "class" : "io.redlink.nlp.model.section.SectionStats"
+    },
+    "stanbol.enhancer.nlp.section" : {
+      "tag" : "p",
+      "section" : 2,
+      "class" : "io.redlink.nlp.model.section.SectionTag"
+    }
+  }, {
+    "type" : "TextSection",
+    "start" : 495,
+    "end" : 592,
+    "stanbol.enhancer.nlp.section.stats" : {
+      "value" : {
+        "numChars" : 97,
+        "numAlpha" : 73,
+        "numDigit" : 0,
+        "numWhitespace" : 20
+      },
+      "class" : "io.redlink.nlp.model.section.SectionStats"
+    },
+    "stanbol.enhancer.nlp.section" : {
+      "tag" : "p",
+      "section" : 2,
+      "class" : "io.redlink.nlp.model.section.SectionTag"
+    }
+  }, {
+    "type" : "TextSection",
+    "start" : 596,
+    "end" : 747,
+    "stanbol.enhancer.nlp.section.stats" : {
+      "value" : {
+        "numChars" : 151,
+        "numAlpha" : 115,
+        "numDigit" : 7,
+        "numWhitespace" : 26
+      },
+      "class" : "io.redlink.nlp.model.section.SectionStats"
+    },
+    "stanbol.enhancer.nlp.section" : {
+      "tag" : "p",
+      "section" : 2,
+      "class" : "io.redlink.nlp.model.section.SectionTag"
+    }
+  }, {
+    "type" : "TextSection",
+    "start" : 751,
+    "end" : 829,
+    "stanbol.enhancer.nlp.section.stats" : {
+      "value" : {
+        "numChars" : 78,
+        "numAlpha" : 57,
+        "numDigit" : 3,
+        "numWhitespace" : 14
+      },
+      "class" : "io.redlink.nlp.model.section.SectionStats"
+    },
+    "stanbol.enhancer.nlp.section" : {
+      "tag" : "p",
+      "section" : 2,
+      "class" : "io.redlink.nlp.model.section.SectionTag"
+    }
+  }, {
+    "type" : "TextSection",
+    "start" : 833,
+    "end" : 912,
+    "stanbol.enhancer.nlp.section.stats" : {
+      "value" : {
+        "numChars" : 79,
+        "numAlpha" : 60,
+        "numDigit" : 0,
+        "numWhitespace" : 15
+      },
+      "class" : "io.redlink.nlp.model.section.SectionStats"
+    },
+    "stanbol.enhancer.nlp.section" : {
+      "tag" : "p",
+      "section" : 2,
+      "class" : "io.redlink.nlp.model.section.SectionTag"
+    }
+  }, {
+    "type" : "TextSection",
+    "start" : 916,
+    "end" : 1010,
+    "stanbol.enhancer.nlp.section.stats" : {
+      "value" : {
+        "numChars" : 94,
+        "numAlpha" : 77,
+        "numDigit" : 0,
+        "numWhitespace" : 15
+      },
+      "class" : "io.redlink.nlp.model.section.SectionStats"
+    },
+    "stanbol.enhancer.nlp.section" : {
+      "tag" : "p",
+      "section" : 2,
+      "class" : "io.redlink.nlp.model.section.SectionTag"
+    }
+  }, {
+    "type" : "TextSection",
+    "start" : 1014,
+    "end" : 1120,
+    "stanbol.enhancer.nlp.section.stats" : {
+      "value" : {
+        "numChars" : 106,
+        "numAlpha" : 82,
+        "numDigit" : 0,
+        "numWhitespace" : 21
+      },
+      "class" : "io.redlink.nlp.model.section.SectionStats"
+    },
+    "stanbol.enhancer.nlp.section" : {
+      "tag" : "p",
+      "section" : 2,
+      "class" : "io.redlink.nlp.model.section.SectionTag"
+    }
+  }, {
+    "type" : "TextSection",
+    "start" : 1124,
+    "end" : 1174,
+    "stanbol.enhancer.nlp.section.stats" : {
+      "value" : {
+        "numChars" : 50,
+        "numAlpha" : 42,
+        "numDigit" : 0,
+        "numWhitespace" : 7
+      },
+      "class" : "io.redlink.nlp.model.section.SectionStats"
+    },
+    "stanbol.enhancer.nlp.section" : {
+      "tag" : "p",
+      "section" : 2,
+      "class" : "io.redlink.nlp.model.section.SectionTag"
+    }
+  }, {
+    "type" : "TextSection",
+    "start" : 1178,
+    "end" : 1228,
+    "stanbol.enhancer.nlp.section.stats" : {
+      "value" : {
+        "numChars" : 50,
+        "numAlpha" : 39,
+        "numDigit" : 0,
+        "numWhitespace" : 6
+      },
+      "class" : "io.redlink.nlp.model.section.SectionStats"
+    },
+    "stanbol.enhancer.nlp.section" : {
+      "tag" : "p",
+      "section" : 2,
+      "class" : "io.redlink.nlp.model.section.SectionTag"
+    }
+  }, {
+    "type" : "TextSection",
+    "start" : 1231,
+    "end" : 1306,
+    "stanbol.enhancer.nlp.section.stats" : {
+      "value" : {
+        "numChars" : 75,
+        "numAlpha" : 64,
+        "numDigit" : 0,
+        "numWhitespace" : 10
+      },
+      "class" : "io.redlink.nlp.model.section.SectionStats"
+    },
+    "stanbol.enhancer.nlp.section" : {
+      "tag" : "p",
+      "section" : 2,
+      "class" : "io.redlink.nlp.model.section.SectionTag"
+    }
+  } ]
+}
