@@ -92,10 +92,10 @@ public class NegationProcessor extends Processor {
     @Autowired
     public NegationProcessor(Collection<NegationRule> rules){
         super("negation", "Negetaion Detector", Phase.negation);
+        negationRules = new HashMap<>();
         for(NegationRule nr : rules){
             addNegationRule(nr);
         }
-        negationRules = new HashMap<>();
     }
     
     @Override

@@ -76,7 +76,7 @@ public class LangdetectProcessorTest {
         }
         File testFilesFolder = new File(baseDir,"src/test/resources/testfiles");
         log.info("testfile folder: {}", testFilesFolder.getAbsolutePath());
-        Assert.assertTrue(testFilesFolder.isDirectory());
+        Assume.assumeTrue(testFilesFolder.isDirectory());
         log.info("Init test files");
         for(File langDir : testFilesFolder.listFiles()){
             if(langDir.isDirectory()){
