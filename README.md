@@ -163,3 +163,20 @@ first item (the highest probability and first added in case of multiple items wi
 
 Free use of this software is granted under the terms of the Apache License Version 2.0. See the [License](LICENSE.txt)
 for more details.
+
+### Considerations for the Stanford NLP Modules
+
+[Stanford Core NLP](https://stanfordnlp.github.io/CoreNLP/) is a GPLv3 licensed 
+language analysis tool suite that supports several languages.
+
+So please consider GPLv3 related requirements when using one of the modules
+that require Stanford Core NLP
+
+* `nlp-stanfordnlp`
+* `nlp-stanfordnlp-de`
+* `nlp-truecase-de`
+
+The code for those Modules is Licensed under Apache License Version 2.0. Actually
+using those modules requires GPLv3 licensed Dependencies.
+
+
