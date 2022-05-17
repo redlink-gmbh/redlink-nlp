@@ -97,7 +97,7 @@
         <spring.boot.version>2.5.4</spring.boot.version>
 
         <http.client.version>4.5.12</http.client.version>
-        <jackson.version>2.13.1</jackson.version>
+        <jackson.version>2.13.2.1</jackson.version>
 
         <solr.version>8.11.1</solr.version>
 
